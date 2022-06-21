@@ -12,7 +12,7 @@ namespace Langulus::Logger
 {
 
 	/// Scoped tabulator destruction															
-	ScopedTabs::~ScopedTabs() noexcept {
+	inline ScopedTabs::~ScopedTabs() noexcept {
 		while (mTabs > 0) {
 			--mTabs;
 			Instance << Untab;
@@ -280,7 +280,7 @@ namespace Langulus::Logger
 	template<class... T>
 	Interface& Append(T&&...arguments) noexcept {
 		if constexpr (sizeof...(arguments) > 0)
-			Instance << ... << ::std::forward<T>(arguments);
+			Instance << (... << ::std::forward<T>(arguments));
 		return *this;
 	}
 
@@ -292,69 +292,96 @@ namespace Langulus::Logger
 	template<class... T>
 	ScopedTabs Section(T&&...arguments) noexcept {
 		ScopedTabs tabs;
-		Interface << Bold << Info(arguments...) << tabs;
-		return Move(tabs);
+		Instance << Bold << Info(::std::forward<T>(arguments)...) << tabs;
+		return ::std::move(tabs);
 	}
 
-
+	/// Write a new-line error																	
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Error(T&&...) noexcept {
-
+	Interface& Error(T&&...arguments) noexcept {
+		return Line<Red | DefaultColor>(::std::forward<T>(arguments)...);
 	}
 
+	/// Write a new-line warning																
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Warning(T&&...) noexcept {
-
+	Interface& Warning(T&&...arguments) noexcept {
+		return Line<DarkYellow | DefaultColor>(::std::forward<T>(arguments)...);
 	}
 
+	/// Write a new-line with verbose information										
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Verbose(T&&...) noexcept {
-
+	Interface& Verbose(T&&...arguments) noexcept {
+		return Line<Gray | DefaultColor>(::std::forward<T>(arguments)...);
 	}
 
+	/// Write a new-line with information													
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Info(T&&...) noexcept {
-
+	Interface& Info(T&&...arguments) noexcept {
+		return Line<White | DefaultColor>(::std::forward<T>(arguments)...);
 	}
 
+	/// Write a new-line with a personal message											
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Message(T&&...) noexcept {
-
+	Interface& Message(T&&...arguments) noexcept {
+		return Line<DarkGreen | DefaultColor>(::std::forward<T>(arguments)...);
 	}
 
+	/// Write a new-line with special text													
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Special(T&&...) noexcept {
-
+	Interface& Special(T&&...arguments) noexcept {
+		return Line<Purple | DefaultColor>(::std::forward<T>(arguments)...);
 	}
 
+	/// Write a new-line with flow information											
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Flow(T&&...) noexcept {
-
+	Interface& Flow(T&&...arguments) noexcept {
+		return Line<Cyan | DefaultColor>(::std::forward<T>(arguments)...);
 	}
 
+	/// Write a new-line on user input														
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Input(T&&...) noexcept {
-
+	Interface& Input(T&&...arguments) noexcept {
+		return Line<Blue | DefaultColor>(::std::forward<T>(arguments)...);
 	}
 
+	/// Write a new-line with network message												
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& TCP(T&&...) noexcept {
-
+	Interface& Network(T&&...arguments) noexcept {
+		return Line<Yellow | DefaultColor>(::std::forward<T>(arguments)...);
 	}
 
+	/// Write a new-line with a message from OS											
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& UDP(T&&...) noexcept {
-
+	Interface& OS(T&&...arguments) noexcept {
+		return Line<DarkBlue | DefaultColor>(::std::forward<T>(arguments)...);
 	}
 
+	/// Write a new-line with an input prompt												
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& OS(T&&...) noexcept {
-
-	}
-
-	template<class... T>
-	Interface& Prompt(T&&...) noexcept {
-
+	Interface& Prompt(T&&...arguments) noexcept {
+		return Line<Green | DefaultColor>(::std::forward<T>(arguments)...);
 	}
 
 } // namespace Langulus::Logger

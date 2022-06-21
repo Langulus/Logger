@@ -82,13 +82,13 @@ namespace Langulus::Logger
 	/// Initialize logger together with the first include of the header			
 	Inner::InterfaceInitializer::InterfaceInitializer() {
 		if (NiftyCounter++ == 0)
-			new (&InstanceBuffer) Interface();
+			new (&Instance) Interface();
 	}
 
 	/// Destroy logger with the last destruction of the initializer				
 	Inner::InterfaceInitializer::~InterfaceInitializer() {
 		if (--NiftyCounter == 0)
-			reinterpret_cast<Interface&>(InstanceBuffer).~Interface();
+			Instance.~Interface();
 	}
 
 	/// Logger construction																		

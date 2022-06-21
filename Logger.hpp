@@ -194,7 +194,7 @@ namespace Langulus::Logger
 	///																								
 	extern Interface& Instance;
 
-	template<ColorState COLOR, class... T>
+	template<ColorState COLOR = DefaultColor|DefaultColor, class... T>
 	Interface& Line(T&&...) noexcept;
 	template<class... T>
 	Interface& Append(T&&...) noexcept;
