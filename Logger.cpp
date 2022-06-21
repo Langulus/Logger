@@ -6,13 +6,15 @@
 /// See LICENSE file, or https://www.gnu.org/licenses									
 ///																									
 #include "Logger.hpp"
-#include <ctime>
-#include <iomanip>
 #include <new>
 #include <type_traits>
 #include <syncstream>
 #include <iostream>
-#include <format>
+#include <chrono>
+
+using Clock = ::std::chrono::system_clock;
+using TimePoint = typename Clock::time_point;
+using ZonedTime = ::std::chrono::zoned_time<typename Clock::duration>;
 
 #ifdef _WIN32
 	// Shave it..																			
@@ -65,14 +67,6 @@ namespace Langulus::Logger
 	/// You can still use \t when writing it as string									
 	constexpr Token TabString = "|  ";
 
-	/// Scoped tabulator destruction															
-	ScopedTab::~ScopedTab() noexcept {
-		while (mTabs > 0) {
-			--mTabs;
-			Instance << Untab;
-		}
-	}
-
 
 	/// Schwarz counter pattern																
 	/// https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Nifty_Counter			
@@ -99,6 +93,7 @@ namespace Langulus::Logger
 
 	/// Logger construction																		
 	Interface::Interface() {
+		mColorStack.push({DefaultColor, DefaultColor});
 		#ifdef _WIN32
 			// Enable modern windows terminal ANSI/VT100 escape sequences	
 			// A bit slower, unfortunately											
@@ -123,40 +118,57 @@ namespace Langulus::Logger
 
 	/// A thread-safe write to std::cout													
 	/// https://www.modernescpp.com/index.php/synchronized-outputstreams			
-	void Interface::Write(const char8_t& character) const noexcept {
-		std::osyncstream(std::cout) << character;
+	void Interface::Write(const Letter& character) const noexcept {
+		::std::osyncstream(::std::cout) << character;
 	}
 
+	/// A thread-safe write to std::cout													
+	/// https://www.modernescpp.com/index.php/synchronized-outputstreams			
 	void Interface::Write(const Token& literalText) const noexcept {
-		std::osyncstream(std::cout) << literalText;
+		::std::osyncstream(::std::cout) << literalText;
 	}
 
-	void Interface::Write(const ::std::string& stdString) const noexcept {
-		std::osyncstream(std::cout) << stdString;
+	/// A thread-safe write to std::cout													
+	/// https://www.modernescpp.com/index.php/synchronized-outputstreams			
+	void Interface::Write(const Text& stdString) const noexcept {
+		::std::osyncstream(::std::cout) << stdString;
 	}
 
-	/// We can use this to convert from UTC to the local time zone as follows	
-	auto LocalTime(::std::chrono::system_clock::time_point const tp) {
-		return ::std::chrono::zoned_time {::std::chrono::current_zone(), tp};
+	/// Generate an exhaustive timestamp in the current system time zone			
+	///	@return the timestamp text															
+	Text A::Interface::GetAdvancedTime() noexcept {
+		try {
+			return ::std::format("{:%F %T %Z}", ZonedTime {
+				::std::chrono::current_zone(), Clock::now()
+			});
+		}
+		catch (...) {
+			return {};
+		}
 	}
 
-	/// The zoned_time value can be converted to a string using the new text	
-	/// formatting library and the std::format() function								
-	inline ::std::string AdvancedTime(auto tp) {
-		return ::std::format("{:%F %T %Z}", tp);
-	}
-
-	/// The zoned_time value can be converted to a string using the new text	
-	/// formatting library and the std::format() function								
-	inline ::std::string SimpleTime(auto tp) {
-		return ::std::format("{%T}", tp);
+	/// Generate a short timestamp in the current system time zone					
+	///	@return the timestamp text															
+	Text A::Interface::GetSimpleTime() noexcept {
+		try {
+			return ::std::format("{:%T}", ZonedTime {
+				::std::chrono::current_zone(), Clock::now()
+			});
+		}
+		catch (...) {
+			return {};
+		}
 	}
 
 	/// Execute a logger command																
+	///	@param c - the command to execute												
 	void Interface::Write(const Command& c) noexcept {
 		switch (c) {
 		case Command::Clear:
 			Write(Token {"\033c"});
+			break;
+		case Command::NewLine:
+			NewLine();
 			break;
 		case Command::Invert:
 			Write(Token {"\033[7m"});
@@ -174,15 +186,17 @@ namespace Langulus::Logger
 			Write(Token {"\033[0m"});
 			break;
 		case Command::Time:
-			Write(SimpleTime(LocalTime(::std::chrono::system_clock::now())));
+			Write(GetSimpleTime());
 			break;
 		case Command::ExactTime:
-			Write(AdvancedTime(LocalTime(::std::chrono::system_clock::now())));
+			Write(GetAdvancedTime());
 			break;
 		case Command::Pop:
-			mColorStack.pop();
-			SetForegroundColor(mColorStack.top().mForeground);
-			SetBackgroundColor(mColorStack.top().mBackground);
+			if (mColorStack.size() > 1) {
+				mColorStack.pop();
+				SetForegroundColor(mColorStack.top().mForeground);
+				SetBackgroundColor(mColorStack.top().mBackground);
+			}
 			break;
 		case Command::Push:
 			mColorStack.push(mColorStack.top());
@@ -196,24 +210,9 @@ namespace Langulus::Logger
 			break;
 		}
 
-		if (mExtension)
-			mExtension->Command(c);
-	}
-
-	void Interface::NewLine() const noexcept {
-
-	}
-
-	void Interface::SetForegroundColor(Color) noexcept {
-
-	}
-
-	void Interface::SetBackgroundColor(Color) noexcept {
-
-	}
-
-	void Interface::Tabulate() const noexcept {
-
+		// Dispatch																			
+		for (auto attachment : mAttachments)
+			attachment->Write(c);
 	}
 
 	/// Remove formatting, add a new line, add a timestamp and tabulate			
@@ -225,128 +224,52 @@ namespace Langulus::Logger
 		// Add timestamp																	
 		Command(Time);
 		// Add a separator for the timestamp										
-		Write(Token {"| "});
+		Write(TabString);
 		// Tabulate																			
 		Tabulate();
 
-
-		if (mExtension)
-			mExtension->NewLine();
-		return *this;
+		// Dispatch																			
+		for (auto attachment : mAttachments)
+			attachment->NewLine();
 	}
 
-	/// Insert tabs																				
+	/// Set foreground color																	
+	///	@param c - the color to set														
+	void Interface::SetForegroundColor(Color c) noexcept {
+		mColorStack.top().mForeground = c;
+		Write(GetColorCode(mColorStack.top()));
+	}
+
+	/// Set background color																	
+	///	@param c - the color to set														
+	void Interface::SetBackgroundColor(Color c) noexcept {
+		mColorStack.top().mBackground = c;
+		Write(GetColorCode(mColorStack.top()));
+	}
+
+	/// Insert current tabs																		
 	void Interface::Tabulate() const noexcept {
 		auto tabs = mTabulator;
-		Write(GetColorCode(Gray, DefaultColor));
+		Write(GetColorCode(mTabColor));
 		while (tabs > 0) {
 			Write(TabString);
 			--tabs;
 		}
+		Write(GetColorCode(mColorStack.top()));
 	}
 
-	/// Attach a receiver log to the logger. Unsafe.									
-	void Interface::Attach(Interface* receiver) noexcept {
-		if (receiver)
-			return;
-
-		auto log = this;
-		while (log->mExtension)
-			log = log->mExtension;
-		
-		log->mExtension = receiver;
+	/// Attach another logger, such as an html file										
+	///	@attention the logger doesn't have ownership of the attachment			
+	///	@param receiver - the logger to attach											
+	void Interface::Attach(A::Interface* receiver) noexcept {
+		mAttachments.push_back(receiver);
 	}
 
-	/// Dettach a receiver log. Unsafe.														
-	void Interface::Dettach(Interface* receiver) noexcept {
-		if (receiver)
-			return;
-
-		auto log = this;
-		while (log->mExtension && log->mExtension != receiver)
-			log = log->mExtension;
-
-		if (!log->mExtension)
-			return;
+	/// Dettach a logger 																		
+	///	@attention the logger doesn't have ownership of the attachment			
+	///	@param receiver - the logger to dettach										
+	void Interface::Dettach(A::Interface* receiver) noexcept {
+		mAttachments.remove(receiver);
 	}
-
-	/// Colorize																					
-	///	@return a reference to the logger for chaining								
-	/*LoggerSystem& LoggerSystem::operator << (const ConsoleColor item) {
-		return SetForegroundColor(item);
-	}
-
-	/// Push a command																			
-	///	@return a reference to the logger for chaining								
-	LoggerSystem& LoggerSystem::operator << (const ConsoleCommand item) {
-		return Command(item);
-	}
-
-	/// Push a byte count																		
-	///	@return a reference to the logger for chaining								
-	LoggerSystem& LoggerSystem::operator << (const ByteCount& item) {
-		const auto asLiteral = item.GetLiteral();
-		return Write(LiteralText(asLiteral));
-	}
-
-	/// Push literal																				
-	///	@return a reference to the logger for chaining								
-	LoggerSystem& LoggerSystem::operator << (const LiteralText& item) {
-		return Write(item);
-	}
-
-	/// Push std::string																			
-	///	@return a reference to the logger for chaining								
-	LoggerSystem& LoggerSystem::operator << (const std::string& item) {
-		return Write(item.c_str());
-	}
-
-	/// Push literal																				
-	///	@return a reference to the logger for chaining								
-	LoggerSystem& LoggerSystem::operator << (const char* item) {
-		return Write(item);
-	}
-
-	/// Push character																			
-	///	@return a reference to the logger for chaining								
-	LoggerSystem& LoggerSystem::operator << (const char item) {
-		return Write(item);
-	}
-
-	/// Push boolean																				
-	///	@return a reference to the logger for chaining								
-	LoggerSystem& LoggerSystem::operator << (const bool item) {
-		return Write(item? LiteralText("yes") : LiteralText("no"));
-	}
-
-	/// Push hash																					
-	///	@return a reference to the logger for chaining								
-	LoggerSystem& LoggerSystem::operator << (const Hash& item) {
-		return Write(LiteralText(pcToHex(item)));
-	}
-
-	/// Operator for using logging calls as push operators, too						
-	///	@return a reference to the logger for chaining								
-	LoggerSystem& LoggerSystem::operator << (const LoggerSystem&) {
-		return *this;
-	}
-
-	/// Push a tabulator. Modifies internal counter for tabulator					
-	/// This allows the use of scoped tabulators that untab on function exit	
-	///	@return a reference to the logger for chaining								
-	LoggerSystem& LoggerSystem::operator << (Tab& tabulator) {
-		Command(ConsoleCommand::ccTab);
-		++tabulator.mTabs;
-		return *this;
-	}
-
-	/// Log a void pointer by writing a hex												
-	///	@param pointer - the pointer to log												
-	///	@return a reference to the logger for chaining								
-	LoggerSystem& LoggerSystem::operator << (const void* pointer) {
-		if (!pointer)
-			return (*this) << ccPush << ccRed << "null" << ccPop;
-		return (*this) << Hash(pcP2N(pointer));
-	}*/
 
 } // namespace Langulus::Logger

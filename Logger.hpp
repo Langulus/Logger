@@ -9,10 +9,29 @@
 #include <stack>
 #include <list>
 #include <string_view>
+#include <string>
+#include <format>
 
 namespace Langulus::Logger
 {
-	using Token = ::std::string_view;
+	using Letter = char;
+	using Token = ::std::basic_string_view<Letter>;
+	using Text = ::std::basic_string<Letter>;
+}
+
+namespace Langulus::CT
+{
+	/// Check if a type can be used with std::format									
+	template<class T>
+	concept Formattable = ::std::_Has_const_formatter<T, 
+		::std::basic_format_context<
+			::std::back_insert_iterator<
+				::std::_Fmt_buffer<::Langulus::Logger::Letter>>,
+			::Langulus::Logger::Letter>>;
+}
+
+namespace Langulus::Logger
+{
 
 	/// Color codes, consistent with ANSI/VT100 escapes								
 	enum Color {
@@ -37,10 +56,21 @@ namespace Langulus::Logger
 		ColorCounter
 	};
 
+	/// A pair of a foreground and background color										
+	struct ColorState {
+		Color mForeground;
+		Color mBackground;
+	};
+
+	constexpr ColorState operator | (Color&& fg, Color&& bg) noexcept {
+		return { fg, bg };
+	}
+
 	/// Console commands																			
 	/// You can << these as easily as text													
 	enum Command {
 		Clear = ColorCounter,			// Clear the console						
+		NewLine,		// Write a new line, with a timestamp and tabulation	
 		Pop,			// Pop the color state											
 		Push,			// Push the color state											
 		Invert,		// Inverts background and foreground colors				
@@ -55,17 +85,21 @@ namespace Langulus::Logger
 	};
 
 	/// Tabulation marker (can be pushed to log)											
-	struct Tab {
-		constexpr Tab() noexcept = default;
-		constexpr Tab(const Tab&) = default;
-		constexpr Tab(int tabs) : mTabs(tabs) {}
+	struct Tabs {
 		int mTabs = 0;
+
+		constexpr Tabs() noexcept = default;
+		constexpr Tabs(const Tabs&) noexcept = default;
+		constexpr Tabs(Tabs&& other) noexcept
+			: mTabs{other.mTabs} { other.mTabs = 0; }
+		constexpr Tabs(int tabs) noexcept
+			: mTabs{tabs} {}
 	};
 
 	/// Scoped tabulation marker that restores tabbing when destroyed				
-	struct ScopedTab : public Tab {
-		using Tab::Tab;
-		~ScopedTab() noexcept;
+	struct ScopedTabs : public Tabs {
+		using Tabs::Tabs;
+		~ScopedTabs() noexcept;
 	};
 
 	namespace Inner
@@ -77,51 +111,82 @@ namespace Langulus::Logger
 		} InterfaceInitializerInstance;
 	}
 
+	namespace A
+	{
+		///																							
+		///	The abstract logger interface - override this to define an			
+		///	attachment																			
+		///																							
+		class Interface {
+		public:
+			static constexpr Token GetColorCode(const ColorState&) noexcept;
+			static constexpr Token GetFunctionName(const Token&) noexcept;
+			static Text GetAdvancedTime() noexcept;
+			static Text GetSimpleTime() noexcept;
+
+			virtual void Write(const Letter&) const noexcept = 0;
+			virtual void Write(const Token&) const noexcept = 0;
+			virtual void Write(const Text&) const noexcept = 0;
+			virtual void Write(const Command&) noexcept = 0;
+			virtual void NewLine() const noexcept = 0;
+			virtual void SetForegroundColor(Color) noexcept = 0;
+			virtual void SetBackgroundColor(Color) noexcept = 0;
+			virtual void Tabulate() const noexcept = 0;
+
+			/// Implicit bool operator in order to use log in 'if' statements		
+			/// Example: if (condition && Logger::Info("stuff"))						
+			///	@return true																	
+			constexpr operator bool() const noexcept {
+				return true;
+			}
+
+			Interface& operator << (const Interface&) noexcept;
+			Interface& operator << (const Command&) noexcept;
+			Interface& operator << (const Color&) noexcept;
+			Interface& operator << (const ColorState&) noexcept;
+			Interface& operator << (const Tabs&) noexcept;
+			Interface& operator << (Tabs&) noexcept;
+
+			template<CT::Formattable T>
+			Interface& operator << (const T&) const noexcept;
+		};
+	}
+
 
 	///																								
 	///	The main logger interface															
 	///																								
-	///	Supports colors, formatting commands, and can relay messages to a		
+	/// Supports colors, formatting commands, and can relay messages to a		
 	/// list of attachments																		
 	///																								
-	class Interface {
+	class Interface : public A::Interface {
 	friend class Inner::InterfaceInitializer;
 	private:
 		// Color stack																		
-		struct ColorState {
-			Color mForeground;
-			Color mBackground;
-		};
-
 		::std::stack<ColorState> mColorStack;
-
 		// Number of tabulations														
 		size_t mTabulator = 0;
-
+		// Tabulator color																
+		ColorState mTabColor {Gray, DefaultColor};
 		// Attachments																		
-		::std::list<Interface*> mAttachments;
+		::std::list<A::Interface*> mAttachments;
 
+	private:
 		Interface();
 		~Interface();
 
-		static constexpr Token GetColorCode(Color, Color) noexcept;
-		static constexpr Token GetFunctionName(const Token&) noexcept;
-
-		void Write(const char8_t&) const noexcept;
-		void Write(const Token&) const noexcept;
-		void Write(const ::std::string&) const noexcept;
-		void Write(const Command&) noexcept;
-		void NewLine() const noexcept;
-		void SetForegroundColor(Color) noexcept;
-		void SetBackgroundColor(Color) noexcept;
-		void Tabulate() const noexcept;
+		void Write(const Letter&) const noexcept final;
+		void Write(const Token&) const noexcept final;
+		void Write(const Text&) const noexcept final;
+		void Write(const Command&) noexcept final;
+		void NewLine() const noexcept final;
+		void SetForegroundColor(Color) noexcept final;
+		void SetBackgroundColor(Color) noexcept final;
+		void Tabulate() const noexcept final;
 
 	public:
-		void Attach(Interface*) noexcept;
-		void Dettach(Interface*) noexcept;
-
-		template<class T>
-		Interface& operator << (const T&) noexcept;
+		void Attach(A::Interface*) noexcept;
+		void Dettach(A::Interface*) noexcept;
 	};
 
 	///																								
@@ -129,93 +194,38 @@ namespace Langulus::Logger
 	///																								
 	extern Interface& Instance;
 
+	template<ColorState COLOR, class... T>
+	Interface& Line(T&&...) noexcept;
 	template<class... T>
-	Interface& Error(T...) noexcept;
+	Interface& Append(T&&...) noexcept;
+
 	template<class... T>
-	Interface& Warning(T...) noexcept;
+	ScopedTabs Section(T&&...) noexcept;
+
 	template<class... T>
-	Interface& Verbose(T...) noexcept;
-
-	/// Concept for stuff that is integrated to logger by default					
-	/*template<typename T>
-	concept NotLogSpecific = 
-		!( Same<T, LoggerSystem> || Same<T, ConsoleColor>
-		|| Same<T, ConsoleCommand> || Same<T, LiteralText> || Same<T, std::string>
-		|| Same<T, Hash> || Same<T, ByteCount> || Boolean<T> || Character<T>
-		|| Same<T, Tab> || Same<T, ScopedTab> || Number<T>
-		|| (Same<T, void> && Sparse<T>));
-
-
-	///																								
-	///	LOGGER																					
-	///																								
-	///																								
-	class PC_API_LOG LoggerSystem {
-	public:
-		static LoggerSystem* CreateInstance();
-		static LoggerSystem* GetInstance();
-		
-		NOD() static constexpr LiteralText GetColorCode(ConsoleColor, ConsoleColor);
-		NOD() static constexpr LiteralText GetFunctionName(const LiteralText&);
-
-
-
-		/// Implicit bool operator in order to use log in IF statements			
-		constexpr operator bool() const noexcept { return true; }
-
-		LoggerSystem& operator << (const ConsoleColor);
-		LoggerSystem& operator << (const ConsoleCommand);
-		LoggerSystem& operator << (const ByteCount&);
-		LoggerSystem& operator << (const LiteralText&);
-		LoggerSystem& operator << (const std::string&);
-		LoggerSystem& operator << (const std::wstring&);
-		LoggerSystem& operator << (const char*);
-		LoggerSystem& operator << (const wchar_t*);
-		LoggerSystem& operator << (const char8*);
-		LoggerSystem& operator << (const charw*);
-		LoggerSystem& operator << (char);
-		LoggerSystem& operator << (wchar_t);
-		LoggerSystem& operator << (char8);
-		LoggerSystem& operator << (charw);
-		LoggerSystem& operator << (bool);
-		LoggerSystem& operator << (const Hash&);
-		LoggerSystem& operator << (const LoggerSystem&);
-		LoggerSystem& operator << (Tab&);
-		LoggerSystem& operator << (const void*);
-		template<Number T>
-		LoggerSystem& operator << (const T&);
-
-		/// This operator is intentionally left undefined - if you want to log	
-		/// custom types, you'll have to define it										
-		template<NotLogSpecific T>
-		LoggerSystem& operator << (const T&);
-
-	private:
-		static constexpr pcptr ColorCacheSize = 32;
-
-		// Cached colors																	
-		struct ColorState {
-			ConsoleColor mForeground = ConsoleColor::ccDefaultColor;
-			ConsoleColor mBackground = ConsoleColor::ccDefaultColor;
-		};
-
-		ColorState mColorCache[ColorCacheSize] = {};
-
-		// Current position in color cache											
-		pcptr mColorIndex = 0;
-
-		// Number of tabulations														
-		pcptr mTabulator = 0;
-
-		// Log relay																		
-		LoggerSystem* mExtension = nullptr;
-
-		// Will be prepended																
-
-	private:
-		LoggerSystem();
-		~LoggerSystem() = default;
-	};*/
+	Interface& Error(T&&...) noexcept;
+	template<class... T>
+	Interface& Warning(T&&...) noexcept;
+	template<class... T>
+	Interface& Verbose(T&&...) noexcept;
+	template<class... T>
+	Interface& Info(T&&...) noexcept;
+	template<class... T>
+	Interface& Message(T&&...) noexcept;
+	template<class... T>
+	Interface& Special(T&&...) noexcept;
+	template<class... T>
+	Interface& Flow(T&&...) noexcept;
+	template<class... T>
+	Interface& Input(T&&...) noexcept;
+	template<class... T>
+	Interface& TCP(T&&...) noexcept;
+	template<class... T>
+	Interface& UDP(T&&...) noexcept;
+	template<class... T>
+	Interface& OS(T&&...) noexcept;
+	template<class... T>
+	Interface& Prompt(T&&...) noexcept;
 
 } // namespace Langulus::Logger
 

@@ -11,13 +11,21 @@
 namespace Langulus::Logger
 {
 
+	/// Scoped tabulator destruction															
+	ScopedTabs::~ScopedTabs() noexcept {
+		while (mTabs > 0) {
+			--mTabs;
+			Instance << Untab;
+		}
+	}
+
 	/// Convert a logger color to an ANSI/VT100 escape code							
 	///	@param foreground - the foreground color										
 	///	@param background - the background color										
 	///	@return the combined escape sequence											
-	constexpr Token Interface::GetColorCode(Color foreground, Color background) noexcept {
+	constexpr Token A::Interface::GetColorCode(const ColorState& state) noexcept {
 		const Token colorCode[ColorCounter][ColorCounter] = {
-			{ // ConsoleColor::None														
+			{ // ConsoleColor::Defaul													
 				"\033[[1;39;49m",
 				"\033[[1;39;40m", "\033[[1;39;44m", "\033[[1;39;42m", "\033[[1;39;46m",
 				"\033[[1;39;41m", "\033[[1;39;45m", "\033[[1;39;43m", "\033[[1;39;47m",
@@ -138,14 +146,14 @@ namespace Langulus::Logger
 			},
 		};
 
-		return colorCode[foreground][background];
+		return colorCode[state.mForeground][state.mBackground];
 	}
 
 	/// Analyzes text returned by LANGULUS_FUNCTION() in order to isolate the	
 	/// relevant part for logging																
 	///	@param text - the text to scan													
 	///	@return the interesting part														
-	constexpr Token Interface::GetFunctionName(const Token& text) noexcept {
+	constexpr Token A::Interface::GetFunctionName(const Token& text) noexcept {
 		size_t length = text.size();
 		size_t start = 0;
 		size_t end = 0;
@@ -193,58 +201,160 @@ namespace Langulus::Logger
 		return text.substr(start, end - start);
 	}
 
-	/// Log numbers																				
-	///	@param item - the number to log													
+	/// Does nothing, but allows for grouping logging statements in ()			
+	/// Example: Logger::Error() << "yeah" << (Logger::Info() << "no")			
 	///	@return a reference to the logger for chaining								
-	/*template<Number T>
-	LoggerSystem& LoggerSystem::operator << (const T& item) {
-		if constexpr (Dense<T>) {
-			// Log a number with minimal memory overhead							
-			// This is more of an optimization than anything else				
-			if constexpr (RealNumber<T>) {
-				// Stringify a real number												
-				constexpr auto size = std::numeric_limits<T>::max_digits10 * 2;
-				char temp[size];
-				auto [lastChar, errorCode] = std::to_chars(
-					temp, temp + size, item, std::chars_format::general);
-				if (errorCode != std::errc())
-					return *this;
-
-				while ((*lastChar == '0' || *lastChar == '.') && lastChar > temp) {
-					if (*lastChar == '.')
-						break;
-					--lastChar;
-				}
-
-				const auto copied = pcP2N(lastChar) - pcP2N(temp);
-				Write(LiteralText(temp, copied));
-			}
-			else if constexpr (IntegerNumber<T>) {
-				// Stringify an integer													
-				constexpr auto size = std::numeric_limits<T>::digits10 * 2;
-				char temp[size];
-				auto [lastChar, errorCode] = std::to_chars(
-					temp, temp + size, item);
-				if (errorCode != std::errc())
-					return *this;
-
-				const auto copied = pcP2N(lastChar) - pcP2N(temp);
-				Write(LiteralText(temp, copied));
-			}
-			else if constexpr (CustomNumber<T>) {
-				// Stringify a custom number											
-				LoggerSystem::operator << (item.GetBuiltinNumber());
-			}
-			else LANGULUS_ASSERT("Unsupported number type");
-		}
-		else {
-			// Log sparse number by dereferencing									
-			if (!item)
-				return *this << ccPush << ccRed << "null" << ccPop;
-			*this << *item;
-		}
-
+	inline A::Interface& A::Interface::operator << (const Interface&) noexcept {
 		return *this;
-	}*/
+	}
+
+	/// Push a command																			
+	///	@param c - the command to push													
+	///	@return a reference to the logger for chaining								
+	inline A::Interface& A::Interface::operator << (const Command& c) noexcept {
+		Write(c);
+		return *this;
+	}
+
+	/// Push a foreground color																
+	///	@param c - the command to push													
+	///	@return a reference to the logger for chaining								
+	inline A::Interface& A::Interface::operator << (const Color& c) noexcept {
+		SetForegroundColor(c);
+		return *this;
+	}
+
+	/// Push a foreground and background color											
+	///	@param c - the state to push														
+	///	@return a reference to the logger for chaining								
+	inline A::Interface& A::Interface::operator << (const ColorState& c) noexcept {
+		SetForegroundColor(c.mForeground);
+		SetBackgroundColor(c.mBackground);
+		return *this;
+	}
+
+	/// Push a number of tabs, scoped or not												
+	///	@param t - the tabs to push														
+	///	@return a reference to the logger for chaining								
+	inline A::Interface& A::Interface::operator << (const Tabs& t) noexcept {
+		Command(Tab);
+		return *this;
+	}
+
+	/// Push a number of tabs, scoped or not												
+	/// Keeps track of the number of tabs that have been pushed, and then		
+	/// automatically untabs when the Tabs object is destroyed						
+	///	@param t - [in/out] the tabs to push											
+	///	@return a reference to the logger for chaining								
+	inline A::Interface& A::Interface::operator << (Tabs& t) noexcept {
+		Command(Tab);
+		++t.mTabs;
+		return *this;
+	}
+
+	/// Stringify anything that has a valid std::formatter							
+	///	@param anything - type type to stringify										
+	///	@return a reference to the logger for chaining								
+	template<CT::Formattable T>
+	A::Interface& A::Interface::operator << (const T& anything) const noexcept {
+		try {
+			Write(::std::format("{}", anything));
+		}
+		catch (...) {}
+		return *this;
+	}
+
+	/// A general new-line write function with color									
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
+	template<ColorState COLOR, class... T>
+	Interface& Line(T&&...arguments) noexcept {
+		if constexpr (sizeof...(arguments) > 0)
+			Instance << NewLine << COLOR << (... << ::std::forward<T>(arguments));
+		return *this;
+	}
+
+	/// A general same-line write function with color									
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
+	template<class... T>
+	Interface& Append(T&&...arguments) noexcept {
+		if constexpr (sizeof...(arguments) > 0)
+			Instance << ... << ::std::forward<T>(arguments);
+		return *this;
+	}
+
+	/// Write a section on a new line, tab all consecutive lines, bold it,		
+	/// and return the scoped tabs, that will be	untabbed automatically at the	
+	/// scope's end																				
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a scoped tab																	
+	template<class... T>
+	ScopedTabs Section(T&&...arguments) noexcept {
+		ScopedTabs tabs;
+		Interface << Bold << Info(arguments...) << tabs;
+		return Move(tabs);
+	}
+
+
+	template<class... T>
+	Interface& Error(T&&...) noexcept {
+
+	}
+
+	template<class... T>
+	Interface& Warning(T&&...) noexcept {
+
+	}
+
+	template<class... T>
+	Interface& Verbose(T&&...) noexcept {
+
+	}
+
+	template<class... T>
+	Interface& Info(T&&...) noexcept {
+
+	}
+
+	template<class... T>
+	Interface& Message(T&&...) noexcept {
+
+	}
+
+	template<class... T>
+	Interface& Special(T&&...) noexcept {
+
+	}
+
+	template<class... T>
+	Interface& Flow(T&&...) noexcept {
+
+	}
+
+	template<class... T>
+	Interface& Input(T&&...) noexcept {
+
+	}
+
+	template<class... T>
+	Interface& TCP(T&&...) noexcept {
+
+	}
+
+	template<class... T>
+	Interface& UDP(T&&...) noexcept {
+
+	}
+
+	template<class... T>
+	Interface& OS(T&&...) noexcept {
+
+	}
+
+	template<class... T>
+	Interface& Prompt(T&&...) noexcept {
+
+	}
 
 } // namespace Langulus::Logger
