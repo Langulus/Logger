@@ -15,138 +15,8 @@ namespace Langulus::Logger
 	inline ScopedTabs::~ScopedTabs() noexcept {
 		while (mTabs > 0) {
 			--mTabs;
-			Instance << Untab;
+			Instance << Command::Untab;
 		}
-	}
-
-	/// Convert a logger color to an ANSI/VT100 escape code							
-	///	@param foreground - the foreground color										
-	///	@param background - the background color										
-	///	@return the combined escape sequence											
-	constexpr Token A::Interface::GetColorCode(const ColorState& state) noexcept {
-		const Token colorCode[ColorCounter][ColorCounter] = {
-			{ // ConsoleColor::Defaul													
-				"\033[[1;39;49m",
-				"\033[[1;39;40m", "\033[[1;39;44m", "\033[[1;39;42m", "\033[[1;39;46m",
-				"\033[[1;39;41m", "\033[[1;39;45m", "\033[[1;39;43m", "\033[[1;39;47m",
-				"\033[[1;39;47m", "\033[[1;39;44m", "\033[[1;39;42m", "\033[[1;39;46m",
-				"\033[[1;39;41m", "\033[[1;39;45m", "\033[[1;39;43m", "\033[[1;39;47m"
-			}, 
-			{ // ConsoleColor::Black													
-				"\033[[0;30;49m",
-				"\033[[0;30;40m", "\033[[0;30;44m", "\033[[0;30;42m", "\033[[0;30;46m",
-				"\033[[0;30;41m", "\033[[0;30;45m", "\033[[0;30;43m", "\033[[0;30;47m",
-				"\033[[0;30;47m", "\033[[0;30;44m", "\033[[0;30;42m", "\033[[0;30;46m",
-				"\033[[0;30;41m", "\033[[0;30;45m", "\033[[0;30;43m", "\033[[0;30;47m"
-			}, 
-			{ // ConsoleColor::DarkBlue												
-				"\033[[0;34;49m",
-				"\033[[0;34;40m", "\033[[0;34;44m", "\033[[0;34;42m", "\033[[0;34;46m",
-				"\033[[0;34;41m", "\033[[0;34;45m", "\033[[0;34;43m", "\033[[0;34;47m",
-				"\033[[0;34;47m", "\033[[0;34;44m", "\033[[0;34;42m", "\033[[0;34;46m",
-				"\033[[0;34;41m", "\033[[0;34;45m", "\033[[0;34;43m", "\033[[0;34;47m"
-			},
-			{ // ConsoleColor::DarkGreen												
-				"\033[[0;32;49m",
-				"\033[[0;32;40m", "\033[[0;32;44m", "\033[[0;32;42m", "\033[[0;32;46m",
-				"\033[[0;32;41m", "\033[[0;32;45m", "\033[[0;32;43m", "\033[[0;32;47m",
-				"\033[[0;32;47m", "\033[[0;32;44m", "\033[[0;32;42m", "\033[[0;32;46m",
-				"\033[[0;32;41m", "\033[[0;32;45m", "\033[[0;32;43m", "\033[[0;32;47m"
-			},
-			{ // ConsoleColor::DarkCyan												
-				"\033[[0;36;49m",
-				"\033[[0;36;40m", "\033[[0;36;44m", "\033[[0;36;42m", "\033[[0;36;46m",
-				"\033[[0;36;41m", "\033[[0;36;45m", "\033[[0;36;43m", "\033[[0;36;47m",
-				"\033[[0;36;47m", "\033[[0;36;44m", "\033[[0;36;42m", "\033[[0;36;46m",
-				"\033[[0;36;41m", "\033[[0;36;45m", "\033[[0;36;43m", "\033[[0;36;47m"
-			},
-			{ // ConsoleColor::DarkRed													
-				"\033[[0;31;49m",
-				"\033[[0;31;40m", "\033[[0;31;44m", "\033[[0;31;42m", "\033[[0;31;46m",
-				"\033[[0;31;41m", "\033[[0;31;45m", "\033[[0;31;43m", "\033[[0;31;47m",
-				"\033[[0;31;47m", "\033[[0;31;44m", "\033[[0;31;42m", "\033[[0;31;46m",
-				"\033[[0;31;41m", "\033[[0;31;45m", "\033[[0;31;43m", "\033[[0;31;47m"
-			},
-			{ // ConsoleColor::DarkPurple												
-				"\033[[0;35;49m",
-				"\033[[0;35;40m", "\033[[0;35;44m", "\033[[0;35;42m", "\033[[0;35;46m",
-				"\033[[0;35;41m", "\033[[0;35;45m", "\033[[0;35;43m", "\033[[0;35;47m",
-				"\033[[0;35;47m", "\033[[0;35;44m", "\033[[0;35;42m", "\033[[0;35;46m",
-				"\033[[0;35;41m", "\033[[0;35;45m", "\033[[0;35;43m", "\033[[0;35;47m"
-			},
-			{ // ConsoleColor::DarkYellow												
-				"\033[[0;33;49m",
-				"\033[[0;33;40m", "\033[[0;33;44m", "\033[[0;33;42m", "\033[[0;33;46m",
-				"\033[[0;33;41m", "\033[[0;33;45m", "\033[[0;33;43m", "\033[[0;33;47m",
-				"\033[[0;33;47m", "\033[[0;33;44m", "\033[[0;33;42m", "\033[[0;33;46m",
-				"\033[[0;33;41m", "\033[[0;33;45m", "\033[[0;33;43m", "\033[[0;33;47m"
-			},
-			{ // ConsoleColor::DarkWhite												
-				"\033[[0;37;49m",
-				"\033[[0;37;40m", "\033[[0;37;44m", "\033[[0;37;42m", "\033[[0;37;46m",
-				"\033[[0;37;41m", "\033[[0;37;45m", "\033[[0;37;43m", "\033[[0;37;47m",
-				"\033[[0;37;47m", "\033[[0;37;44m", "\033[[0;37;42m", "\033[[0;37;46m",
-				"\033[[0;37;41m", "\033[[0;37;45m", "\033[[0;37;43m", "\033[[0;37;47m"
-			},
-			{ // ConsoleColor::Gray														
-				"\033[[1;30;49m",
-				"\033[[1;30;40m", "\033[[1;30;44m", "\033[[1;30;42m", "\033[[1;30;46m",
-				"\033[[1;30;41m", "\033[[1;30;45m", "\033[[1;30;43m", "\033[[1;30;47m",
-				"\033[[1;30;47m", "\033[[1;30;44m", "\033[[1;30;42m", "\033[[1;30;46m",
-				"\033[[1;30;41m", "\033[[1;30;45m", "\033[[1;30;43m", "\033[[1;30;47m"
-			},
-			{ // ConsoleColor::Blue														
-				"\033[[1;34;49m",
-				"\033[[1;34;40m", "\033[[1;34;44m", "\033[[1;34;42m", "\033[[1;34;46m",
-				"\033[[1;34;41m", "\033[[1;34;45m", "\033[[1;34;43m", "\033[[1;34;47m",
-				"\033[[1;34;47m", "\033[[1;34;44m", "\033[[1;34;42m", "\033[[1;34;46m",
-				"\033[[1;34;41m", "\033[[1;34;45m", "\033[[1;34;43m", "\033[[1;34;47m"
-			},
-			{ // ConsoleColor::Green													
-				"\033[[1;32;49m",
-				"\033[[1;32;40m", "\033[[1;32;44m", "\033[[1;32;42m", "\033[[1;32;46m",
-				"\033[[1;32;41m", "\033[[1;32;45m", "\033[[1;32;43m", "\033[[1;32;47m",
-				"\033[[1;32;47m", "\033[[1;32;44m", "\033[[1;32;42m", "\033[[1;32;46m",
-				"\033[[1;32;41m", "\033[[1;32;45m", "\033[[1;32;43m", "\033[[1;32;47m"
-			},
-			{ // ConsoleColor::Cyan														
-				"\033[[1;36;49m",
-				"\033[[1;36;40m", "\033[[1;36;44m", "\033[[1;36;42m", "\033[[1;36;46m",
-				"\033[[1;36;41m", "\033[[1;36;45m", "\033[[1;36;43m", "\033[[1;36;47m",
-				"\033[[1;36;47m", "\033[[1;36;44m", "\033[[1;36;42m", "\033[[1;36;46m",
-				"\033[[1;36;41m", "\033[[1;36;45m", "\033[[1;36;43m", "\033[[1;36;47m"
-			},
-			{ // ConsoleColor::Red														
-				"\033[[1;31;49m",
-				"\033[[1;31;40m", "\033[[1;31;44m", "\033[[1;31;42m", "\033[[1;31;46m",
-				"\033[[1;31;41m", "\033[[1;31;45m", "\033[[1;31;43m", "\033[[1;31;47m",
-				"\033[[1;31;47m", "\033[[1;31;44m", "\033[[1;31;42m", "\033[[1;31;46m",
-				"\033[[1;31;41m", "\033[[1;31;45m", "\033[[1;31;43m", "\033[[1;31;47m"
-			},
-			{ // ConsoleColor::Purple													
-				"\033[[1;35;49m",
-				"\033[[1;35;40m", "\033[[1;35;44m", "\033[[1;35;42m", "\033[[1;35;46m",
-				"\033[[1;35;41m", "\033[[1;35;45m", "\033[[1;35;43m", "\033[[1;35;47m",
-				"\033[[1;35;47m", "\033[[1;35;44m", "\033[[1;35;42m", "\033[[1;35;46m",
-				"\033[[1;35;41m", "\033[[1;35;45m", "\033[[1;35;43m", "\033[[1;35;47m"
-			},
-			{ // ConsoleColor::Yellow													
-				"\033[[1;33;49m",
-				"\033[[1;33;40m", "\033[[1;33;44m", "\033[[1;33;42m", "\033[[1;33;46m",
-				"\033[[1;33;41m", "\033[[1;33;45m", "\033[[1;33;43m", "\033[[1;33;47m",
-				"\033[[1;33;47m", "\033[[1;33;44m", "\033[[1;33;42m", "\033[[1;33;46m",
-				"\033[[1;33;41m", "\033[[1;33;45m", "\033[[1;33;43m", "\033[[1;33;47m"
-			},
-			{ // ConsoleColor::White													
-				"\033[[1;37;49m",
-				"\033[[1;37;40m", "\033[[1;37;44m", "\033[[1;37;42m", "\033[[1;37;46m",
-				"\033[[1;37;41m", "\033[[1;37;45m", "\033[[1;37;43m", "\033[[1;37;47m",
-				"\033[[1;37;47m", "\033[[1;37;44m", "\033[[1;37;42m",	"\033[[1;37;46m",
-				"\033[[1;37;41m", "\033[[1;37;45m", "\033[[1;37;43m", "\033[[1;37;47m"
-			},
-		};
-
-		return colorCode[state.mForeground][state.mBackground];
 	}
 
 	/// Analyzes text returned by LANGULUS_FUNCTION() in order to isolate the	
@@ -204,7 +74,7 @@ namespace Langulus::Logger
 	/// Does nothing, but allows for grouping logging statements in ()			
 	/// Example: Logger::Error() << "yeah" << (Logger::Info() << "no")			
 	///	@return a reference to the logger for chaining								
-	inline A::Interface& A::Interface::operator << (const Interface&) noexcept {
+	inline A::Interface& A::Interface::operator << (A::Interface&) noexcept {
 		return *this;
 	}
 
@@ -220,16 +90,23 @@ namespace Langulus::Logger
 	///	@param c - the command to push													
 	///	@return a reference to the logger for chaining								
 	inline A::Interface& A::Interface::operator << (const Color& c) noexcept {
-		SetForegroundColor(c);
+		Write(c);
+		return *this;
+	}
+
+	/// Push an emphasis																			
+	///	@param e - the emphasis to push													
+	///	@return a reference to the logger for chaining								
+	inline A::Interface& A::Interface::operator << (const Emphasis& e) noexcept {
+		Write(e);
 		return *this;
 	}
 
 	/// Push a foreground and background color											
 	///	@param c - the state to push														
 	///	@return a reference to the logger for chaining								
-	inline A::Interface& A::Interface::operator << (const ColorState& c) noexcept {
-		SetForegroundColor(c.mForeground);
-		SetBackgroundColor(c.mBackground);
+	inline A::Interface& A::Interface::operator << (const Style& c) noexcept {
+		Write(c);
 		return *this;
 	}
 
@@ -237,7 +114,12 @@ namespace Langulus::Logger
 	///	@param t - the tabs to push														
 	///	@return a reference to the logger for chaining								
 	inline A::Interface& A::Interface::operator << (const Tabs& t) noexcept {
-		Command(Tab);
+		auto tabs = ::std::max(1, t.mTabs);
+		while (tabs) {
+			Write(Command::Tab);
+			--tabs;
+		}
+
 		return *this;
 	}
 
@@ -247,7 +129,12 @@ namespace Langulus::Logger
 	///	@param t - [in/out] the tabs to push											
 	///	@return a reference to the logger for chaining								
 	inline A::Interface& A::Interface::operator << (Tabs& t) noexcept {
-		Command(Tab);
+		auto tabs = ::std::max(1, t.mTabs);
+		while (tabs) {
+			Write(Command::Tab);
+			--tabs;
+		}
+
 		++t.mTabs;
 		return *this;
 	}
@@ -255,33 +142,32 @@ namespace Langulus::Logger
 	/// Stringify anything that has a valid std::formatter							
 	///	@param anything - type type to stringify										
 	///	@return a reference to the logger for chaining								
-	template<CT::Formattable T>
+	template<Formattable T>
 	A::Interface& A::Interface::operator << (const T& anything) const noexcept {
-		try {
-			Write(::std::format("{}", anything));
-		}
-		catch (...) {}
-		return *this;
+		Write(fmt::format("{}", anything));
+		return const_cast<A::Interface&>(*this);
 	}
 
 	/// A general new-line write function with color									
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
-	template<ColorState COLOR, class... T>
-	Interface& Line(T&&...arguments) noexcept {
-		if constexpr (sizeof...(arguments) > 0)
-			Instance << NewLine << COLOR << (... << ::std::forward<T>(arguments));
-		return *this;
+	template<class... T>
+	A::Interface& Line(T&&...arguments) noexcept {
+		if constexpr (sizeof...(arguments) > 0) {
+			Instance.NewLine();
+			(Instance << ... << ::std::forward<T>(arguments));
+		}
+		return Instance;
 	}
 
 	/// A general same-line write function with color									
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Append(T&&...arguments) noexcept {
+	A::Interface& Append(T&&...arguments) noexcept {
 		if constexpr (sizeof...(arguments) > 0)
-			Instance << (... << ::std::forward<T>(arguments));
-		return *this;
+			(Instance << ... << ::std::forward<T>(arguments));
+		return Instance;
 	}
 
 	/// Write a section on a new line, tab all consecutive lines, bold it,		
@@ -292,96 +178,104 @@ namespace Langulus::Logger
 	template<class... T>
 	ScopedTabs Section(T&&...arguments) noexcept {
 		ScopedTabs tabs;
-		Instance << Bold << Info(::std::forward<T>(arguments)...) << tabs;
+		Line(Color::White, Emphasis::Bold, ::std::forward<T>(arguments)..., tabs);
 		return ::std::move(tabs);
+	}
+
+	/// Write a new-line fatal error															
+	///	@tparam ...T - a sequence of elements to log (deducible)					
+	///	@return a reference to the logger for chaining								
+	template<class... T>
+	A::Interface& Fatal(T&&...arguments) noexcept {
+		return Line(Color::DarkRed, "FATAL ERROR: ", ::std::forward<T>(arguments)...);
 	}
 
 	/// Write a new-line error																	
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Error(T&&...arguments) noexcept {
-		return Line<Red | DefaultColor>(::std::forward<T>(arguments)...);
+	A::Interface& Error(T&&...arguments) noexcept {
+		return Line(Color::Red, "ERROR: ", ::std::forward<T>(arguments)...);
 	}
 
 	/// Write a new-line warning																
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Warning(T&&...arguments) noexcept {
-		return Line<DarkYellow | DefaultColor>(::std::forward<T>(arguments)...);
+	A::Interface& Warning(T&&...arguments) noexcept {
+		return Line(Color::DarkYellow, "WARNING: ", ::std::forward<T>(arguments)...);
 	}
 
 	/// Write a new-line with verbose information										
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Verbose(T&&...arguments) noexcept {
-		return Line<Gray | DefaultColor>(::std::forward<T>(arguments)...);
+	A::Interface& Verbose(T&&...arguments) noexcept {
+		return Line(Color::DarkGray, ::std::forward<T>(arguments)...);
 	}
 
 	/// Write a new-line with information													
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Info(T&&...arguments) noexcept {
-		return Line<White | DefaultColor>(::std::forward<T>(arguments)...);
+	A::Interface& Info(T&&...arguments) noexcept {
+		return Line(Color::Gray, ::std::forward<T>(arguments)...);
 	}
 
 	/// Write a new-line with a personal message											
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Message(T&&...arguments) noexcept {
-		return Line<DarkGreen | DefaultColor>(::std::forward<T>(arguments)...);
+	A::Interface& Message(T&&...arguments) noexcept {
+		return Line(Color::White, ::std::forward<T>(arguments)...);
 	}
 
 	/// Write a new-line with special text													
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Special(T&&...arguments) noexcept {
-		return Line<Purple | DefaultColor>(::std::forward<T>(arguments)...);
+	A::Interface& Special(T&&...arguments) noexcept {
+		return Line(Color::Purple, ::std::forward<T>(arguments)...);
 	}
 
 	/// Write a new-line with flow information											
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Flow(T&&...arguments) noexcept {
-		return Line<Cyan | DefaultColor>(::std::forward<T>(arguments)...);
+	A::Interface& Flow(T&&...arguments) noexcept {
+		return Line(Color::DarkCyan, ::std::forward<T>(arguments)...);
 	}
 
 	/// Write a new-line on user input														
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Input(T&&...arguments) noexcept {
-		return Line<Blue | DefaultColor>(::std::forward<T>(arguments)...);
+	A::Interface& Input(T&&...arguments) noexcept {
+		return Line(Color::Blue, ::std::forward<T>(arguments)...);
 	}
 
 	/// Write a new-line with network message												
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Network(T&&...arguments) noexcept {
-		return Line<Yellow | DefaultColor>(::std::forward<T>(arguments)...);
+	A::Interface& Network(T&&...arguments) noexcept {
+		return Line(Color::Yellow, ::std::forward<T>(arguments)...);
 	}
 
 	/// Write a new-line with a message from OS											
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& OS(T&&...arguments) noexcept {
-		return Line<DarkBlue | DefaultColor>(::std::forward<T>(arguments)...);
+	A::Interface& OS(T&&...arguments) noexcept {
+		return Line(Color::DarkBlue, ::std::forward<T>(arguments)...);
 	}
 
 	/// Write a new-line with an input prompt												
 	///	@tparam ...T - a sequence of elements to log (deducible)					
 	///	@return a reference to the logger for chaining								
 	template<class... T>
-	Interface& Prompt(T&&...arguments) noexcept {
-		return Line<Green | DefaultColor>(::std::forward<T>(arguments)...);
+	A::Interface& Prompt(T&&...arguments) noexcept {
+		return Line(Color::Green, ::std::forward<T>(arguments)...);
 	}
 
 } // namespace Langulus::Logger

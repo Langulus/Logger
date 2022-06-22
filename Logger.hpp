@@ -6,77 +6,74 @@
 /// See LICENSE file, or https://www.gnu.org/licenses									
 ///																									
 #pragma once
+#include <Langulus.Core.hpp>
 #include <stack>
 #include <list>
 #include <string_view>
 #include <string>
-#include <format>
+#include <fmt/format.h>
+#include <fmt/color.h>
 
 namespace Langulus::Logger
 {
 	using Letter = char;
 	using Token = ::std::basic_string_view<Letter>;
 	using Text = ::std::basic_string<Letter>;
-}
 
-namespace Langulus::CT
-{
-	/// Check if a type can be used with std::format									
+	/// Check if a type can be used with {fmt} by the logger							
 	template<class T>
-	concept Formattable = ::std::_Has_const_formatter<T, 
-		::std::basic_format_context<
-			::std::back_insert_iterator<
-				::std::_Fmt_buffer<::Langulus::Logger::Letter>>,
-			::Langulus::Logger::Letter>>;
+	concept Formattable = fmt::is_formattable<T, Letter>::value;
 }
 
 namespace Langulus::Logger
 {
 
 	/// Color codes, consistent with ANSI/VT100 escapes								
-	enum Color {
+	/// Also consistent with fmt::terminal_color											
+	enum class Color : ::std::underlying_type_t<fmt::terminal_color> {
 		DefaultColor = 0,
-		Black,
-		DarkBlue,
-		DarkGreen,
-		DarkCyan,
+
+		Black = 30,
 		DarkRed,
-		DarkPurple,
+		DarkGreen,
 		DarkYellow,
-		DarkWhite,
+		DarkBlue,
+		DarkPurple,
+		DarkCyan,
 		Gray,
-		Blue,
-		Green,
-		Cyan,
+
+		DarkGray = 90,
 		Red,
-		Purple,
+		Green,
 		Yellow,
-		White,
-
-		ColorCounter
+		Blue,
+		Purple,
+		Cyan,
+		White
 	};
 
-	/// A pair of a foreground and background color										
-	struct ColorState {
-		Color mForeground;
-		Color mBackground;
+	/// Some formatting styles, consistent with fmt::emphasis						
+	enum class Emphasis : ::std::underlying_type_t<fmt::emphasis> {
+		Bold = 1,					// Not working on windows
+		Faint = 1 << 1,			// Not working on windows
+		Italic = 1 << 2,			// Not working on windows
+		Underline = 1 << 3,
+		Blink = 1 << 4,			// Not working on windows
+		Reverse = 1 << 5,
+		Conceal = 1 << 6,			// Not working on windows
+		Strike = 1 << 7,			// Not working on windows
 	};
 
-	constexpr ColorState operator | (Color&& fg, Color&& bg) noexcept {
-		return { fg, bg };
-	}
+	/// Text style, with background color, foreground color, and emphasis		
+	using Style = fmt::text_style;
 
 	/// Console commands																			
-	/// You can << these as easily as text													
-	enum Command {
-		Clear = ColorCounter,			// Clear the console						
+	enum class Command : uint8_t {
+		Clear,		// Clear the console												
 		NewLine,		// Write a new line, with a timestamp and tabulation	
 		Pop,			// Pop the color state											
 		Push,			// Push the color state											
 		Invert,		// Inverts background and foreground colors				
-		Bold,			// Enable bold (not widely supported)						
-		Italic,		// Enable italic (not widely supported)					
-		Blink,		// Enable blink													
 		Reset,		// Reset the color and formatting state					
 		Tab,			// Tab once on a new line after this command				
 		Untab,		// Untab once, again on a new line after this command	
@@ -85,20 +82,23 @@ namespace Langulus::Logger
 	};
 
 	/// Tabulation marker (can be pushed to log)											
-	struct Tabs {
+	class Tabs {
+	public:
 		int mTabs = 0;
 
 		constexpr Tabs() noexcept = default;
 		constexpr Tabs(const Tabs&) noexcept = default;
 		constexpr Tabs(Tabs&& other) noexcept
-			: mTabs{other.mTabs} { other.mTabs = 0; }
+			: mTabs {other.mTabs} { other.mTabs = 0; }
 		constexpr Tabs(int tabs) noexcept
-			: mTabs{tabs} {}
+			: mTabs {tabs} {}
 	};
 
 	/// Scoped tabulation marker that restores tabbing when destroyed				
 	struct ScopedTabs : public Tabs {
 		using Tabs::Tabs;
+		constexpr ScopedTabs(ScopedTabs&& other) noexcept
+			: Tabs {::std::forward<Tabs>(other)} {}
 		~ScopedTabs() noexcept;
 	};
 
@@ -114,12 +114,10 @@ namespace Langulus::Logger
 	namespace A
 	{
 		///																							
-		///	The abstract logger interface - override this to define an			
-		///	attachment																			
+		/// The abstract logger interface - override this to define attachments	
 		///																							
 		class Interface {
 		public:
-			static constexpr Token GetColorCode(const ColorState&) noexcept;
 			static constexpr Token GetFunctionName(const Token&) noexcept;
 			static Text GetAdvancedTime() noexcept;
 			static Text GetSimpleTime() noexcept;
@@ -128,9 +126,10 @@ namespace Langulus::Logger
 			virtual void Write(const Token&) const noexcept = 0;
 			virtual void Write(const Text&) const noexcept = 0;
 			virtual void Write(const Command&) noexcept = 0;
+			virtual void Write(const Color&) noexcept = 0;
+			virtual void Write(const Emphasis&) noexcept = 0;
+			virtual void Write(const Style&) noexcept = 0;
 			virtual void NewLine() const noexcept = 0;
-			virtual void SetForegroundColor(Color) noexcept = 0;
-			virtual void SetBackgroundColor(Color) noexcept = 0;
 			virtual void Tabulate() const noexcept = 0;
 
 			/// Implicit bool operator in order to use log in 'if' statements		
@@ -140,14 +139,15 @@ namespace Langulus::Logger
 				return true;
 			}
 
-			Interface& operator << (const Interface&) noexcept;
+			Interface& operator << (A::Interface&) noexcept;
 			Interface& operator << (const Command&) noexcept;
 			Interface& operator << (const Color&) noexcept;
-			Interface& operator << (const ColorState&) noexcept;
+			Interface& operator << (const Emphasis&) noexcept;
+			Interface& operator << (const Style&) noexcept;
 			Interface& operator << (const Tabs&) noexcept;
 			Interface& operator << (Tabs&) noexcept;
 
-			template<CT::Formattable T>
+			template<Formattable T>
 			Interface& operator << (const T&) const noexcept;
 		};
 	}
@@ -162,12 +162,18 @@ namespace Langulus::Logger
 	class Interface : public A::Interface {
 	friend class Inner::InterfaceInitializer;
 	private:
+		// Tabulator color and formatting											
+		static constexpr Style DefaultStyle = {};
+		static constexpr Style TabStyle = fmt::fg(fmt::terminal_color::bright_black);
+		static constexpr Style TimeStampStyle = TabStyle;
+
+		// A string used instead of \t, when you push a Tab command			
+		static constexpr Token TabString = "|  ";
+
 		// Color stack																		
-		::std::stack<ColorState> mColorStack;
+		::std::stack<Style> mStyleStack;
 		// Number of tabulations														
 		size_t mTabulator = 0;
-		// Tabulator color																
-		ColorState mTabColor {Gray, DefaultColor};
 		// Attachments																		
 		::std::list<A::Interface*> mAttachments;
 
@@ -175,16 +181,17 @@ namespace Langulus::Logger
 		Interface();
 		~Interface();
 
+	public:
 		void Write(const Letter&) const noexcept final;
 		void Write(const Token&) const noexcept final;
 		void Write(const Text&) const noexcept final;
+		void Write(const Color&) noexcept final;
+		void Write(const Emphasis&) noexcept final;
 		void Write(const Command&) noexcept final;
+		void Write(const Style&) noexcept final;
 		void NewLine() const noexcept final;
-		void SetForegroundColor(Color) noexcept final;
-		void SetBackgroundColor(Color) noexcept final;
 		void Tabulate() const noexcept final;
 
-	public:
 		void Attach(A::Interface*) noexcept;
 		void Dettach(A::Interface*) noexcept;
 	};
@@ -194,38 +201,38 @@ namespace Langulus::Logger
 	///																								
 	extern Interface& Instance;
 
-	template<ColorState COLOR = DefaultColor|DefaultColor, class... T>
-	Interface& Line(T&&...) noexcept;
 	template<class... T>
-	Interface& Append(T&&...) noexcept;
+	A::Interface& Line(T&&...) noexcept;
+	template<class... T>
+	A::Interface& Append(T&&...) noexcept;
 
 	template<class... T>
 	ScopedTabs Section(T&&...) noexcept;
 
 	template<class... T>
-	Interface& Error(T&&...) noexcept;
+	A::Interface& Fatal(T&&...) noexcept;
 	template<class... T>
-	Interface& Warning(T&&...) noexcept;
+	A::Interface& Error(T&&...) noexcept;
 	template<class... T>
-	Interface& Verbose(T&&...) noexcept;
+	A::Interface& Warning(T&&...) noexcept;
 	template<class... T>
-	Interface& Info(T&&...) noexcept;
+	A::Interface& Verbose(T&&...) noexcept;
 	template<class... T>
-	Interface& Message(T&&...) noexcept;
+	A::Interface& Info(T&&...) noexcept;
 	template<class... T>
-	Interface& Special(T&&...) noexcept;
+	A::Interface& Message(T&&...) noexcept;
 	template<class... T>
-	Interface& Flow(T&&...) noexcept;
+	A::Interface& Special(T&&...) noexcept;
 	template<class... T>
-	Interface& Input(T&&...) noexcept;
+	A::Interface& Flow(T&&...) noexcept;
 	template<class... T>
-	Interface& TCP(T&&...) noexcept;
+	A::Interface& Input(T&&...) noexcept;
 	template<class... T>
-	Interface& UDP(T&&...) noexcept;
+	A::Interface& Network(T&&...) noexcept;
 	template<class... T>
-	Interface& OS(T&&...) noexcept;
+	A::Interface& OS(T&&...) noexcept;
 	template<class... T>
-	Interface& Prompt(T&&...) noexcept;
+	A::Interface& Prompt(T&&...) noexcept;
 
 } // namespace Langulus::Logger
 
