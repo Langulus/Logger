@@ -23,7 +23,7 @@ download_project(
 	GIT_PROGRESS        TRUE
 	UPDATE_DISCONNECTED 1
 )
-add_subdirectory(${fmt_SOURCE_DIR})
+add_subdirectory(${fmt_SOURCE_DIR} ${fmt_BINARY_DIR})
 
 # Build and install Logger library
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE_FILES)
