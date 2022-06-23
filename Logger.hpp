@@ -232,7 +232,7 @@ namespace Langulus::Logger
 	LANGULUS(ALWAYSINLINE) A::Interface& Append(T&&...) noexcept;
 
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) NOD() ScopedTabs Section(T&&...) noexcept;
+	NOD() LANGULUS(ALWAYSINLINE) ScopedTabs Section(T&&...) noexcept;
 
 	template<class... T>
 	LANGULUS(ALWAYSINLINE) A::Interface& Fatal(T&&...) noexcept;
