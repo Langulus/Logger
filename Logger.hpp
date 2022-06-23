@@ -31,7 +31,8 @@ namespace Langulus::Logger
 	/// Color codes, consistent with ANSI/VT100 escapes								
 	/// Also consistent with fmt::terminal_color											
 	enum class Color : ::std::underlying_type_t<fmt::terminal_color> {
-		DefaultColor = 0,
+		NoForeground = 0,
+		NoBackground = 1,
 
 		Black = 30,
 		DarkRed,
@@ -42,6 +43,15 @@ namespace Langulus::Logger
 		DarkCyan,
 		Gray,
 
+		BlackBgr = 40,
+		DarkRedBgr,
+		DarkGreenBgr,
+		DarkYellowBgr,
+		DarkBlueBgr,
+		DarkPurpleBgr,
+		DarkCyanBgr,
+		GrayBgr,
+
 		DarkGray = 90,
 		Red,
 		Green,
@@ -49,8 +59,19 @@ namespace Langulus::Logger
 		Blue,
 		Purple,
 		Cyan,
-		White
+		White,
+
+		DarkGrayBgr = 100,
+		RedBgr,
+		GreenBgr,
+		YellowBgr,
+		BlueBgr,
+		PurpleBgr,
+		CyanBgr,
+		WhiteBgr
 	};
+
+	using enum Color;
 
 	/// Some formatting styles, consistent with fmt::emphasis						
 	enum class Emphasis : ::std::underlying_type_t<fmt::emphasis> {
@@ -63,6 +84,8 @@ namespace Langulus::Logger
 		Conceal = 1 << 6,			// Not working on windows
 		Strike = 1 << 7,			// Not working on windows
 	};
+
+	using enum Emphasis;
 
 	/// Text style, with background color, foreground color, and emphasis		
 	using Style = fmt::text_style;
@@ -80,6 +103,8 @@ namespace Langulus::Logger
 		Time,			// Write a short timestamp										
 		ExactTime,	// Write an exhaustive timestamp								
 	};
+
+	using enum Command;
 
 	/// Tabulation marker (can be pushed to log)											
 	class Tabs {
@@ -139,16 +164,16 @@ namespace Langulus::Logger
 				return true;
 			}
 
-			Interface& operator << (A::Interface&) noexcept;
-			Interface& operator << (const Command&) noexcept;
-			Interface& operator << (const Color&) noexcept;
-			Interface& operator << (const Emphasis&) noexcept;
-			Interface& operator << (const Style&) noexcept;
-			Interface& operator << (const Tabs&) noexcept;
-			Interface& operator << (Tabs&) noexcept;
+			LANGULUS(ALWAYSINLINE) Interface& operator << (A::Interface&) noexcept;
+			LANGULUS(ALWAYSINLINE) Interface& operator << (const Command&) noexcept;
+			LANGULUS(ALWAYSINLINE) Interface& operator << (const Color&) noexcept;
+			LANGULUS(ALWAYSINLINE) Interface& operator << (const Emphasis&) noexcept;
+			LANGULUS(ALWAYSINLINE) Interface& operator << (const Style&) noexcept;
+			LANGULUS(ALWAYSINLINE) Interface& operator << (const Tabs&) noexcept;
+			LANGULUS(ALWAYSINLINE) Interface& operator << (Tabs&) noexcept;
 
 			template<Formattable T>
-			Interface& operator << (const T&) const noexcept;
+			LANGULUS(ALWAYSINLINE) Interface& operator << (const T&) const noexcept;
 		};
 	}
 
@@ -202,37 +227,37 @@ namespace Langulus::Logger
 	extern Interface& Instance;
 
 	template<class... T>
-	A::Interface& Line(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Line(T&&...) noexcept;
 	template<class... T>
-	A::Interface& Append(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Append(T&&...) noexcept;
 
 	template<class... T>
-	ScopedTabs Section(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) NOD() ScopedTabs Section(T&&...) noexcept;
 
 	template<class... T>
-	A::Interface& Fatal(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Fatal(T&&...) noexcept;
 	template<class... T>
-	A::Interface& Error(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Error(T&&...) noexcept;
 	template<class... T>
-	A::Interface& Warning(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Warning(T&&...) noexcept;
 	template<class... T>
-	A::Interface& Verbose(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Verbose(T&&...) noexcept;
 	template<class... T>
-	A::Interface& Info(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Info(T&&...) noexcept;
 	template<class... T>
-	A::Interface& Message(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Message(T&&...) noexcept;
 	template<class... T>
-	A::Interface& Special(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Special(T&&...) noexcept;
 	template<class... T>
-	A::Interface& Flow(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Flow(T&&...) noexcept;
 	template<class... T>
-	A::Interface& Input(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Input(T&&...) noexcept;
 	template<class... T>
-	A::Interface& Network(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Network(T&&...) noexcept;
 	template<class... T>
-	A::Interface& OS(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& OS(T&&...) noexcept;
 	template<class... T>
-	A::Interface& Prompt(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) A::Interface& Prompt(T&&...) noexcept;
 
 } // namespace Langulus::Logger
 

@@ -16,7 +16,6 @@ using Clock = ::std::chrono::system_clock;
 namespace Langulus::Logger
 {
 
-
 	/// Schwarz counter pattern																
 	/// https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Nifty_Counter			
 	/// Zero initialized at load time, guaranteed										
@@ -81,7 +80,7 @@ namespace Langulus::Logger
 	/// When using fmt::print(style, mask, ...), the style will be reset after	
 	/// message has been written, and I don't want that to happen					
 	///	@param style - the style to set													
-	inline void FmtPrintStyle(const Style& style) {
+	LANGULUS(ALWAYSINLINE) void FmtPrintStyle(const Style& style) {
 		// Always reset before a style change										
 		fmt::print("{}", "\x1b[0m");
 		
@@ -101,38 +100,44 @@ namespace Langulus::Logger
 		}
 	}
 
-	/// Change the foreground color															
+	/// Change the foreground/background color											
 	///	@param c - the color																	
 	void Interface::Write(const Color& c) noexcept {
 		auto& style = mStyleStack.top();
 		const auto oldStyle = style;
-		if (c != Color::DefaultColor) {
+		if (c == Color::NoForeground) {
+			// Reset the foreground color												
+			style = {};
+			if (oldStyle.has_background())
+				style |= fmt::bg(oldStyle.get_background());
+		}
+		else if (c == Color::NoBackground) {
+			// Reset the background color												
+			style = {};
+			if (oldStyle.has_foreground())
+				style |= fmt::fg(oldStyle.get_foreground());
+		}
+		else if ((c >= Color::Black && c < Color::BlackBgr) || (c >= Color::DarkGray && c < Color::DarkGrayBgr)) {
 			// Create a new foreground color style									
 			style = fmt::fg(static_cast<fmt::terminal_color>(c));
+			if (oldStyle.has_background())
+				style |= fmt::bg(oldStyle.get_background());
 		}
 		else {
-			// Reset foreground color													
-			style = {};
+			// Create a new background color style									
+			style = fmt::fg(static_cast<fmt::terminal_color>(c));
+			if (oldStyle.has_background())
+				style |= fmt::bg(oldStyle.get_background());
 		}
 
-		// Restore background color and emphasis									
-		if (oldStyle.has_background())
-			style |= fmt::bg(oldStyle.get_background());
 		if (oldStyle.has_emphasis())
 			style |= oldStyle.get_emphasis();
-
 		FmtPrintStyle(style);
 	}
 
 	/// Change the emphasis																		
 	///	@param e - the emphasis																
 	void Interface::Write(const Emphasis& e) noexcept {
-		#if defined(_WIN32)
-			// Boldness is ignored on Windows, because it screws with color
-			if (e == Emphasis::Bold)
-				return;
-		#endif
-
 		auto& style = mStyleStack.top();
 		style |= static_cast<fmt::emphasis>(e);
 		FmtPrintStyle(style);
@@ -151,16 +156,17 @@ namespace Langulus::Logger
 	void Interface::Write(const Command& c) noexcept {
 		switch (c) {
 		case Command::Clear:
-			Write(Token {"\033c"});
+			fmt::print("{}", "\x1b[2J");
 			break;
 		case Command::NewLine:
 			NewLine();
 			break;
 		case Command::Invert:
-			Write(Token {"\033[7m"});
+			Write(Emphasis::Reverse);
 			break;
 		case Command::Reset:
-			Write(Token {"\x1b[0m"});
+			mStyleStack.top() = DefaultStyle;
+			FmtPrintStyle(mStyleStack.top());
 			break;
 		case Command::Time:
 			Write(GetSimpleTime());

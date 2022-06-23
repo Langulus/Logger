@@ -28,10 +28,35 @@ SCENARIO("Logging to console", "[logger]") {
 				auto scope = Logger::Section("This should be the section title");
 				Logger::Line("This should be a line inside a section #1");
 				Logger::Line("This should be a line inside a section #2");
+				{
+					auto scope2 = Logger::Section("This should be a subsection section title");
+					Logger::Line("This should be a line inside a subsection #1");
+					Logger::Line("This should be a line inside a subsection #2");
+					Logger::Line("This should be a line inside a subsection #3");
+					Logger::Append(", and this should be appended to it");
+				}
 				Logger::Line("This should be a line inside a section #3");
 				Logger::Append(", and this should be appended to it");
 			}
 			Logger::Line("This should be a line after a section");
+		}
+
+		WHEN("Writing all colors") {
+			{
+				auto scope = Logger::Section(Logger::Reset, "Now testing foreground colors: ");
+				Logger::Line(Logger::Black, "Black, ", Logger::Blue, "Blue, ", Logger::Cyan, "Cyan, ", Logger::DarkBlue, "Dark blue, ");
+				Logger::Line(Logger::DarkCyan, "Dark cyan, ", Logger::DarkGray, "Dark gray, ", Logger::DarkGreen, "Dark green, ", Logger::DarkPurple, "Dark purple, ");
+				Logger::Line(Logger::DarkRed, "Dark red, ", Logger::DarkYellow, "Dark yellow, ", Logger::Gray, "Gray, ", Logger::Green, "Green, ");
+				Logger::Line(Logger::Purple, "Purple, ", Logger::Red, "Red, ", Logger::White, "White, ", Logger::Yellow, "Yellow, ");
+			}
+			{
+				auto scope = Logger::Section(Logger::Reset, "Now testing background colors: ");
+				Logger::Line(Logger::BlackBgr, "Black, ", Logger::BlueBgr, "Blue, ", Logger::CyanBgr, "Cyan, ", Logger::DarkBlueBgr, "Dark blue, ");
+				Logger::Line(Logger::DarkCyanBgr, "Dark cyan, ", Logger::DarkGrayBgr, "Dark gray, ", Logger::DarkGreenBgr, "Dark green, ", Logger::DarkPurpleBgr, "Dark purple, ");
+				Logger::Line(Logger::DarkRedBgr, "Dark red, ", Logger::DarkYellowBgr, "Dark yellow, ", Logger::GrayBgr, "Gray, ", Logger::GreenBgr, "Green, ");
+				Logger::Line(Logger::PurpleBgr, "Purple, ", Logger::RedBgr, "Red, ", Logger::WhiteBgr, "White, ", Logger::YellowBgr, "Yellow, ");
+			}
+			Logger::Line(Logger::Reset, "Done testing colors");
 		}
 
 		WHEN("Calling Logger::Fatal()") {
