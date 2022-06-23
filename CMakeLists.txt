@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-include(cmake/DownloadProject.cmake)
+include(cmake/FetchLangulusModule.cmake)
 
 project(Langulus_Logger)
 
@@ -8,18 +8,10 @@ if(PROJECT_IS_TOP_LEVEL)
     # We're building it as standalone
     set(CMAKE_CXX_STANDARD 20)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    enable_testing()
 
-    # Configure Langulus.Core
-    message(STATUS "Configuring external project: Langulus.Core...")
-    download_project(
-	    PROJ                Langulus_Core
-	    GIT_REPOSITORY      https://github.com/Langulus/Core.git
-	    GIT_TAG             main
-	    GIT_PROGRESS        TRUE
-	    UPDATE_DISCONNECTED 1
-    )
-    include_directories(${Langulus_Core_SOURCE_DIR}/include)
+    fetch_langulus_module(Core)
+	enable_testing()
+	add_subdirectory(test)
 endif()
 
 # Configure {fmt} library
@@ -42,7 +34,7 @@ target_include_directories(Langulus.Logger
 	INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 target_link_libraries(Langulus.Logger
-	PUBLIC   fmt
+	PUBLIC   Langulus.Core fmt
 )
 
 if (MSVC)
@@ -50,5 +42,3 @@ if (MSVC)
 endif()
 
 # Testing
-add_subdirectory(test)
-add_test(NAME Test.Logger COMMAND Test.Logger)
