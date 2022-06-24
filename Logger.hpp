@@ -173,7 +173,7 @@ namespace Langulus::Logger
 			LANGULUS(ALWAYSINLINE) Interface& operator << (Tabs&) noexcept;
 
 			template<Formattable T>
-			LANGULUS(ALWAYSINLINE) Interface& operator << (const T&) const noexcept;
+			LANGULUS(ALWAYSINLINE) Interface& operator << (const T&) noexcept;
 		};
 	}
 

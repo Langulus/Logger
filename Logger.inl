@@ -143,9 +143,9 @@ namespace Langulus::Logger
 	///	@param anything - type type to stringify										
 	///	@return a reference to the logger for chaining								
 	template<Formattable T>
-	A::Interface& A::Interface::operator << (const T& anything) const noexcept {
+	A::Interface& A::Interface::operator << (const T& anything) noexcept {
 		Write(fmt::format("{}", anything));
-		return const_cast<A::Interface&>(*this);
+		return *this;
 	}
 
 	/// A general new-line write function with color									

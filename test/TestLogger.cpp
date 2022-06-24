@@ -106,6 +106,19 @@ SCENARIO("Logging to console", "[logger]") {
 		WHEN("Calling Logger::Prompt()") {
 			Logger::Prompt("This is an input prompt, that blocks execution and waits for console input (TODO)");
 		}
+
+		WHEN("Logging numbers, characters and booleans") {
+			Logger::Special() << "The answer is " << 42 << '!' << " It's " << bool{true} << ", I tell ya!";
+		}
+
+		WHEN("Pushing and popping styles") {
+			Logger::Warning("This is a warning, ",
+				Logger::Push, Logger::Underline, "but now we underline it, ",
+					Logger::Push, Logger::RedBgr, "then we even change color, ",
+					Logger::Pop, "but then we return to underlined warning, ",
+				Logger::Pop, "and finally, back to warning, ",
+			Logger::Pop, "but if we actually pop once more, we return to default Logger style\n\n");
+		}
 	}
 }
 
