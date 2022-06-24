@@ -16,13 +16,14 @@
 
 namespace Langulus::Logger
 {
-	using Letter = char;
-	using Token = ::std::basic_string_view<Letter>;
+
+	/// Text container used by the logger													
 	using Text = ::std::basic_string<Letter>;
 
 	/// Check if a type can be used with {fmt} by the logger							
 	template<class T>
 	concept Formattable = fmt::is_formattable<T, Letter>::value;
+
 }
 
 namespace Langulus::Logger
