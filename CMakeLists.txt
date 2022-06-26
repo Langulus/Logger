@@ -2,12 +2,11 @@ cmake_minimum_required(VERSION 3.20)
 include(cmake/FetchLangulusModule.cmake)
 project(Langulus_Logger)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Check if this project is built as standalone, or a part of something else
 if(PROJECT_IS_TOP_LEVEL)
-    # We're building it as standalone
-    set(CMAKE_CXX_STANDARD 20)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
     fetch_langulus_module(Core)
 
 	enable_testing()
@@ -29,13 +28,8 @@ add_subdirectory(${fmt_SOURCE_DIR} ${fmt_BINARY_DIR})
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE_FILES)
 add_library(Langulus.Logger ${SOURCE_FILES})
 
-target_include_directories(Langulus.Logger
-	INTERFACE	include/
-)
-
-target_link_libraries(Langulus.Logger
-	PUBLIC		Langulus.Core fmt
-)
+target_include_directories(Langulus.Logger PUBLIC include)
+target_link_libraries(Langulus.Logger PUBLIC Langulus.Core fmt)
 
 if (MSVC)
     target_compile_options(Langulus.Logger PRIVATE /utf-8)
