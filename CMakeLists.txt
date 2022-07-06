@@ -19,7 +19,6 @@ download_project(
 	PROJ                fmt
 	GIT_REPOSITORY      https://github.com/fmtlib/fmt.git
 	GIT_TAG             master
-	GIT_PROGRESS        TRUE
 	UPDATE_DISCONNECTED 1
 )
 add_subdirectory(${fmt_SOURCE_DIR} ${fmt_BINARY_DIR})
