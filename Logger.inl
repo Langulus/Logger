@@ -19,11 +19,11 @@ namespace Langulus::Logger
 		}
 	}
 
-	/// Analyzes text returned by LANGULUS_FUNCTION() in order to isolate the	
-	/// relevant part for logging																
+	/// Analyzes text returned by LANGULUS(FUNCTION) in order to isolate the	
+	/// name part for logging																	
 	///	@param text - the text to scan													
 	///	@return the interesting part														
-	constexpr Token A::Interface::GetFunctionName(const Token& text) noexcept {
+	constexpr Token A::Interface::GetFunctionName(const Token& text, const Token& omit) noexcept {
 		size_t length = text.size();
 		size_t start = 0;
 		size_t end = 0;
@@ -64,11 +64,11 @@ namespace Langulus::Logger
 			--length;
 		}
 
-		constexpr Token mNamespaceFilter = "Langulus::";
-		if (text.starts_with(mNamespaceFilter))
-			start += mNamespaceFilter.size();
+		const auto nodecorations = text.substr(start, end - start);
+		if (nodecorations.starts_with(omit))
+			return nodecorations.substr(omit.size());
 
-		return text.substr(start, end - start);
+		return nodecorations;
 	}
 
 	/// Does nothing, but allows for grouping logging statements in ()			

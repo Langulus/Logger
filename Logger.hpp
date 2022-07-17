@@ -144,9 +144,9 @@ namespace Langulus::Logger
 		///																							
 		class Interface {
 		public:
-			static constexpr Token GetFunctionName(const Token&) noexcept;
-			static Text GetAdvancedTime() noexcept;
-			static Text GetSimpleTime() noexcept;
+			NOD() static constexpr Token GetFunctionName(const Token&, const Token& omit = "Langulus::") noexcept;
+			NOD() static Text GetAdvancedTime() noexcept;
+			NOD() static Text GetSimpleTime() noexcept;
 
 			virtual void Write(const Letter&) const noexcept = 0;
 			virtual void Write(const Token&) const noexcept = 0;
@@ -261,5 +261,7 @@ namespace Langulus::Logger
 	LANGULUS(ALWAYSINLINE) A::Interface& Prompt(T&&...) noexcept;
 
 } // namespace Langulus::Logger
+
+#define LANGULUS_FUNCTION_NAME() (::Langulus::Logger::A::Interface::GetFunctionName(LANGULUS_FUNCTION()))
 
 #include "Logger.inl"
