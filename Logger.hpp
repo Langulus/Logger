@@ -171,7 +171,7 @@ namespace Langulus::Logger
 			LANGULUS(ALWAYSINLINE) Interface& operator << (const Emphasis&) noexcept;
 			LANGULUS(ALWAYSINLINE) Interface& operator << (const Style&) noexcept;
 			LANGULUS(ALWAYSINLINE) Interface& operator << (const Tabs&) noexcept;
-			LANGULUS(ALWAYSINLINE) Interface& operator << (Tabs&) noexcept;
+			LANGULUS(ALWAYSINLINE) ScopedTabs operator << (Tabs&&) noexcept;
 
 			template<Formattable T>
 			LANGULUS(ALWAYSINLINE) Interface& operator << (const T&) noexcept;
@@ -228,37 +228,37 @@ namespace Langulus::Logger
 	extern Interface& Instance;
 
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Line(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Line(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Append(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Append(T&&...) noexcept;
 
 	template<class... T>
 	NOD() LANGULUS(ALWAYSINLINE) ScopedTabs Section(T&&...) noexcept;
 
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Fatal(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Fatal(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Error(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Error(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Warning(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Warning(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Verbose(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Verbose(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Info(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Info(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Message(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Message(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Special(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Special(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Flow(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Flow(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Input(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Input(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Network(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Network(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& OS(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) OS(T&&...) noexcept;
 	template<class... T>
-	LANGULUS(ALWAYSINLINE) A::Interface& Prompt(T&&...) noexcept;
+	LANGULUS(ALWAYSINLINE) decltype(auto) Prompt(T&&...) noexcept;
 
 } // namespace Langulus::Logger
 
