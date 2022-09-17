@@ -50,31 +50,56 @@ namespace Langulus::Logger
 	/// Generate an exhaustive timestamp in the current system time zone			
 	///	@return the timestamp text															
 	Text A::Interface::GetAdvancedTime() noexcept {
-		return fmt::format("{:%F %T %Z}", fmt::localtime(Clock::now()));
+		try {
+			return fmt::format("{:%F %T %Z}", fmt::localtime(Clock::now()));
+		}
+		catch (...) {
+			return "<unable to extract time>";
+		}
 	}
 
 	/// Generate a short timestamp in the current system time zone					
 	///	@return the timestamp text															
 	Text A::Interface::GetSimpleTime() noexcept {
-		return fmt::format("{:%T}", fmt::localtime(Clock::now()));
+		try {
+			return fmt::format("{:%T}", fmt::localtime(Clock::now()));
+		}
+		catch (...) {
+			return "<unable to extract time>";
+		}
 	}
 
 	/// Write a character to stdout															
 	///	@param character - the character to write										
 	void Interface::Write(const Letter& character) const noexcept {
-		fmt::print("{}", character);
+		try {
+			fmt::print("{}", character);
+		}
+		catch (...) {
+			Logger::Error() << "Logger exception";
+		}
 	}
 
 	/// Write a string view to stdout														
 	///	@param literalText - the text to write											
 	void Interface::Write(const Token& literalText) const noexcept {
-		fmt::print("{}", literalText);
+		try {
+			fmt::print("{}", literalText);
+		}
+		catch (...) {
+			Logger::Error() << "Logger exception";
+		}
 	}
 
 	/// Write a string view to stdout														
 	///	@param literalText - the text to write											
 	void Interface::Write(const Text& stdString) const noexcept {
-		fmt::print("{}", stdString);
+		try {
+			fmt::print("{}", stdString);
+		}
+		catch (...) {
+			Logger::Error() << "Logger exception";
+		}
 	}
 	
 	/// When using fmt::print(style, mask, ...), the style will be reset after	
@@ -202,7 +227,13 @@ namespace Langulus::Logger
 	void Interface::NewLine() const noexcept {
 		// Clear formatting, add new line, add a simple time stamp			
 		FmtPrintStyle(TimeStampStyle);
-		fmt::print("\n{:%T}| ", fmt::localtime(Clock::now()));
+
+		try {
+			fmt::print("\n{:%T}| ", fmt::localtime(Clock::now()));
+		}
+		catch (...) {
+			Logger::Error() << "Logger exception";
+		}
 
 		// Tabulate																			
 		Tabulate();
