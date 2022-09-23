@@ -6,7 +6,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses									
 ///																									
 #pragma once
-#include <Langulus.Logger.hpp>
+#include <LangulusLogger.hpp>
 #include <cstdint>
 #include <cstddef>
 #include <vector>

@@ -47,7 +47,7 @@ download_project(
 add_subdirectory(${fmt_SOURCE_DIR} ${fmt_BINARY_DIR})
 
 # Build and install Logger library
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE_FILES)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source SOURCE_FILES)
 add_library(Langulus.Logger ${SOURCE_FILES})
 
 target_include_directories(Langulus.Logger PUBLIC include)
