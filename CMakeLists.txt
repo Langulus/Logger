@@ -1,34 +1,23 @@
 cmake_minimum_required(VERSION 3.22)
-include(cmake/FetchLangulusModule.cmake)
 project(Langulus.Logger)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Configure the features you require, all these are disabled by default
-option(LANGULUS_ENABLE_SAFE_MODE 
-    "Overrides additional error checking and sanity checks, \
-    incurs a serious runtime overhead")
-
-option(LANGULUS_ENABLE_DEBUGGING 
-    "Explicitly define debug mode, in the case that default flags are \
-    not detected by some odd reason")
-
-if(LANGULUS_ENABLE_SAFE_MODE)
-    add_compile_definitions(LANGULUS_ENABLE_SAFE_MODE)
-endif()
-if(LANGULUS_ENABLE_DEBUGGING)
-    add_compile_definitions(LANGULUS_ENABLE_DEBUGGING)
-endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	message(STATUS "Debug mode, all assertions are enabled")
-	add_compile_definitions(LANGULUS_ENABLE_ASSERTION_LEVEL=1000)
-    add_compile_definitions(LANGULUS_ENABLE_DEBUGGING)
-endif()
-
 # Check if this project is built as standalone, or a part of something else
 if(PROJECT_IS_TOP_LEVEL)
+    find_package(Git REQUIRED)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} submodule update --init -- cmake 
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND_ERROR_IS_FATAL ANY
+    )
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+    include(FetchLangulusModule)
+    include(HandleLangulusFeatures)
+
+    handle_langulus_features()
+
     fetch_langulus_module(Core)
 
     add_compile_definitions(LANGULUS_ENABLE_TESTING)
