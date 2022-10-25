@@ -186,7 +186,7 @@ namespace Langulus::Logger
 	/// list of attachments																		
 	///																								
 	class Interface : public A::Interface {
-	friend class Inner::InterfaceInitializer;
+	friend struct Inner::InterfaceInitializer;
 	private:
 		// Tabulator color and formatting											
 		static constexpr Style DefaultStyle = {};
@@ -205,7 +205,7 @@ namespace Langulus::Logger
 
 	private:
 		Interface();
-		~Interface();
+		virtual ~Interface();
 
 	public:
 		void Write(const Letter&) const noexcept final;
