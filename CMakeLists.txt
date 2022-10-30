@@ -6,6 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Check if this project is built as standalone, or a part of something else
 if(PROJECT_IS_TOP_LEVEL)
+    if(LANGULUS_BUILD_SHARED_LIBRARIES)
+        set(LANGULUS_LIBRARY_TYPE SHARED)
+    else()
+        set(LANGULUS_LIBRARY_TYPE STATIC)
+    endif()
+
     find_package(Git REQUIRED)
     execute_process(
         COMMAND ${GIT_EXECUTABLE} submodule update --init -- cmake 
@@ -23,6 +29,8 @@ if(PROJECT_IS_TOP_LEVEL)
     add_compile_definitions(LANGULUS_ENABLE_TESTING)
 	enable_testing()
 	add_subdirectory(test)
+else()
+    set(LANGULUS_LIBRARY_TYPE OBJECT)
 endif()
 
 # Configure {fmt} library
@@ -37,11 +45,7 @@ add_subdirectory(${fmt_SOURCE_DIR} ${fmt_BINARY_DIR})
 
 # Build and install Logger library
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source SOURCE_FILES)
-add_library(Langulus.Logger ${SOURCE_FILES})
+add_library(Langulus.Logger ${LANGULUS_LIBRARY_TYPE} ${SOURCE_FILES})
 
 target_include_directories(Langulus.Logger PUBLIC include)
 target_link_libraries(Langulus.Logger PUBLIC Langulus.Core fmt)
-
-if (MSVC)
-    target_compile_options(Langulus.Logger PRIVATE /utf-8)
-endif()
