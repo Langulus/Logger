@@ -1,7 +1,7 @@
-project(Langulus_Test_Logger)
+project(Langulus.Logger.Test)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE_FILES)
 
-# Configure Catch2 library
+# Configure Catch2 library													
 message(STATUS "Configuring external project: Catch2...")
 download_project(
 	PROJ                Catch2
@@ -9,6 +9,8 @@ download_project(
 	GIT_TAG             v2.x
 	UPDATE_DISCONNECTED 1
 )
+
+remove_definitions(-DLANGULUS_EXPORT_ALL)
 
 add_subdirectory(${Catch2_SOURCE_DIR} ${Catch2_BINARY_DIR})
 add_executable(Test.Logger ${SOURCE_FILES})

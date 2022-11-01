@@ -4,8 +4,10 @@ project(Langulus.Logger)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Check if this project is built as standalone, or a part of something else
+# Check if this project is built as standalone, or a part of something else 
 if(PROJECT_IS_TOP_LEVEL)
+    add_compile_definitions(LANGULUS_EXPORT_ALL)
+
     if(LANGULUS_BUILD_SHARED_LIBRARIES)
         set(LANGULUS_LIBRARY_TYPE SHARED)
     else()
@@ -33,7 +35,7 @@ else()
     set(LANGULUS_LIBRARY_TYPE OBJECT)
 endif()
 
-# Configure {fmt} library
+# Configure {fmt} library                                                   
 message(STATUS "Configuring external project: fmt...")
 download_project(
 	PROJ                fmt
@@ -43,7 +45,7 @@ download_project(
 )
 add_subdirectory(${fmt_SOURCE_DIR} ${fmt_BINARY_DIR})
 
-# Build and install Logger library
+# Build and install Logger library                                          
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/source SOURCE_FILES)
 add_library(Langulus.Logger ${LANGULUS_LIBRARY_TYPE} ${SOURCE_FILES})
 
