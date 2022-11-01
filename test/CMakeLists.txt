@@ -10,8 +10,6 @@ download_project(
 	UPDATE_DISCONNECTED 1
 )
 
-remove_definitions(-DLANGULUS_EXPORT_ALL)
-
 add_subdirectory(${Catch2_SOURCE_DIR} ${Catch2_BINARY_DIR})
 add_executable(Test.Logger ${SOURCE_FILES})
 target_link_libraries(Test.Logger PRIVATE Langulus.Logger Catch2)
