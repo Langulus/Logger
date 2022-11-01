@@ -6,9 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Check if this project is built as standalone, or a part of something else 
 if(PROJECT_IS_TOP_LEVEL)
-    add_compile_definitions(LANGULUS_EXPORT_ALL)
-
     if(LANGULUS_BUILD_SHARED_LIBRARIES)
+        add_compile_definitions(LANGULUS_EXPORT_ALL)
         set(LANGULUS_LIBRARY_TYPE SHARED)
     else()
         set(LANGULUS_LIBRARY_TYPE STATIC)
@@ -25,7 +24,6 @@ if(PROJECT_IS_TOP_LEVEL)
     include(HandleLangulusFeatures)
 
     handle_langulus_features()
-
     fetch_langulus_module(Core)
 
     add_compile_definitions(LANGULUS_ENABLE_TESTING)
