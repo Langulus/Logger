@@ -29,8 +29,6 @@ if(PROJECT_IS_TOP_LEVEL)
     add_compile_definitions(LANGULUS_ENABLE_TESTING)
 	enable_testing()
 	add_subdirectory(test)
-else()
-    set(LANGULUS_LIBRARY_TYPE OBJECT)
 endif()
 
 # Configure {fmt} library                                                   
