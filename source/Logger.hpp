@@ -138,10 +138,12 @@ namespace Langulus::Logger
    namespace Inner
    {
       /// Static initializer for every translation unit                       
-      static struct InterfaceInitializer {
+      struct InterfaceInitializer {
          InterfaceInitializer();
          ~InterfaceInitializer();
-      } InterfaceInitializerInstance;
+      };
+
+      LANGULUS_API(LOGGER) extern InterfaceInitializer InterfaceInitializerInstance;
    }
 
    namespace A
