@@ -55,7 +55,7 @@ namespace Langulus::Logger
    ///   @return the timestamp text                                           
    Text A::Interface::GetAdvancedTime() noexcept {
       try {
-         return fmt::format("{:%F %T %Z}", fmt::localtime(Clock::now()));
+         return fmt::format("{:%F %T %Z}", fmt::localtime(Clock::to_time_t(Clock::now())));
       }
       catch (...) {
          return "<unable to extract time>";
@@ -66,7 +66,7 @@ namespace Langulus::Logger
    ///   @return the timestamp text                                           
    Text A::Interface::GetSimpleTime() noexcept {
       try {
-         return fmt::format("{:%T}", fmt::localtime(Clock::now()));
+         return fmt::format("{:%T}", fmt::localtime(Clock::to_time_t(Clock::now())));
       }
       catch (...) {
          return "<unable to extract time>";
@@ -233,7 +233,7 @@ namespace Langulus::Logger
       FmtPrintStyle(TimeStampStyle);
 
       try {
-         fmt::print("\n{:%T}| ", fmt::localtime(Clock::now()));
+         fmt::print("\n{:%T}| ", fmt::localtime(Clock::to_time_t(Clock::now())));
       }
       catch (...) {
          Logger::Error() << "Logger exception";
