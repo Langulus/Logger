@@ -12,7 +12,8 @@ namespace Langulus::Logger
 {
 
    /// Scoped tabulator destruction                                           
-   inline ScopedTabs::~ScopedTabs() noexcept {
+   LANGULUS(ALWAYSINLINE)
+   ScopedTabs::~ScopedTabs() noexcept {
       while (mTabs > 0) {
          --mTabs;
          Instance << Command::Untab;
@@ -74,14 +75,16 @@ namespace Langulus::Logger
    /// Does nothing, but allows for grouping logging statements in ()         
    /// Example: Logger::Error() << "yeah" << (Logger::Info() << "no")         
    ///   @return a reference to the logger for chaining                       
-   inline A::Interface& A::Interface::operator << (A::Interface&) noexcept {
+   LANGULUS(ALWAYSINLINE)
+   A::Interface& A::Interface::operator << (A::Interface&) noexcept {
       return *this;
    }
 
    /// Push a command                                                         
    ///   @param c - the command to push                                       
    ///   @return a reference to the logger for chaining                       
-   inline A::Interface& A::Interface::operator << (const Command& c) noexcept {
+   LANGULUS(ALWAYSINLINE)
+   A::Interface& A::Interface::operator << (const Command& c) noexcept {
       Write(c);
       return *this;
    }
@@ -89,7 +92,8 @@ namespace Langulus::Logger
    /// Push a foreground color                                                
    ///   @param c - the command to push                                       
    ///   @return a reference to the logger for chaining                       
-   inline A::Interface& A::Interface::operator << (const Color& c) noexcept {
+   LANGULUS(ALWAYSINLINE)
+   A::Interface& A::Interface::operator << (const Color& c) noexcept {
       Write(c);
       return *this;
    }
@@ -97,7 +101,8 @@ namespace Langulus::Logger
    /// Push an emphasis                                                       
    ///   @param e - the emphasis to push                                      
    ///   @return a reference to the logger for chaining                       
-   inline A::Interface& A::Interface::operator << (const Emphasis& e) noexcept {
+   LANGULUS(ALWAYSINLINE)
+   A::Interface& A::Interface::operator << (const Emphasis& e) noexcept {
       Write(e);
       return *this;
    }
@@ -105,7 +110,8 @@ namespace Langulus::Logger
    /// Push a foreground and background color                                 
    ///   @param c - the state to push                                         
    ///   @return a reference to the logger for chaining                       
-   inline A::Interface& A::Interface::operator << (const Style& c) noexcept {
+   LANGULUS(ALWAYSINLINE)
+   A::Interface& A::Interface::operator << (const Style& c) noexcept {
       Write(c);
       return *this;
    }
@@ -113,7 +119,8 @@ namespace Langulus::Logger
    /// Push a number of tabs                                                  
    ///   @param t - the tabs to push                                          
    ///   @return a reference to the logger for chaining                       
-   inline A::Interface& A::Interface::operator << (const Tabs& t) noexcept {
+   LANGULUS(ALWAYSINLINE)
+   A::Interface& A::Interface::operator << (const Tabs& t) noexcept {
       auto tabs = ::std::max(1, t.mTabs);
       while (tabs) {
          Write(Command::Tab);
@@ -128,7 +135,8 @@ namespace Langulus::Logger
    /// automatically untabs when the Tabs object is destroyed                 
    ///   @param t - [in/out] the tabs to push                                 
    ///   @return a reference to the logger for chaining                       
-   inline ScopedTabs A::Interface::operator << (Tabs&& t) noexcept {
+   LANGULUS(ALWAYSINLINE)
+   ScopedTabs A::Interface::operator << (Tabs&& t) noexcept {
       auto tabs = ::std::max(1, t.mTabs);
       while (tabs) {
          Write(Command::Tab);
@@ -143,6 +151,7 @@ namespace Langulus::Logger
    ///   @param anything - type type to stringify                             
    ///   @return a reference to the logger for chaining                       
    template<Formattable T>
+   LANGULUS(ALWAYSINLINE)
    A::Interface& A::Interface::operator << (const T& anything) noexcept {
       Write(fmt::format("{}", anything));
       return *this;
@@ -152,6 +161,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Line(T&&...arguments) noexcept {
       if constexpr (sizeof...(arguments) > 0) {
          Instance.NewLine();
@@ -164,6 +174,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Append(T&&...arguments) noexcept {
       if constexpr (sizeof...(arguments) > 0)
          (Instance << ... << ::std::forward<T>(arguments));
@@ -176,6 +187,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a scoped tab                                                 
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    ScopedTabs Section(T&&...arguments) noexcept {
       return Line(Color::White, Emphasis::Bold, ::std::forward<T>(arguments)..., Tabs {});
    }
@@ -184,6 +196,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Fatal(T&&...arguments) noexcept {
       return Line(Color::DarkRed, "FATAL ERROR: ", ::std::forward<T>(arguments)...);
    }
@@ -192,6 +205,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Error(T&&...arguments) noexcept {
       return Line(Color::Red, "ERROR: ", ::std::forward<T>(arguments)...);
    }
@@ -200,6 +214,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Warning(T&&...arguments) noexcept {
       return Line(Color::DarkYellow, "WARNING: ", ::std::forward<T>(arguments)...);
    }
@@ -208,6 +223,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Verbose(T&&...arguments) noexcept {
       return Line(Color::DarkGray, ::std::forward<T>(arguments)...);
    }
@@ -216,6 +232,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Info(T&&...arguments) noexcept {
       return Line(Color::Gray, ::std::forward<T>(arguments)...);
    }
@@ -224,6 +241,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Message(T&&...arguments) noexcept {
       return Line(Color::White, ::std::forward<T>(arguments)...);
    }
@@ -240,6 +258,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Flow(T&&...arguments) noexcept {
       return Line(Color::DarkCyan, ::std::forward<T>(arguments)...);
    }
@@ -248,6 +267,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Input(T&&...arguments) noexcept {
       return Line(Color::Blue, ::std::forward<T>(arguments)...);
    }
@@ -256,6 +276,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Network(T&&...arguments) noexcept {
       return Line(Color::Yellow, ::std::forward<T>(arguments)...);
    }
@@ -264,6 +285,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) OS(T&&...arguments) noexcept {
       return Line(Color::DarkBlue, ::std::forward<T>(arguments)...);
    }
@@ -272,6 +294,7 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
+   LANGULUS(ALWAYSINLINE)
    decltype(auto) Prompt(T&&...arguments) noexcept {
       return Line(Color::Green, ::std::forward<T>(arguments)...);
    }

@@ -15,41 +15,14 @@ using Clock = ::std::chrono::system_clock;
 
 namespace Langulus::Logger
 {
-   namespace Inner
-   {
-      InterfaceInitializer InterfaceInitializerInstance {};
-   }
-
-   /// Schwarz counter pattern                                                
-   /// https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Nifty_Counter        
-   /// Zero initialized at load time, guaranteed                              
-   static int NiftyCounter;
-
-   /// Memory for the logger instance                                         
-   static ::std::aligned_storage_t<sizeof(Interface), alignof(Interface)> InstanceBuffer;
 
    /// The global handle shall point to the buffer                            
-   Interface& Instance = reinterpret_cast<Interface&> (InstanceBuffer);
-
-   /// Initialize logger together with the first include of the header        
-   Inner::InterfaceInitializer::InterfaceInitializer() {
-      if (NiftyCounter++ == 0)
-         new (&Instance) Interface();
-   }
-
-   /// Destroy logger with the last destruction of the initializer            
-   Inner::InterfaceInitializer::~InterfaceInitializer() {
-      if (--NiftyCounter == 0)
-         Instance.~Interface();
-   }
+   Interface Instance {};
 
    /// Logger construction                                                    
    Interface::Interface() {
       mStyleStack.push(DefaultStyle);
    }
-
-   /// Logger destruction                                                     
-   Interface::~Interface() { }
 
    /// Generate an exhaustive timestamp in the current system time zone       
    ///   @return the timestamp text                                           
@@ -109,7 +82,8 @@ namespace Langulus::Logger
    /// When using fmt::print(style, mask, ...), the style will be reset after 
    /// message has been written, and I don't want that to happen              
    ///   @param style - the style to set                                      
-   LANGULUS(ALWAYSINLINE) void FmtPrintStyle(const Style& style) {
+   LANGULUS(ALWAYSINLINE)
+   void FmtPrintStyle(const Style& style) {
       // Always reset before a style change                             
       fmt::print("{}", "\x1b[0m");
       
