@@ -59,18 +59,7 @@ namespace Langulus::Logger
 
    /// Write a string view to stdout                                          
    ///   @param literalText - the text to write                               
-   void Interface::Write(const Token& literalText) const noexcept {
-      try {
-         fmt::print("{}", literalText);
-      }
-      catch (...) {
-         Logger::Error() << "Logger exception";
-      }
-   }
-
-   /// Write a string view to stdout                                          
-   ///   @param literalText - the text to write                               
-   void Interface::Write(const Text& stdString) const noexcept {
+   void Interface::Write(const TextView& stdString) const noexcept {
       try {
          fmt::print("{}", stdString);
       }

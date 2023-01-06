@@ -24,7 +24,7 @@ namespace Langulus::Logger
    /// name part for logging                                                  
    ///   @param text - the text to scan                                       
    ///   @return the interesting part                                         
-   constexpr Token A::Interface::GetFunctionName(const Token& text, const Token& omit) noexcept {
+   constexpr TextView A::Interface::GetFunctionName(const TextView& text, const TextView& omit) noexcept {
       size_t length = text.size();
       size_t start = 0;
       size_t end = 0;
@@ -130,6 +130,15 @@ namespace Langulus::Logger
       return *this;
    }
 
+   /// Stringify anything that has a valid std::formatter                     
+   ///   @param anything - type type to stringify                             
+   ///   @return a reference to the logger for chaining                       
+   LANGULUS(ALWAYSINLINE)
+      A::Interface& A::Interface::operator << (const TextView& anything) noexcept {
+      Write(fmt::format("{}", anything));
+      return *this;
+   }
+
    /// Push a number of tabs                                                  
    /// Keeps track of the number of tabs that have been pushed, and then      
    /// automatically untabs when the Tabs object is destroyed                 
@@ -147,16 +156,6 @@ namespace Langulus::Logger
       return ScopedTabs {t.mTabs};
    }
 
-   /// Stringify anything that has a valid std::formatter                     
-   ///   @param anything - type type to stringify                             
-   ///   @return a reference to the logger for chaining                       
-   template<Formattable T>
-   LANGULUS(ALWAYSINLINE)
-   A::Interface& A::Interface::operator << (const T& anything) noexcept {
-      Write(fmt::format("{}", anything));
-      return *this;
-   }
-
    /// A general new-line write function with color                           
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
@@ -167,7 +166,7 @@ namespace Langulus::Logger
          Instance.NewLine();
          return (Instance << ... << ::std::forward<T>(arguments));
       }
-      else return Instance;
+      else return (Instance);
    }
 
    /// A general same-line write function with color                          
@@ -178,7 +177,7 @@ namespace Langulus::Logger
    decltype(auto) Append(T&&...arguments) noexcept {
       if constexpr (sizeof...(arguments) > 0)
          (Instance << ... << ::std::forward<T>(arguments));
-      return Instance;
+      return (Instance);
    }
 
    /// Write a section on a new line, tab all consecutive lines, bold it,     

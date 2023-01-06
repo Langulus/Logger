@@ -26,10 +26,7 @@ namespace Langulus::Logger
 
    /// Text container used by the logger                                      
    using Text = ::std::basic_string<Letter>;
-
-   /// Check if a type can be used with {fmt} by the logger                   
-   template<class T>
-   concept Formattable = fmt::is_formattable<T, Letter>::value;
+   using TextView = ::std::basic_string_view<Letter>;
 
 } // namespace Langulus::Logger
 
@@ -142,13 +139,12 @@ namespace Langulus::Logger
       ///                                                                     
       class Interface {
       public:
-         NOD() static constexpr Token GetFunctionName(const Token&, const Token& omit = "Langulus::") noexcept;
+         NOD() static constexpr TextView GetFunctionName(const TextView&, const TextView& omit = "Langulus::") noexcept;
          NOD() static Text GetAdvancedTime() noexcept;
          NOD() static Text GetSimpleTime() noexcept;
 
          virtual void Write(const Letter&) const noexcept = 0;
-         virtual void Write(const Token&) const noexcept = 0;
-         virtual void Write(const Text&) const noexcept = 0;
+         virtual void Write(const TextView&) const noexcept = 0;
          virtual void Write(const Command&) noexcept = 0;
          virtual void Write(const Color&) noexcept = 0;
          virtual void Write(const Emphasis&) noexcept = 0;
@@ -169,10 +165,9 @@ namespace Langulus::Logger
          Interface& operator << (const Emphasis&) noexcept;
          Interface& operator << (const Style&) noexcept;
          Interface& operator << (const Tabs&) noexcept;
-         ScopedTabs operator << (Tabs&&) noexcept;
+         Interface& operator << (const TextView&) noexcept;
 
-         template<Formattable T>
-         Interface& operator << (const T&) noexcept;
+         ScopedTabs operator << (Tabs&&) noexcept;
       };
    }
 
@@ -191,7 +186,7 @@ namespace Langulus::Logger
       static constexpr Style TimeStampStyle = TabStyle;
 
       // A string used instead of \t, when you push a Tab command       
-      static constexpr Token TabString = "|  ";
+      static constexpr TextView TabString = "|  ";
 
       // Color stack                                                    
       ::std::stack<Style> mStyleStack;
@@ -202,11 +197,9 @@ namespace Langulus::Logger
 
    public:
       Interface();
-      virtual ~Interface() = default;
 
       void Write(const Letter&) const noexcept final;
-      void Write(const Token&) const noexcept final;
-      void Write(const Text&) const noexcept final;
+      void Write(const TextView&) const noexcept final;
       void Write(const Color&) noexcept final;
       void Write(const Emphasis&) noexcept final;
       void Write(const Command&) noexcept final;
