@@ -130,11 +130,20 @@ namespace Langulus::Logger
       return *this;
    }
 
+   /// Write string views                                                     
+   ///   @param t - text to write                                             
+   ///   @return a reference to the logger for chaining                       
+   LANGULUS(ALWAYSINLINE)
+      A::Interface& A::Interface::operator << (const TextView& t) noexcept {
+      Write(fmt::format("{}", t));
+      return *this;
+   }
+
    /// Stringify anything that has a valid std::formatter                     
    ///   @param anything - type type to stringify                             
    ///   @return a reference to the logger for chaining                       
    LANGULUS(ALWAYSINLINE)
-      A::Interface& A::Interface::operator << (const TextView& anything) noexcept {
+   A::Interface& A::Interface::operator << (const Formattable auto& anything) noexcept {
       Write(fmt::format("{}", anything));
       return *this;
    }

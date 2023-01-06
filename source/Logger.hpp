@@ -28,6 +28,9 @@ namespace Langulus::Logger
    using Text = ::std::basic_string<Letter>;
    using TextView = ::std::basic_string_view<Letter>;
 
+   template<class... T>
+   concept Formattable = (fmt::is_formattable<T>::value && ...);
+
 } // namespace Langulus::Logger
 
 namespace Langulus::Logger
@@ -120,7 +123,7 @@ namespace Langulus::Logger
       constexpr Tabs(const Tabs&) noexcept = default;
       constexpr Tabs(Tabs&& other) noexcept
          : mTabs {other.mTabs} { other.mTabs = 0; }
-      constexpr Tabs(int tabs) noexcept
+      constexpr explicit Tabs(int tabs) noexcept
          : mTabs {tabs} {}
    };
 
@@ -155,7 +158,7 @@ namespace Langulus::Logger
          /// Implicit bool operator in order to use log in 'if' statements    
          /// Example: if (condition && Logger::Info("stuff"))                 
          ///   @return true                                                   
-         constexpr operator bool() const noexcept {
+         constexpr explicit operator bool() const noexcept {
             return true;
          }
 
@@ -166,6 +169,7 @@ namespace Langulus::Logger
          Interface& operator << (const Style&) noexcept;
          Interface& operator << (const Tabs&) noexcept;
          Interface& operator << (const TextView&) noexcept;
+         Interface& operator << (const Formattable auto&) noexcept;
 
          ScopedTabs operator << (Tabs&&) noexcept;
       };
