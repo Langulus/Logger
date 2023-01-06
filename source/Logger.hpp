@@ -182,7 +182,7 @@ namespace Langulus::Logger
    /// Supports colors, formatting commands, and can relay messages to a      
    /// list of attachments                                                    
    ///                                                                        
-   class Interface : public A::Interface {
+   class Interface final : public A::Interface {
    private:
       // Tabulator color and formatting                                 
       static constexpr Style DefaultStyle = {};
