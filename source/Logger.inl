@@ -205,11 +205,10 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    LANGULUS(ALWAYSINLINE)
-   decltype(auto) Fatal(T&&...arguments) noexcept {
+   decltype(auto) Fatal([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_FATALERRORS
          return Line(Color::DarkRed, "FATAL ERROR: ", ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
@@ -219,11 +218,10 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    LANGULUS(ALWAYSINLINE)
-   decltype(auto) Error(T&&...arguments) noexcept {
+   decltype(auto) Error([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_ERRORS
          return Line(Color::Red, "ERROR: ", ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
@@ -233,11 +231,10 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    LANGULUS(ALWAYSINLINE)
-   decltype(auto) Warning(T&&...arguments) noexcept {
+   decltype(auto) Warning([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_WARNINGS
          return Line(Color::DarkYellow, "WARNING: ", ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
@@ -247,11 +244,10 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    LANGULUS(ALWAYSINLINE)
-   decltype(auto) Verbose(T&&...arguments) noexcept {
+   decltype(auto) Verbose([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_VERBOSE
          return Line(Color::DarkGray, ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
@@ -261,11 +257,10 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    LANGULUS(ALWAYSINLINE)
-   decltype(auto) Info(T&&...arguments) noexcept {
+   decltype(auto) Info([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_INFOS
          return Line(Color::Gray, ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
@@ -275,11 +270,10 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    LANGULUS(ALWAYSINLINE)
-   decltype(auto) Message(T&&...arguments) noexcept {
+   decltype(auto) Message([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_MESSAGES
          return Line(Color::White, ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
@@ -288,11 +282,10 @@ namespace Langulus::Logger
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class... T>
-   decltype(auto) Special(T&&...arguments) noexcept {
+   decltype(auto) Special([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_SPECIALS
          return Line(Color::Purple, ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
@@ -302,11 +295,10 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    LANGULUS(ALWAYSINLINE)
-   decltype(auto) Flow(T&&...arguments) noexcept {
+   decltype(auto) Flow([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_FLOWS
          return Line(Color::DarkCyan, ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
@@ -316,11 +308,10 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    LANGULUS(ALWAYSINLINE)
-   decltype(auto) Input(T&&...arguments) noexcept {
+   decltype(auto) Input([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_INPUTS
          return Line(Color::Blue, ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
@@ -330,11 +321,10 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    LANGULUS(ALWAYSINLINE)
-   decltype(auto) Network(T&&...arguments) noexcept {
+   decltype(auto) Network([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_NETWORKS
          return Line(Color::Yellow, ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
@@ -344,11 +334,10 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    LANGULUS(ALWAYSINLINE)
-   decltype(auto) OS(T&&...arguments) noexcept {
+   decltype(auto) OS([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_OS
          return Line(Color::DarkBlue, ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
@@ -358,11 +347,10 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    LANGULUS(ALWAYSINLINE)
-   decltype(auto) Prompt(T&&...arguments) noexcept {
+   decltype(auto) Prompt([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_PROMPTS
          return Line(Color::Green, ::std::forward<T>(arguments)...);
       #else
-         (arguments);
          return (Instance);
       #endif
    }
