@@ -206,7 +206,12 @@ namespace Langulus::Logger
    template<class... T>
    LANGULUS(ALWAYSINLINE)
    decltype(auto) Fatal(T&&...arguments) noexcept {
-      return Line(Color::DarkRed, "FATAL ERROR: ", ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_FATALERRORS
+         return Line(Color::DarkRed, "FATAL ERROR: ", ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
    /// Write a new-line error                                                 
@@ -215,7 +220,12 @@ namespace Langulus::Logger
    template<class... T>
    LANGULUS(ALWAYSINLINE)
    decltype(auto) Error(T&&...arguments) noexcept {
-      return Line(Color::Red, "ERROR: ", ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_ERRORS
+         return Line(Color::Red, "ERROR: ", ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
    /// Write a new-line warning                                               
@@ -224,7 +234,12 @@ namespace Langulus::Logger
    template<class... T>
    LANGULUS(ALWAYSINLINE)
    decltype(auto) Warning(T&&...arguments) noexcept {
-      return Line(Color::DarkYellow, "WARNING: ", ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_WARNINGS
+         return Line(Color::DarkYellow, "WARNING: ", ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
    /// Write a new-line with verbose information                              
@@ -233,7 +248,12 @@ namespace Langulus::Logger
    template<class... T>
    LANGULUS(ALWAYSINLINE)
    decltype(auto) Verbose(T&&...arguments) noexcept {
-      return Line(Color::DarkGray, ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_VERBOSE
+         return Line(Color::DarkGray, ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
    /// Write a new-line with information                                      
@@ -242,7 +262,12 @@ namespace Langulus::Logger
    template<class... T>
    LANGULUS(ALWAYSINLINE)
    decltype(auto) Info(T&&...arguments) noexcept {
-      return Line(Color::Gray, ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_INFOS
+         return Line(Color::Gray, ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
    /// Write a new-line with a personal message                               
@@ -251,7 +276,12 @@ namespace Langulus::Logger
    template<class... T>
    LANGULUS(ALWAYSINLINE)
    decltype(auto) Message(T&&...arguments) noexcept {
-      return Line(Color::White, ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_MESSAGES
+         return Line(Color::White, ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
    /// Write a new-line with special text                                     
@@ -259,7 +289,12 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    template<class... T>
    decltype(auto) Special(T&&...arguments) noexcept {
-      return Line(Color::Purple, ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_SPECIALS
+         return Line(Color::Purple, ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
    /// Write a new-line with flow information                                 
@@ -268,7 +303,12 @@ namespace Langulus::Logger
    template<class... T>
    LANGULUS(ALWAYSINLINE)
    decltype(auto) Flow(T&&...arguments) noexcept {
-      return Line(Color::DarkCyan, ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_FLOWS
+         return Line(Color::DarkCyan, ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
    /// Write a new-line on user input                                         
@@ -277,7 +317,12 @@ namespace Langulus::Logger
    template<class... T>
    LANGULUS(ALWAYSINLINE)
    decltype(auto) Input(T&&...arguments) noexcept {
-      return Line(Color::Blue, ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_INPUTS
+         return Line(Color::Blue, ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
    /// Write a new-line with network message                                  
@@ -286,7 +331,12 @@ namespace Langulus::Logger
    template<class... T>
    LANGULUS(ALWAYSINLINE)
    decltype(auto) Network(T&&...arguments) noexcept {
-      return Line(Color::Yellow, ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_NETWORKS
+         return Line(Color::Yellow, ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
    /// Write a new-line with a message from OS                                
@@ -295,7 +345,12 @@ namespace Langulus::Logger
    template<class... T>
    LANGULUS(ALWAYSINLINE)
    decltype(auto) OS(T&&...arguments) noexcept {
-      return Line(Color::DarkBlue, ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_OS
+         return Line(Color::DarkBlue, ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
    /// Write a new-line with an input prompt                                  
@@ -304,7 +359,12 @@ namespace Langulus::Logger
    template<class... T>
    LANGULUS(ALWAYSINLINE)
    decltype(auto) Prompt(T&&...arguments) noexcept {
-      return Line(Color::Green, ::std::forward<T>(arguments)...);
+      #ifdef LANGULUS_LOGGER_ENABLE_PROMPTS
+         return Line(Color::Green, ::std::forward<T>(arguments)...);
+      #else
+         (arguments);
+         return (Instance);
+      #endif
    }
 
 } // namespace Langulus::Logger
