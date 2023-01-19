@@ -134,9 +134,39 @@ namespace Langulus::Logger
    ///   @param t - text to write                                             
    ///   @return a reference to the logger for chaining                       
    LANGULUS(ALWAYSINLINE)
-      A::Interface& A::Interface::operator << (const TextView& t) noexcept {
-      Write(fmt::format("{}", t));
+   A::Interface& A::Interface::operator << (const TextView& t) noexcept {
+      Write(t);
       return *this;
+   }
+
+   /// Write a nullptr as "null"                                              
+   ///   @return a reference to the logger for chaining                       
+   LANGULUS(ALWAYSINLINE)
+   A::Interface& A::Interface::operator << (const nullptr_t&) noexcept {
+      Write("null");
+      return *this;
+   }
+
+   /// Dereference anything sparse, and route it through the logger again     
+   ///   @param anything - type type to stringify                             
+   ///   @return a reference to the logger for chaining                       
+   template<CT::Sparse T>
+   LANGULUS(ALWAYSINLINE)
+   A::Interface& A::Interface::operator << (const T& sparse) noexcept {
+      if constexpr (CT::BuiltinCharacter<T>) {
+         Write(sparse);
+         return *this;
+      }
+      else {
+         using DT = Deptr<T>;
+         static_assert(CT::Sparse<DT> || Formattable<DT>,
+            "Dereferenced pointer is not Formattable, you have to declare "
+            "a (dense) fmt::formatter for it");
+         if (sparse == nullptr)
+            return operator << (nullptr);
+         else
+            return operator << (*sparse);
+      }
    }
 
    /// Stringify anything that has a valid std::formatter                     
