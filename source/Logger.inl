@@ -142,7 +142,7 @@ namespace Langulus::Logger
    /// Write a nullptr as "null"                                              
    ///   @return a reference to the logger for chaining                       
    LANGULUS(ALWAYSINLINE)
-   A::Interface& A::Interface::operator << (const nullptr_t&) noexcept {
+   A::Interface& A::Interface::operator << (const ::std::nullptr_t&) noexcept {
       Write("null");
       return *this;
    }
@@ -173,7 +173,7 @@ namespace Langulus::Logger
    ///   @param anything - type type to stringify                             
    ///   @return a reference to the logger for chaining                       
    LANGULUS(ALWAYSINLINE)
-   A::Interface& A::Interface::operator << (const Formattable auto& anything) noexcept {
+   A::Interface& A::Interface::operator << (Formattable auto&& anything) noexcept {
       Write(fmt::format("{}", anything));
       return *this;
    }
