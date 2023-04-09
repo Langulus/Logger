@@ -71,7 +71,7 @@ namespace Langulus::Logger
    /// When using fmt::print(style, mask, ...), the style will be reset after 
    /// message has been written, and I don't want that to happen              
    ///   @param style - the style to set                                      
-   LANGULUS(ALWAYSINLINE)
+   LANGULUS(INLINED)
    void FmtPrintStyle(const Style& style) {
       // Always reset before a style change                             
       fmt::print("{}", "\x1b[0m");
