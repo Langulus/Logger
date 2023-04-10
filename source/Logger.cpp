@@ -77,18 +77,18 @@ namespace Langulus::Logger
       fmt::print("{}", "\x1b[0m");
       
       if (style.has_emphasis()) {
-         auto emphasis = fmt::detail::make_emphasis<Letter>(style.get_emphasis());
-         fmt::print("{}", emphasis);
+         const auto emphasis = fmt::detail::make_emphasis<Letter>(style.get_emphasis());
+         fmt::print("{}", emphasis.begin());
       }
 
       if (style.has_foreground()) {
-         auto foreground = fmt::detail::make_foreground_color<Letter>(style.get_foreground());
-         fmt::print("{}", foreground);
+         const auto foreground = fmt::detail::make_foreground_color<Letter>(style.get_foreground());
+         fmt::print("{}", foreground.begin());
       }
 
       if (style.has_background()) {
-         auto background = fmt::detail::make_background_color<Letter>(style.get_background());
-         fmt::print("{}", background);
+         const auto background = fmt::detail::make_background_color<Letter>(style.get_background());
+         fmt::print("{}", background.begin());
       }
    }
 
