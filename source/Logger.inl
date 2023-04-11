@@ -80,6 +80,17 @@ namespace Langulus::Logger
       return *this;
    }
 
+   /// Write an exception                                                     
+   ///   @param e - exception to write                                        
+   ///   @return a reference to the logger for chaining                       
+   LANGULUS(INLINED)
+   A::Interface& A::Interface::operator << (const Exception& e) noexcept {
+      Write(fmt::format(
+         "{}({} at {})", e.GetName(), e.GetMessage(), e.GetLocation())
+      );
+      return *this;
+   }
+
    /// Push a command                                                         
    ///   @param c - the command to push                                       
    ///   @return a reference to the logger for chaining                       
