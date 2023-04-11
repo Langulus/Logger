@@ -30,12 +30,7 @@ namespace Langulus::Logger
 
    template<class... T>
    concept Formattable = 
-      CT::Dense<T...> && ((fmt::is_formattable<T>::value) && ...);
-
-} // namespace Langulus::Logger
-
-namespace Langulus::Logger
-{
+      CT::Dense<T...> && ((::fmt::is_formattable<T>::value) && ...);
 
    /// Color codes, consistent with ANSI/VT100 escapes                        
    /// Also consistent with fmt::terminal_color                               
@@ -174,8 +169,8 @@ namespace Langulus::Logger
          Interface& operator << (const ::std::nullptr_t&) noexcept;
          template<CT::Sparse T>
          Interface& operator << (const T&) noexcept;
-         Interface& operator << (const Formattable auto&) noexcept;
-
+         template<::Langulus::Logger::Formattable T>
+         Interface& operator << (const T&) noexcept;
          ScopedTabs operator << (Tabs&&) noexcept;
       };
    }

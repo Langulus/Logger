@@ -170,7 +170,7 @@ namespace Langulus::Logger
       }
       else {
          using DT = Deptr<T>;
-         static_assert(CT::Sparse<DT> || Formattable<DT>,
+         static_assert(CT::Sparse<DT> || ::Langulus::Logger::Formattable<DT>,
             "Dereferenced pointer is not Formattable, you have to declare "
             "a (dense) fmt::formatter for it");
          if (sparse == nullptr)
@@ -183,8 +183,9 @@ namespace Langulus::Logger
    /// Stringify anything that has a valid fmt formatter                      
    ///   @param anything - type to stringify                                  
    ///   @return a reference to the logger for chaining                       
+   template<::Langulus::Logger::Formattable T>
    LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (const Formattable auto& anything) noexcept {
+   A::Interface& A::Interface::operator << (const T& anything) noexcept {
       Write(fmt::format("{}", anything));
       return *this;
    }
