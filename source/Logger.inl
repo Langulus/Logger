@@ -159,7 +159,7 @@ namespace Langulus::Logger
    }
 
    /// Dereference anything sparse, and route it through the logger again     
-   ///   @param anything - type type to stringify                             
+   ///   @param anything - pointer to stringify                               
    ///   @return a reference to the logger for chaining                       
    template<CT::Sparse T>
    LANGULUS(INLINED)
@@ -180,11 +180,11 @@ namespace Langulus::Logger
       }
    }
 
-   /// Stringify anything that has a valid std::formatter                     
-   ///   @param anything - type type to stringify                             
+   /// Stringify anything that has a valid fmt formatter                      
+   ///   @param anything - type to stringify                                  
    ///   @return a reference to the logger for chaining                       
    LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (Formattable auto&& anything) noexcept {
+   A::Interface& A::Interface::operator << (const Formattable auto& anything) noexcept {
       Write(fmt::format("{}", anything));
       return *this;
    }

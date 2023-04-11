@@ -29,7 +29,8 @@ namespace Langulus::Logger
    using TextView = ::std::basic_string_view<Letter>;
 
    template<class... T>
-   concept Formattable = ((fmt::is_formattable<T>::value) && ...);
+   concept Formattable = 
+      CT::Dense<T...> && ((fmt::is_formattable<T>::value) && ...);
 
 } // namespace Langulus::Logger
 
@@ -173,7 +174,7 @@ namespace Langulus::Logger
          Interface& operator << (const ::std::nullptr_t&) noexcept;
          template<CT::Sparse T>
          Interface& operator << (const T&) noexcept;
-         Interface& operator << (Formattable auto&&) noexcept;
+         Interface& operator << (const Formattable auto&) noexcept;
 
          ScopedTabs operator << (Tabs&&) noexcept;
       };
