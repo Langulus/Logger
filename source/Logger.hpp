@@ -139,8 +139,12 @@ namespace Langulus::Logger
       class Interface {
       public:
          NOD() static constexpr TextView GetFunctionName(const TextView&, const TextView& omit = "Langulus::") noexcept;
-         NOD() static Text GetAdvancedTime() noexcept;
-         NOD() static Text GetSimpleTime() noexcept;
+         
+         NOD() LANGULUS_API(LOGGER)
+         static Text GetAdvancedTime() noexcept;
+         
+         NOD() LANGULUS_API(LOGGER)
+         static Text GetSimpleTime() noexcept;
 
          virtual void Write(const Letter&) const noexcept = 0;
          virtual void Write(const TextView&) const noexcept = 0;
@@ -200,18 +204,37 @@ namespace Langulus::Logger
       ::std::list<A::Interface*> mAttachments;
 
    public:
+      LANGULUS_API(LOGGER)
       Interface();
 
+      LANGULUS_API(LOGGER)
       void Write(const Letter&) const noexcept final;
+
+      LANGULUS_API(LOGGER)
       void Write(const TextView&) const noexcept final;
+
+      LANGULUS_API(LOGGER)
       void Write(const Command&) noexcept final;
+
+      LANGULUS_API(LOGGER)
       void Write(const Color&) noexcept final;
+
+      LANGULUS_API(LOGGER)
       void Write(const Emphasis&) noexcept final;
+
+      LANGULUS_API(LOGGER)
       void Write(const Style&) noexcept final;
+
+      LANGULUS_API(LOGGER)
       void NewLine() const noexcept final;
+
+      LANGULUS_API(LOGGER)
       void Tabulate() const noexcept final;
 
+      LANGULUS_API(LOGGER)
       void Attach(A::Interface*) noexcept;
+
+      LANGULUS_API(LOGGER)
       void Dettach(A::Interface*) noexcept;
    };
 
