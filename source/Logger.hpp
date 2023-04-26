@@ -6,7 +6,7 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include <LangulusCore.hpp>
+#include <Core/Exceptions.hpp>
 
 #if defined(LANGULUS_EXPORT_ALL) || defined(LANGULUS_EXPORT_LOGGER)
    #define LANGULUS_API_LOGGER() LANGULUS_EXPORT()
@@ -282,3 +282,6 @@ namespace Langulus::Logger
    (::Langulus::Logger::A::Interface::GetFunctionName(LANGULUS_FUNCTION()))
 
 #include "Logger.inl"
+
+/// Make the rest of the code aware, that Langulus::Logger has been included  
+#define LANGULUS_LIBRARY_LOGGER() 1

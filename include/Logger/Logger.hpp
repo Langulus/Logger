@@ -6,6 +6,6 @@
 /// See LICENSE file, or https://www.gnu.org/licenses                         
 ///                                                                           
 #pragma once
-#include "../source/Logger.hpp"
+#include "../../source/Logger.hpp"
 
 #define LANGULUS_LIBRARY_LOGGER() 1
