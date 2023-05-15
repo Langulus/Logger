@@ -1,4 +1,4 @@
-project(Langulus::Logger::Test)
+project(LangulusLoggerTest)
 
 add_executable(LangulusLoggerTest 
 	Main.cpp
@@ -11,7 +11,7 @@ target_link_libraries(LangulusLoggerTest
 )
 
 add_test(
-	NAME		Langulus::Logger::Test
+	NAME		LangulusLoggerTest
 	COMMAND		LangulusLoggerTest
 )
 
