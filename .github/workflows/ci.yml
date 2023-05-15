@@ -33,6 +33,7 @@ jobs:
             architecture: x64
             cmake_args: "-G \"Visual Studio 17 2022\" -A x64"
 
+
     name: "${{matrix.os}}-${{matrix.cxx}}-${{matrix.build}}-${{matrix.architecture}}"
     runs-on: ${{matrix.os}}
     steps:
@@ -53,6 +54,6 @@ jobs:
           -DLANGULUS_BUILD_SHARED_LIBRARIES=ON
           ${{matrix.cmake_args}}
       - name: Build
-        run: cmake --build out --config ${{matrix.build}} --parallel
+        run: cmake --build out --config ${{matrix.build}}
       - name: Test
-        run: ctest --test-dir build -V
+        run: ctest -V -C ${{matrix.build}}
