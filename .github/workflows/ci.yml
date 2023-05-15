@@ -33,6 +33,7 @@ jobs:
             architecture: x64
             cmake_args: "-G \"Visual Studio 17 2022\" -A x64"
 
+    name: "${{matrix.os}}-${{matrix.cxx}}-${{matrix.build}}-${{matrix.architecture}}"
     runs-on: ${{matrix.os}}
     steps:
       - name: Dispatch Trigger
@@ -46,12 +47,12 @@ jobs:
           cmake
           -DCMAKE_CXX_COMPILER=${{matrix.cxx}}
           -S .
-          -B out/build
+          -B out
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
           -DLANGULUS_ENABLE_TESTING=ON
           -DLANGULUS_BUILD_SHARED_LIBRARIES=ON
           ${{matrix.cmake_args}}
       - name: Build
-        run: cmake --build out/build --config ${{matrix.build}}
+        run: cmake --build out --config ${{matrix.build}} --parallel
       - name: Test
-        run: cd out/test && ctest -V -C ${{matrix.build}}
+        run: ctest --test-dir build -V
