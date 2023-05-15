@@ -43,6 +43,6 @@ target_link_libraries(LangulusLogger
 
 if(LANGULUS_ENABLE_TESTING)
     enable_testing()
-	add_subdirectory(tests)
-    langulus_copy_dlls(TestLogger ON LangulusLogger)
+	add_subdirectory(test)
+    #langulus_copy_dlls(TestLogger ON LangulusLogger)
 endif()
