@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Langulus::Logger)
+project(LangulusLogger)
 
 # Check if this project is built as standalone, or a part of something else 
 if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
