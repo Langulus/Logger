@@ -17,4 +17,4 @@ jobs:
           -H "Accept: application/vnd.github+json"
           -H "Authorization: Bearer ${{secrets.TRIGGER_WORKFLOWS}}"
           https://api.github.com/repos/Langulus/${{matrix.dependents}}/dispatches
-          -d '{"event_type":"Dependency changed","client_payload":{"cause":"Logger"}}'
+          -d '{"event_type":"Dependency Langulus::Logger changed: ${{github.event.head_commit.message}}","client_payload":{"cause":"Logger"}}'

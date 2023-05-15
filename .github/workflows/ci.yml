@@ -33,15 +33,16 @@ jobs:
             architecture: x64
             cmake_args: "-G \"Visual Studio 17 2022\" -A x64"
 
+
     name: "${{matrix.os}}-${{matrix.cxx}}-${{matrix.build}}-${{matrix.architecture}}"
     runs-on: ${{matrix.os}}
     steps:
       - name: Dispatch Trigger
-        if: github.event.action == 'Dependency changed'
+        if: ${{ startsWith(github.event.action, 'Dependency') }}
         run: >
           echo "Triggered by dependency: ${{github.event.client_payload.cause}}"
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Configure
         run: >
           cmake
@@ -50,6 +51,7 @@ jobs:
           -B out/${{matrix.name}}
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
           ${{matrix.cmake_args}}
+          -DLANGULUS_FEATURE_ENABLE_TESTING=ON
       - name: Build
         run: cmake --build out/${{matrix.name}} --config ${{matrix.build}}
       - name: Test

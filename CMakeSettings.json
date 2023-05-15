@@ -9,7 +9,14 @@
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
-      "ctestCommandArgs": ""
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "MSVC-x86-Debug",
@@ -20,7 +27,14 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x86" ]
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "WSL-GCC-Debug",
@@ -33,7 +47,14 @@
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
-      "wslPath": "${defaultWSLPath}"
+      "wslPath": "${defaultWSLPath}",
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "x86-Clang-Debug",
@@ -44,7 +65,14 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "clang_cl_x86" ]
+      "inheritEnvironments": [ "clang_cl_x86" ],
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "MSVC-x86-Release",
@@ -55,7 +83,14 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x86" ]
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "MSVC-x64-Release",
@@ -66,7 +101,14 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64_x64" ]
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "x86-Clang-Release",
@@ -77,7 +119,14 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "clang_cl_x86" ]
+      "inheritEnvironments": [ "clang_cl_x86" ],
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "WSL-GCC-Release",
@@ -90,7 +139,14 @@
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
-      "wslPath": "${defaultWSLPath}"
+      "wslPath": "${defaultWSLPath}",
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "x64-Clang-Release",
@@ -101,7 +157,14 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "clang_cl_x64_x64" ]
+      "inheritEnvironments": [ "clang_cl_x64_x64" ],
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "x64-Clang-Debug",
@@ -112,7 +175,14 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "clang_cl_x64_x64" ]
+      "inheritEnvironments": [ "clang_cl_x64_x64" ],
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "arm64-Clang-Release",
@@ -123,7 +193,14 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "clang_cl_arm64_x64" ]
+      "inheritEnvironments": [ "clang_cl_arm64_x64" ],
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "arm64-Release",
@@ -135,7 +212,13 @@
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_arm64_x64" ],
-      "variables": []
+      "variables": [
+        {
+          "name": "LANGULUS_ENABLE_TESTING",
+          "value": "ON",
+          "type": "BOOL"
+        }
+      ]
     }
   ]
 }
