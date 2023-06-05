@@ -249,7 +249,7 @@ namespace Langulus::Logger
    decltype(auto) Append(T&&...) noexcept;
 
    template<class... T>
-   NOD() ScopedTabs Section(T&&...) noexcept;
+   decltype(auto) Section(T&&...) noexcept;
 
    template<class... T>
    decltype(auto) Fatal(T&&...) noexcept;

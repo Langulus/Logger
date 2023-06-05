@@ -238,8 +238,14 @@ namespace Langulus::Logger
    ///   @return a scoped tab                                                 
    template<class... T>
    LANGULUS(INLINED)
-   ScopedTabs Section(T&&...arguments) noexcept {
-      return Line(Color::White, Emphasis::Bold, ::std::forward<T>(arguments)..., Tabs {});
+   decltype(auto) Section(T&&...arguments) noexcept {
+      if constexpr (sizeof...(arguments) > 0) {
+         Instance.NewLine();
+         Instance << Color::White << Emphasis::Bold;
+         (Instance << ... << ::std::forward<T>(arguments));
+         return (Instance << Tabs {});
+      }
+      else return (Instance);
    }
 
    /// Write a new-line fatal error                                           
@@ -249,7 +255,13 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    decltype(auto) Fatal([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_FATALERRORS
-         return Line(Color::DarkRed, "FATAL ERROR: ", ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::DarkRed;
+            Instance << "FATAL ERROR: ";
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -262,7 +274,13 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    decltype(auto) Error([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_ERRORS
-         return Line(Color::Red, "ERROR: ", ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::Red;
+            Instance << "ERROR: ";
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -275,7 +293,13 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    decltype(auto) Warning([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_WARNINGS
-         return Line(Color::DarkYellow, "WARNING: ", ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::DarkYellow;
+            Instance << "WARNING: ";
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -288,7 +312,12 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    decltype(auto) Verbose([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_VERBOSE
-         return Line(Color::DarkGray, ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::DarkGray;
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -301,7 +330,12 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    decltype(auto) Info([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_INFOS
-         return Line(Color::Gray, ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::Gray;
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -314,7 +348,12 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    decltype(auto) Message([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_MESSAGES
-         return Line(Color::White, ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::White;
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -326,7 +365,12 @@ namespace Langulus::Logger
    template<class... T>
    decltype(auto) Special([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_SPECIALS
-         return Line(Color::Purple, ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::Purple;
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -339,7 +383,12 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    decltype(auto) Flow([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_FLOWS
-         return Line(Color::DarkCyan, ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::DarkCyan;
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -352,7 +401,12 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    decltype(auto) Input([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_INPUTS
-         return Line(Color::Blue, ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::Blue;
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -365,7 +419,12 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    decltype(auto) Network([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_NETWORKS
-         return Line(Color::Yellow, ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::Yellow;
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -378,7 +437,12 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    decltype(auto) OS([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_OS
-         return Line(Color::DarkBlue, ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::DarkBlue;
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -391,7 +455,12 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    decltype(auto) Prompt([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_PROMPTS
-         return Line(Color::Green, ::std::forward<T>(arguments)...);
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance.NewLine();
+            Instance << Color::Green;
+            return (Instance << ... << ::std::forward<T>(arguments));
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
