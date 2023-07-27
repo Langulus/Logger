@@ -157,7 +157,9 @@ namespace Langulus::Logger
          Write(Emphasis::Reverse);
          break;
       case Command::Reset:
-         mStyleStack.top() = DefaultStyle;
+         while (!mStyleStack.empty())
+            mStyleStack.pop();
+         mStyleStack.push(DefaultStyle);
          FmtPrintStyle(mStyleStack.top());
          break;
       case Command::Time:
@@ -212,10 +214,8 @@ namespace Langulus::Logger
 
    /// Insert current tabs and apply last style from the stack                
    void Interface::Tabulate() const noexcept {
-      if (!mTabulator) {
-         FmtPrintStyle(mStyleStack.top());
+      if (!mTabulator)
          return;
-      }
 
       auto tabs = mTabulator;
       FmtPrintStyle(TabStyle);
@@ -223,7 +223,6 @@ namespace Langulus::Logger
          Write(TabString);
          --tabs;
       }
-      FmtPrintStyle(mStyleStack.top());
    }
 
    /// Attach another logger, such as an html file                            
