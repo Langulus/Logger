@@ -1,5 +1,3 @@
-project(LangulusLoggerTest)
-
 add_executable(TestLogger
 	Main.cpp
 	TestLogger.cpp
