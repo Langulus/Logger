@@ -3,7 +3,6 @@ project(LangulusLogger
     VERSION         1.0.0
     DESCRIPTION     "Langulus logging library, using {fmt} library"
     HOMEPAGE_URL    https://langulus.com
-    LANGUAGES       CXX
 )
 
 # Check if this project is built as standalone, or a part of something else 
