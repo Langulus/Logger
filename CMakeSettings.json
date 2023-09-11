@@ -12,12 +12,12 @@
       "ctestCommandArgs": "",
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }
@@ -35,12 +35,12 @@
       "inheritEnvironments": [ "msvc_x86" ],
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }
@@ -60,12 +60,12 @@
       "wslPath": "${defaultWSLPath}",
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }
@@ -83,12 +83,12 @@
       "inheritEnvironments": [ "clang_cl_x86" ],
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }
@@ -106,12 +106,12 @@
       "inheritEnvironments": [ "msvc_x86" ],
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }
@@ -129,12 +129,12 @@
       "inheritEnvironments": [ "msvc_x64_x64" ],
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }
@@ -152,12 +152,12 @@
       "inheritEnvironments": [ "clang_cl_x86" ],
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }
@@ -177,12 +177,12 @@
       "wslPath": "${defaultWSLPath}",
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }
@@ -200,12 +200,12 @@
       "inheritEnvironments": [ "clang_cl_x64_x64" ],
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }
@@ -223,12 +223,12 @@
       "inheritEnvironments": [ "clang_cl_x64_x64" ],
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }
@@ -246,12 +246,12 @@
       "inheritEnvironments": [ "clang_cl_arm64_x64" ],
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }
@@ -269,12 +269,12 @@
       "inheritEnvironments": [ "msvc_arm64_x64" ],
       "variables": [
         {
-          "name": "LANGULUS_ENABLE_TESTING",
+          "name": "LANGULUS_TESTING",
           "value": "ON",
           "type": "BOOL"
         },
         {
-          "name": "LANGULUS_BUILD_SHARED_LIBRARIES",
+          "name": "LANGULUS_SHARED_LIBRARIES",
           "value": "ON",
           "type": "BOOL"
         }

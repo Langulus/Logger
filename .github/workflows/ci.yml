@@ -49,8 +49,8 @@ jobs:
           -S .
           -B out
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
-          -DLANGULUS_ENABLE_TESTING=ON
-          -DLANGULUS_BUILD_SHARED_LIBRARIES=ON
+          -DLANGULUS_TESTING=ON
+          -DLANGULUS_SHARED_LIBRARIES=ON
           ${{matrix.cmake_args}}
       - name: Build
         run: cmake --build out --config ${{matrix.build}}

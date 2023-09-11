@@ -45,8 +45,7 @@ target_link_libraries(LangulusLogger
                 fmt
 )
 
-if(LANGULUS_ENABLE_TESTING)
+if(LANGULUS_TESTING)
     enable_testing()
 	add_subdirectory(test)
-    #langulus_copy_dlls(TestLogger ON LangulusLogger)
 endif()

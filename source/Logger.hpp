@@ -8,7 +8,7 @@
 #pragma once
 #include <Core/Exceptions.hpp>
 
-#if defined(LANGULUS_EXPORT_ALL) || defined(LANGULUS_EXPORT_LOGGER)
+#if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_LOGGER)
    #define LANGULUS_API_LOGGER() LANGULUS_EXPORT()
 #else
    #define LANGULUS_API_LOGGER() LANGULUS_IMPORT()

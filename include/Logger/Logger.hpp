@@ -7,5 +7,3 @@
 ///                                                                           
 #pragma once
 #include "../../source/Logger.hpp"
-
-#define LANGULUS_LIBRARY_LOGGER() 1
