@@ -7,16 +7,9 @@ project(LangulusLogger
 
 # Check if this project is built as standalone, or a part of something else 
 if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
-    # Populate the cmake directory											
     include(LangulusUtilities.cmake)
-    langulus_fetch_cmake()
-
-    # Handle feature flags and global definitions/requirements				
-    include(HandleLangulusFeatures)
-    handle_langulus_features()
 
     # Add Langulus::Core library                                            
-    include(FetchLangulusModule)
     fetch_langulus_module(Core)
 endif()
 
@@ -24,7 +17,7 @@ endif()
 fetch_external_module(
     fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG        aeedac5 # master branch
+    GIT_TAG        5bdce18 # master branch
 )
 
 # Build and install Logger library                                          
