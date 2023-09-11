@@ -1,6 +1,10 @@
+include(FetchContent)
+
 function(fetch_langulus_module NAME)
     if(NOT DEFINED LANGULUS_EXTERNAL_DIRECTORY)
-        message(FATAL_ERROR "LANGULUS_EXTERNAL_DIRECTORY is not defined")
+        set(LANGULUS_EXTERNAL_DIRECTORY "${CMAKE_SOURCE_DIR}/external" CACHE PATH
+            "Place where external dependencies will be downloaded and configured")
+        message(WARNING "LANGULUS_EXTERNAL_DIRECTORY not defined, using default: ${LANGULUS_EXTERNAL_DIRECTORY}")
     endif()
 
     message(STATUS "Fetching external Langulus${NAME}...")
@@ -18,7 +22,9 @@ endfunction()
 
 function(fetch_external_module NAME GIT_REPOSITORY REPO GIT_TAG TAG)
     if(NOT DEFINED LANGULUS_EXTERNAL_DIRECTORY)
-        message(FATAL_ERROR "LANGULUS_EXTERNAL_DIRECTORY is not defined")
+        set(LANGULUS_EXTERNAL_DIRECTORY "${CMAKE_SOURCE_DIR}/external" CACHE PATH
+            "Place where external dependencies will be downloaded and configured")
+        message(WARNING "LANGULUS_EXTERNAL_DIRECTORY not defined, using default: ${LANGULUS_EXTERNAL_DIRECTORY}")
     endif()
 
     message(STATUS "Fetching external library ${NAME}...")
