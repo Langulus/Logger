@@ -25,7 +25,10 @@ namespace Langulus::Logger
    /// name part for logging                                                  
    ///   @param text - the text to scan                                       
    ///   @return the interesting part                                         
-   constexpr TextView A::Interface::GetFunctionName(const TextView& text, const TextView& omit) noexcept {
+   constexpr TextView A::Interface::GetFunctionName(
+      const TextView& text,
+      const TextView& omit
+   ) noexcept {
       size_t length = text.size();
       size_t start = 0;
       size_t end = 0;
@@ -41,7 +44,7 @@ namespace Langulus::Logger
             break;
          case '(':
             --scopes;
-            if (scopes == 0 && !anticipatingName) {
+            if (scopes == 0 and not anticipatingName) {
                start = end = length - 1;
                anticipatingName = true;
             }
@@ -53,7 +56,7 @@ namespace Langulus::Logger
             --templates;
             break;
          case ' ': case '\t':
-            if (anticipatingName && templates == 0) {
+            if (anticipatingName and templates == 0) {
                start = length;
                done = true;
             }
@@ -86,9 +89,13 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const Exception& e) noexcept {
-      Write(fmt::format(
-         "{}({} at {})", e.GetName(), e.GetMessage(), e.GetLocation())
-      );
+      #if LANGULUS(DEBUG)
+         Write(fmt::format("{}({} at {})",
+            e.GetName(), e.GetMessage(), e.GetLocation())
+         );
+      #else
+         Write(fmt::format("{}", e.GetName()));
+      #endif
       return *this;
    }
 
@@ -171,7 +178,7 @@ namespace Langulus::Logger
       }
       else {
          using DT = Deptr<T>;
-         static_assert(CT::Sparse<DT> || ::Langulus::Logger::Formattable<DT>,
+         static_assert(CT::Sparse<DT> or ::Langulus::Logger::Formattable<DT>,
             "Dereferenced pointer is not Formattable, you have to declare "
             "a (dense) fmt::formatter for it");
          if (sparse == nullptr)

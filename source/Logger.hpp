@@ -30,8 +30,8 @@ namespace Langulus::Logger
    using TextView = ::std::basic_string_view<Letter>;
 
    template<class... T>
-   concept Formattable = 
-      CT::Dense<T...> && ((::fmt::is_formattable<T>::value) && ...);
+   concept Formattable = CT::Dense<T...>
+       and ((::fmt::is_formattable<T>::value) and ...);
 
    /// Color codes, consistent with ANSI/VT100 escapes                        
    /// Also consistent with fmt::terminal_color                               
@@ -80,14 +80,14 @@ namespace Langulus::Logger
 
    /// Some formatting styles, consistent with fmt::emphasis                  
    enum class Emphasis : ::std::underlying_type_t<fmt::emphasis> {
-      Bold = 1,					// Not working on windows
-      Faint = 1 << 1,			// Not working on windows
-      Italic = 1 << 2,			// Not working on windows
-      Underline = 1 << 3,
-      Blink = 1 << 4,			// Not working on windows
-      Reverse = 1 << 5,
-      Conceal = 1 << 6,			// Not working on windows
-      Strike = 1 << 7,			// Not working on windows
+      Bold        = 1,			// Not working on windows                 
+      Faint       = 1 << 1,	// Not working on windows                 
+      Italic      = 1 << 2,	// Not working on windows                 
+      Underline   = 1 << 3,
+      Blink       = 1 << 4,	// Not working on windows                 
+      Reverse     = 1 << 5,
+      Conceal     = 1 << 6,	// Not working on windows                 
+      Strike      = 1 << 7,	// Not working on windows                 
    };
 
    using enum Emphasis;
@@ -139,7 +139,10 @@ namespace Langulus::Logger
       ///                                                                     
       class Interface {
       public:
-         NOD() static constexpr TextView GetFunctionName(const TextView&, const TextView& omit = "Langulus::") noexcept;
+         NOD() static constexpr TextView GetFunctionName(
+            const TextView&,
+            const TextView& omit = "Langulus::"
+         ) noexcept;
          
          NOD() LANGULUS_API(LOGGER)
          static Text GetAdvancedTime() noexcept;

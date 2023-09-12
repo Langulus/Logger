@@ -29,7 +29,8 @@ namespace Langulus::Logger
    ///   @return the timestamp text                                           
    Text A::Interface::GetAdvancedTime() noexcept {
       try {
-         return fmt::format("{:%F %T %Z}", fmt::localtime(Clock::to_time_t(Clock::now())));
+         return fmt::format("{:%F %T %Z}",
+            fmt::localtime(Clock::to_time_t(Clock::now())));
       }
       catch (...) {
          return "<unable to extract time>";
@@ -40,7 +41,8 @@ namespace Langulus::Logger
    ///   @return the timestamp text                                           
    Text A::Interface::GetSimpleTime() noexcept {
       try {
-         return fmt::format("{:%T}", fmt::localtime(Clock::to_time_t(Clock::now())));
+         return fmt::format("{:%T}",
+            fmt::localtime(Clock::to_time_t(Clock::now())));
       }
       catch (...) {
          return "<unable to extract time>";
@@ -110,7 +112,8 @@ namespace Langulus::Logger
          if (oldStyle.has_foreground())
             style |= fmt::fg(oldStyle.get_foreground());
       }
-      else if ((c >= Color::Black && c < Color::BlackBgr) || (c >= Color::DarkGray && c < Color::DarkGrayBgr)) {
+      else if ((c >= Color::Black    and c < Color::BlackBgr) 
+           or  (c >= Color::DarkGray and c < Color::DarkGrayBgr)) {
          // Create a new foreground color style                         
          style = fmt::fg(static_cast<fmt::terminal_color>(c));
          if (oldStyle.has_background())
@@ -158,7 +161,7 @@ namespace Langulus::Logger
          Write(Emphasis::Reverse);
          break;
       case Command::Reset:
-         while (!mStyleStack.empty())
+         while (not mStyleStack.empty())
             mStyleStack.pop();
          mStyleStack.push(DefaultStyle);
          FmtPrintStyle(mStyleStack.top());
@@ -199,7 +202,8 @@ namespace Langulus::Logger
       FmtPrintStyle(TimeStampStyle);
 
       try {
-         fmt::print("\n{:%T}| ", fmt::localtime(Clock::to_time_t(Clock::now())));
+         fmt::print("\n{:%T}| ",
+            fmt::localtime(Clock::to_time_t(Clock::now())));
       }
       catch (...) {
          Logger::Error() << "Logger exception";
@@ -215,7 +219,7 @@ namespace Langulus::Logger
 
    /// Insert current tabs and apply last style from the stack                
    void Interface::Tabulate() const noexcept {
-      if (!mTabulator)
+      if (not mTabulator)
          return;
 
       auto tabs = mTabulator;
