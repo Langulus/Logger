@@ -2,5 +2,6 @@
 /.vs
 /external
 *.user
-*.hint
 *.bak
+*.hint
+*.TMP
