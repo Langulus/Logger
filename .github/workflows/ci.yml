@@ -43,13 +43,8 @@ jobs:
           echo "Triggered by dependency: ${{github.event.client_payload.cause}}"
       - name: Clone
         uses: actions/checkout@v3
-      - if: matrix.os == 'ubuntu-22.04' && matrix.arch == 'x86' && matrix.cxx == 'clang++'
-        name: Install Clang++ for Linux cross-compilation
-        run: |
-          sudo apt update
-          sudo apt install libc++-dev libc++abi-dev
-      - if: matrix.os == 'ubuntu-22.04' && matrix.arch == 'x86' && matrix.cxx == 'g++'
-        name: Install G++ for Linux cross-compilation
+      - if: matrix.os == 'ubuntu-22.04' && matrix.arch == 'x86'
+        name: Prepare Linux for cross-compilation
         run: |
           sudo apt update
           sudo apt install g++-multilib
