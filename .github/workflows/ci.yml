@@ -1,5 +1,5 @@
 name: Langulus::Logger CI
-on: [push, repository_dispatch] # Trigger on pushes to all branches and for all pull-requests
+on: [push, repository_dispatch]
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
@@ -41,13 +41,16 @@ jobs:
         if: ${{ startsWith(github.event.action, 'Dependency') }}
         run: >
           echo "Triggered by dependency: ${{github.event.client_payload.cause}}"
+
       - name: Clone
         uses: actions/checkout@v3
+
       - if: matrix.os == 'ubuntu-22.04' && matrix.arch == 'x86'
         name: Prepare Linux for cross-compilation
         run: |
           sudo apt update
           sudo apt install g++-multilib
+
       - name: Configure
         run: >
           cmake
@@ -56,7 +59,9 @@ jobs:
           -B out
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
           ${{matrix.cmake_args}}
+
       - name: Build
         run: cmake --build out --config ${{matrix.build}}
+
       - name: Test
         run: cd out && ctest -V -C ${{matrix.build}}
