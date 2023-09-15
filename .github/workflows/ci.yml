@@ -16,8 +16,6 @@ jobs:
         exclude:
           - os: ubuntu-22.04
             cxx: cl
-          - os: ubuntu-22.04
-            arch: x86
           - os: windows-latest
             cxx: g++
           - os: windows-latest
