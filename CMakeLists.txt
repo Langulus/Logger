@@ -6,7 +6,7 @@ project(LangulusLogger
 )
 
 # Check if this project is built as standalone, or a part of something else 
-if(PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
+if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
     include(LangulusUtilities.cmake)
 
     # Add Langulus::Core library                                            
@@ -38,7 +38,7 @@ target_link_libraries(LangulusLogger
                 fmt
 )
 
-if(LANGULUS_TESTING)
+if (LANGULUS_TESTING)
     enable_testing()
 	add_subdirectory(test)
 endif()
