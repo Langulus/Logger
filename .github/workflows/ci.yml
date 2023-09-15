@@ -1,5 +1,5 @@
 name: Langulus::Logger CI
-on: [push, pull_request, repository_dispatch] # Trigger on pushes to all branches and for all pull-requests
+on: [push, repository_dispatch] # Trigger on pushes to all branches and for all pull-requests
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
