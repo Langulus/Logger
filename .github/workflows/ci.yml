@@ -47,7 +47,7 @@ jobs:
         name: Install Clang++ for Linux cross-compilation
         run: |
           sudo apt update
-          sudo apt install libc6-dev-i386-cross
+          sudo apt install libc++-16-dev
       - if: matrix.os == 'ubuntu-22.04' && matrix.arch == 'x86' && matrix.cxx == 'g++'
         name: Install G++ for Linux cross-compilation
         run: |
