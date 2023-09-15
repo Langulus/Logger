@@ -7,36 +7,36 @@ concurrency:
 jobs:
   build:
     strategy:
-      fail-fast: false # do not abort on a failed job
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, windows-latest]
         build: [Debug, Release]
-        architecture: [x86, x64]
+        arch: [x86, x64]
         cxx: [g++, clang++, cl]
         exclude:
           - os: ubuntu-22.04
             cxx: cl
           - os: ubuntu-22.04
-            architecture: x86
+            arch: x86
           - os: windows-latest
             cxx: g++
           - os: windows-latest
             cxx: clang++
         include:
-          #- os: ubuntu-22.04
-          #  architecture: x86
-          #  cmake_args: "-DCMAKE_CXX_FLAGS=-m32"
           - os: ubuntu-22.04
-            architecture: x64
+            arch: x86
+            cmake_args: "-DCMAKE_CXX_FLAGS=-m32"
+          - os: ubuntu-22.04
+            arch: x64
             cmake_args: "-DCMAKE_CXX_FLAGS=-m64"
           - os: windows-latest
-            architecture: x86
+            arch: x86
             cmake_args: "-G \"Visual Studio 17 2022\" -A Win32"
           - os: windows-latest
-            architecture: x64
+            arch: x64
             cmake_args: "-G \"Visual Studio 17 2022\" -A x64"
 
-    name: "${{matrix.os}}-${{matrix.cxx}}-${{matrix.build}}-${{matrix.architecture}}"
+    name: "${{matrix.os}}-${{matrix.cxx}}-${{matrix.build}}-${{matrix.arch}}"
     runs-on: ${{matrix.os}}
     steps:
       - name: Dispatch Trigger
@@ -45,6 +45,11 @@ jobs:
           echo "Triggered by dependency: ${{github.event.client_payload.cause}}"
       - name: Clone
         uses: actions/checkout@v3
+      - if: matrix.os == 'ubuntu-22.04' && matrix.arch == 'x86' && matrix.cxx == 'g++'
+        name: Linux installs
+        run: |
+          sudo apt update
+          sudo apt install g++-multilib
       - name: Configure
         run: >
           cmake
