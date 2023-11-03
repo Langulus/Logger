@@ -17,7 +17,7 @@ endif()
 fetch_external_module(
     fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG        8e0ca05 # master branch
+    GIT_TAG        05dda9490ddd5cb89db5f5b8ec85a399d5945deb # master branch
 )
 
 # Build and install Logger library                                          
