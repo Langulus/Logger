@@ -10,7 +10,7 @@ if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
     include(LangulusUtilities.cmake)
 
     # Add Langulus::Core library                                            
-    fetch_langulus_module(Core GIT_TAG 39ae88b)
+    fetch_langulus_module(Core GIT_TAG 0097bd180a5c625f88db0db0514bbf93aff53c7a)
 endif()
 
 # Configure {fmt} library                                                   
