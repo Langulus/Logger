@@ -22,6 +22,7 @@
 #include <fmt/format.h>
 #include <fmt/color.h>
 
+
 namespace Langulus::Logger
 {
 
@@ -134,6 +135,7 @@ namespace Langulus::Logger
 
    namespace A
    {
+
       ///                                                                     
       /// The abstract logger interface - override this to define attachments 
       ///                                                                     
@@ -181,7 +183,8 @@ namespace Langulus::Logger
          Interface& operator << (const T&) noexcept;
          ScopedTabs operator << (Tabs&&) noexcept;
       };
-   }
+
+   } // namespace Langulus::A
 
 
    ///                                                                        
@@ -196,50 +199,57 @@ namespace Langulus::Logger
       static constexpr Style DefaultStyle = {};
       static constexpr Style TabStyle = fmt::fg(fmt::terminal_color::bright_black);
       static constexpr Style TimeStampStyle = TabStyle;
-
-      // A string used instead of \t, when you push a Tab command       
       static constexpr TextView TabString = "|  ";
 
       // Color stack                                                    
       ::std::stack<Style> mStyleStack;
       // Number of tabulations                                          
       size_t mTabulator = 0;
-      // Attachments                                                    
-      ::std::list<A::Interface*> mAttachments;
+
+      // Redirectors                                                    
+      ::std::list<A::Interface*> mRedirectors;
+      // Duplicators                                                    
+      ::std::list<A::Interface*> mDuplicators;
 
    public:
       LANGULUS_API(LOGGER)
       Interface();
 
       LANGULUS_API(LOGGER)
-      void Write(const Letter&) const noexcept final;
+      void Write(const Letter&) const noexcept;
 
       LANGULUS_API(LOGGER)
-      void Write(const TextView&) const noexcept final;
+      void Write(const TextView&) const noexcept;
 
       LANGULUS_API(LOGGER)
-      void Write(const Command&) noexcept final;
+      void Write(const Command&) noexcept;
 
       LANGULUS_API(LOGGER)
-      void Write(const Color&) noexcept final;
+      void Write(const Color&) noexcept;
 
       LANGULUS_API(LOGGER)
-      void Write(const Emphasis&) noexcept final;
+      void Write(const Emphasis&) noexcept;
 
       LANGULUS_API(LOGGER)
-      void Write(const Style&) noexcept final;
+      void Write(const Style&) noexcept;
 
       LANGULUS_API(LOGGER)
-      void NewLine() const noexcept final;
+      void NewLine() const noexcept;
 
       LANGULUS_API(LOGGER)
-      void Tabulate() const noexcept final;
+      void Tabulate() const noexcept;
 
       LANGULUS_API(LOGGER)
-      void Attach(A::Interface*) noexcept;
+      void AttachDuplicator(A::Interface*) noexcept;
 
       LANGULUS_API(LOGGER)
-      void Dettach(A::Interface*) noexcept;
+      void DettachDuplicator(A::Interface*) noexcept;
+
+      LANGULUS_API(LOGGER)
+      void AttachRedirector(A::Interface*) noexcept;
+
+      LANGULUS_API(LOGGER)
+      void DettachRedirector(A::Interface*) noexcept;
    };
 
    ///                                                                        

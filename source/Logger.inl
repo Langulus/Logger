@@ -9,6 +9,7 @@
 #pragma once
 #include "Logger.hpp"
 
+
 namespace Langulus::Logger
 {
 
