@@ -14,6 +14,7 @@
 
 using Clock = ::std::chrono::system_clock;
 
+
 namespace Langulus::Logger
 {
 
@@ -230,18 +231,34 @@ namespace Langulus::Logger
       }
    }
 
-   /// Attach another logger, such as an html file                            
+   /// Attach another logger, if no redirectors are attached, any logging     
+   /// will be duplicated to the provided interface                           
    ///   @attention the logger doesn't have ownership of the attachment       
-   ///   @param receiver - the logger to attach                               
-   void Interface::Attach(A::Interface* receiver) noexcept {
-      mAttachments.push_back(receiver);
+   ///   @param duplicator - the logger to attach                             
+   void Interface::AttachDuplicator(A::Interface* duplicator) noexcept {
+      mDuplicators.push_back(duplicator);
    }
 
-   /// Dettach a logger                                                       
+   /// Dettach a duplicator                                                   
    ///   @attention the logger doesn't have ownership of the attachment       
-   ///   @param receiver - the logger to dettach                              
-   void Interface::Dettach(A::Interface* receiver) noexcept {
-      mAttachments.remove(receiver);
+   ///   @param duplicator - the duplicator to dettach                        
+   void Interface::DettachDuplicator(A::Interface* duplicator) noexcept {
+      mDuplicators.remove(duplicator);
+   }
+
+   /// Attach another logger, that will receive any logging, but also consume 
+   /// it, so that it doesn't reach the console or any attached duplicators   
+   ///   @attention the logger doesn't have ownership of the attachment       
+   ///   @param redirector - the logger to attach                             
+   void Interface::AttachRedirector(A::Interface* redirector) noexcept {
+      mRedirectors.push_back(redirector);
+   }
+
+   /// Dettach a redirector                                                   
+   ///   @attention the logger doesn't have ownership of the attachment       
+   ///   @param redirector - the duplicator to dettach                        
+   void Interface::DettachRedirector(A::Interface* redirector) noexcept {
+      mRedirectors.remove(redirector);
    }
 
 } // namespace Langulus::Logger
