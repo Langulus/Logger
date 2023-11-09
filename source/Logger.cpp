@@ -17,60 +17,6 @@ using Clock = ::std::chrono::system_clock;
 
 namespace Langulus::Logger
 {
-
-   /// The global handle shall point to the buffer                            
-   Interface Instance {};
-
-   /// Logger construction                                                    
-   Interface::Interface() {
-      mStyleStack.push(DefaultStyle);
-   }
-
-   /// Generate an exhaustive timestamp in the current system time zone       
-   ///   @return the timestamp text                                           
-   Text A::Interface::GetAdvancedTime() noexcept {
-      try {
-         return fmt::format("{:%F %T %Z}",
-            fmt::localtime(Clock::to_time_t(Clock::now())));
-      }
-      catch (...) {
-         return "<unable to extract time>";
-      }
-   }
-
-   /// Generate a short timestamp in the current system time zone             
-   ///   @return the timestamp text                                           
-   Text A::Interface::GetSimpleTime() noexcept {
-      try {
-         return fmt::format("{:%T}",
-            fmt::localtime(Clock::to_time_t(Clock::now())));
-      }
-      catch (...) {
-         return "<unable to extract time>";
-      }
-   }
-
-   /// Write a character to stdout                                            
-   ///   @param character - the character to write                            
-   void Interface::Write(const Letter& character) const noexcept {
-      try {
-         fmt::print("{}", character);
-      }
-      catch (...) {
-         Logger::Error() << "Logger exception";
-      }
-   }
-
-   /// Write a string view to stdout                                          
-   ///   @param literalText - the text to write                               
-   void Interface::Write(const TextView& stdString) const noexcept {
-      try {
-         fmt::print("{}", stdString);
-      }
-      catch (...) {
-         Logger::Error() << "Logger exception";
-      }
-   }
    
    /// When using fmt::print(style, mask, ...), the style will be reset after 
    /// message has been written, and I don't want that to happen              
@@ -96,9 +42,74 @@ namespace Langulus::Logger
       }
    }
 
+   /// The global logger instance                                             
+   Interface Instance {};
+
+   /// Logger construction                                                    
+   Interface::Interface() {
+      mStyleStack.push(DefaultStyle);
+   }
+
+   /// Generate an exhaustive timestamp in the current system time zone       
+   ///   @return the timestamp text as {:%F %T %Z}                            
+   Text A::Interface::GetAdvancedTime() noexcept {
+      try {
+         const auto now = Clock::to_time_t(Clock::now());
+         return fmt::format("{:%F %T %Z}", fmt::localtime(now));
+      }
+      catch (...) {
+         return "<time error>";
+      }
+   }
+
+   /// Generate a short timestamp in the current system time zone             
+   ///   @return the timestamp text as {:%T}                                  
+   Text A::Interface::GetSimpleTime() noexcept {
+      try {
+         const auto now = Clock::to_time_t(Clock::now());
+         return fmt::format("{:%T}", fmt::localtime(now));
+      }
+      catch (...) {
+         return "<time error>";
+      }
+   }
+
+   /// Write a string view to stdout                                          
+   ///   @param stdString - the text view to write                            
+   void Interface::Write(const TextView& stdString) const noexcept {
+      // Dispatch to redirectors                                        
+      if (not mRedirectors.empty()) {
+         for (auto attachment : mRedirectors)
+            attachment->Write(stdString);
+
+         // The presence of a redirector blocks console printing        
+         return;
+      }
+
+      try {
+         fmt::print("{}", stdString);
+      }
+      catch (...) {
+         Logger::Append("<logger error>");
+      }
+
+      // Dispatch to duplicators                                        
+      for (auto attachment : mDuplicators)
+         attachment->Write(stdString);
+   }
+
    /// Change the foreground/background color                                 
    ///   @param c - the color                                                 
    void Interface::Write(const Color& c) noexcept {
+      // Dispatch to redirectors                                        
+      if (not mRedirectors.empty()) {
+         for (auto attachment : mRedirectors)
+            attachment->Write(c);
+
+         // The presence of a redirector blocks console printing        
+         return;
+      }
+
       auto& style = mStyleStack.top();
       const auto oldStyle = style;
       if (c == Color::NoForeground) {
@@ -130,27 +141,66 @@ namespace Langulus::Logger
       if (oldStyle.has_emphasis())
          style |= oldStyle.get_emphasis();
       FmtPrintStyle(style);
+
+      // Dispatch to duplicators                                        
+      for (auto attachment : mDuplicators)
+         attachment->Write(c);
    }
 
    /// Change the emphasis                                                    
    ///   @param e - the emphasis                                              
    void Interface::Write(const Emphasis& e) noexcept {
+      // Dispatch to redirectors                                        
+      if (not mRedirectors.empty()) {
+         for (auto attachment : mRedirectors)
+            attachment->Write(e);
+
+         // The presence of a redirector blocks console printing        
+         return;
+      }
+
       auto& style = mStyleStack.top();
       style |= static_cast<fmt::emphasis>(e);
       FmtPrintStyle(style);
+
+      // Dispatch to duplicators                                        
+      for (auto attachment : mDuplicators)
+         attachment->Write(e);
    }
 
    /// Change the style                                                       
    ///   @param s - the style                                                 
    void Interface::Write(const Style& s) noexcept {
+      // Dispatch to redirectors                                        
+      if (not mRedirectors.empty()) {
+         for (auto attachment : mRedirectors)
+            attachment->Write(s);
+
+         // The presence of a redirector blocks console printing        
+         return;
+      }
+
       auto& style = mStyleStack.top();
       style = s;
       FmtPrintStyle(style);
+
+      // Dispatch to duplicators                                        
+      for (auto attachment : mDuplicators)
+         attachment->Write(s);
    }
 
    /// Execute a logger command                                               
    ///   @param c - the command to execute                                    
    void Interface::Write(const Command& c) noexcept {
+      // Dispatch to redirectors                                        
+      if (not mRedirectors.empty()) {
+         for (auto attachment : mRedirectors)
+            attachment->Write(c);
+
+         // The presence of a redirector blocks console printing        
+         return;
+      }
+
       switch (c) {
       case Command::Clear:
          fmt::print("{}", "\x1b[2J");
@@ -192,43 +242,55 @@ namespace Langulus::Logger
          break;
       }
 
-      // Dispatch                                                       
-      for (auto attachment : mAttachments)
+      // Dispatch to duplicators                                        
+      for (auto attachment : mDuplicators)
          attachment->Write(c);
    }
 
    /// Remove formatting, add a new line, add a timestamp and tabulate        
    void Interface::NewLine() const noexcept {
-      // Clear formatting, add new line, add a simple time stamp        
+      // Dispatch to redirectors                                        
+      if (not mRedirectors.empty()) {
+         for (auto attachment : mRedirectors)
+            attachment->NewLine();
+
+         // The presence of a redirector blocks console printing        
+         return;
+      }
+
+      // Clear formatting, add new line, simple time stamp, and tabs    
       FmtPrintStyle(TimeStampStyle);
-
-      try {
-         fmt::print("\n{:%T}| ",
-            fmt::localtime(Clock::to_time_t(Clock::now())));
-      }
-      catch (...) {
-         Logger::Error() << "Logger exception";
-      }
-
-      // Tabulate                                                       
+      fmt::print("\n{}| ", GetSimpleTime());
       Tabulate();
 
-      // Dispatch                                                       
-      for (auto attachment : mAttachments)
+      // Dispatch to duplicators                                        
+      for (auto attachment : mDuplicators)
          attachment->NewLine();
    }
 
    /// Insert current tabs and apply last style from the stack                
    void Interface::Tabulate() const noexcept {
-      if (not mTabulator)
-         return;
+      // Dispatch to redirectors                                        
+      if (not mRedirectors.empty()) {
+         for (auto attachment : mRedirectors)
+            attachment->Tabulate();
 
-      auto tabs = mTabulator;
-      FmtPrintStyle(TabStyle);
-      while (tabs) {
-         Write(TabString);
-         --tabs;
+         // The presence of a redirector blocks console printing        
+         return;
       }
+
+      if (mTabulator) {
+         auto tabs = mTabulator;
+         FmtPrintStyle(TabStyle);
+         while (tabs) {
+            Write(TabString);
+            --tabs;
+         }
+      }
+
+      // Dispatch to duplicators                                        
+      for (auto attachment : mDuplicators)
+         attachment->NewLine();
    }
 
    /// Attach another logger, if no redirectors are attached, any logging     
