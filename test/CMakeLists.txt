@@ -15,5 +15,3 @@ add_test(
 	NAME		LangulusLoggerTest
 	COMMAND		LangulusLoggerTest
 )
-
-langulus_copy_dlls(LangulusLoggerTest ON LangulusLoggerTest)
