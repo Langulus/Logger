@@ -8,12 +8,12 @@ project(LangulusLogger
 # Check if this project is built as standalone, or a part of something else 
 if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin/lib)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
     include(LangulusUtilities.cmake)
 
     # Add Langulus::Core library                                            
-    fetch_langulus_module(Core GIT_TAG 0097bd180a5c625f88db0db0514bbf93aff53c7a)
+    fetch_langulus_module(Core GIT_TAG c11832957380709e316ffaf737d47c4578ed8caf)
 endif()
 
 # Configure {fmt} library                                                   
