@@ -141,6 +141,9 @@ namespace Langulus::Logger
       ///                                                                     
       class Interface {
       public:
+         Interface& operator = (const Interface&) = delete;
+         Interface& operator = (Interface&&) = delete;
+
          NOD() static constexpr TextView GetFunctionName(
             const TextView&,
             const TextView& omit = "Langulus::"
@@ -210,38 +213,29 @@ namespace Langulus::Logger
       ::std::list<A::Interface*> mDuplicators;
 
    public:
-      LANGULUS_API(LOGGER) Interface();
+      LANGULUS_API(LOGGER)  Interface();
+      LANGULUS_API(LOGGER)  Interface(const Interface&);
+      LANGULUS_API(LOGGER) ~Interface();
 
       ///                                                                     
       /// Interface override                                                  
       ///                                                                     
-      LANGULUS_API(LOGGER)
-      void Write(const TextView&) const noexcept;
-      LANGULUS_API(LOGGER)
-      void Write(const Command&) noexcept;
-      LANGULUS_API(LOGGER)
-      void Write(const Color&) noexcept;
-      LANGULUS_API(LOGGER)
-      void Write(const Emphasis&) noexcept;
-      LANGULUS_API(LOGGER)
-      void Write(const Style&) noexcept;
-      LANGULUS_API(LOGGER)
-      void NewLine() const noexcept;
-      LANGULUS_API(LOGGER)
-      void Tabulate() const noexcept;
+      LANGULUS_API(LOGGER) void Write(const TextView&) const noexcept;
+      LANGULUS_API(LOGGER) void Write(const Command&) noexcept;
+      LANGULUS_API(LOGGER) void Write(const Color&) noexcept;
+      LANGULUS_API(LOGGER) void Write(const Emphasis&) noexcept;
+      LANGULUS_API(LOGGER) void Write(const Style&) noexcept;
+      LANGULUS_API(LOGGER) void NewLine() const noexcept;
+      LANGULUS_API(LOGGER) void Tabulate() const noexcept;
 
       ///                                                                     
       /// Attachments                                                         
       ///                                                                     
-      LANGULUS_API(LOGGER)
-      void AttachDuplicator(A::Interface*) noexcept;
-      LANGULUS_API(LOGGER)
-      void DettachDuplicator(A::Interface*) noexcept;
+      LANGULUS_API(LOGGER) void AttachDuplicator(A::Interface*) noexcept;
+      LANGULUS_API(LOGGER) void DettachDuplicator(A::Interface*) noexcept;
 
-      LANGULUS_API(LOGGER)
-      void AttachRedirector(A::Interface*) noexcept;
-      LANGULUS_API(LOGGER)
-      void DettachRedirector(A::Interface*) noexcept;
+      LANGULUS_API(LOGGER) void AttachRedirector(A::Interface*) noexcept;
+      LANGULUS_API(LOGGER) void DettachRedirector(A::Interface*) noexcept;
    };
 
    ///                                                                        
