@@ -50,6 +50,13 @@ namespace Langulus::Logger
       mStyleStack.push(DefaultStyle);
    }
 
+   /// Logger copy-construction                                               
+   Interface::Interface(const Interface& other)
+      : mStyleStack {other.mStyleStack} {}
+
+   /// Logger destruction                                                     
+   Interface::~Interface() {}
+
    /// Generate an exhaustive timestamp in the current system time zone       
    ///   @return the timestamp text as {:%F %T %Z}                            
    Text A::Interface::GetAdvancedTime() noexcept {
