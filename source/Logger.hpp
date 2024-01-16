@@ -185,7 +185,7 @@ namespace Langulus::Logger
          ScopedTabs operator << (Tabs&&) noexcept;
       };
 
-   } // namespace Langulus::A
+   } // namespace Langulus::Logger::A
 
 
    ///                                                                        
@@ -285,3 +285,29 @@ namespace Langulus::Logger
 
 /// Make the rest of the code aware, that Langulus::Logger has been included  
 #define LANGULUS_LIBRARY_LOGGER() 1
+
+namespace fmt
+{
+   
+   ///                                                                        
+   /// Extend FMT to be capable of logging any exception                      
+   ///                                                                        
+   template<Langulus::CT::Exception T>
+   struct formatter<T> {
+      template<class CONTEXT>
+      constexpr auto parse(CONTEXT& ctx) {
+         return ctx.begin();
+      }
+
+      template<class CONTEXT> LANGULUS(INLINED)
+      auto format(T const& e, CONTEXT& ctx) {
+         #if LANGULUS(DEBUG)
+            return fmt::format_to(ctx.out(), "{}({} at {})",
+               e.GetName(), e.GetMessage(), e.GetLocation());
+         #else
+            return fmt::format_to(ctx.out(), "{}", e.GetName());
+         #endif
+      }
+   };
+
+} // namespace fmt
