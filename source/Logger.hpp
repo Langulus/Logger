@@ -32,7 +32,7 @@ namespace Langulus::Logger
 
    template<class... T>
    concept Formattable = CT::Dense<T...>
-       and ((::fmt::is_formattable<T>::value) and ...);
+       and ((::fmt::is_formattable<Deref<T>>::value) and ...);
 
    /// Color codes, consistent with ANSI/VT100 escapes                        
    /// Also consistent with fmt::terminal_color                               
@@ -170,7 +170,6 @@ namespace Langulus::Logger
          }
 
          Interface& operator << (A::Interface&) noexcept;
-         Interface& operator << (const Exception&) noexcept;
          Interface& operator << (const TextView&) noexcept;
          Interface& operator << (const Command&) noexcept;
          Interface& operator << (const Color&) noexcept;
@@ -178,10 +177,8 @@ namespace Langulus::Logger
          Interface& operator << (const Style&) noexcept;
          Interface& operator << (const Tabs&) noexcept;
          Interface& operator << (const ::std::nullptr_t&) noexcept;
-         template<CT::Sparse T>
-         Interface& operator << (const T&) noexcept;
-         template<::Langulus::Logger::Formattable T>
-         Interface& operator << (const T&) noexcept;
+         Interface& operator << (const CT::Sparse auto&) noexcept;
+         Interface& operator << (const ::Langulus::Logger::Formattable auto&) noexcept;
          ScopedTabs operator << (Tabs&&) noexcept;
       };
 
@@ -243,38 +240,23 @@ namespace Langulus::Logger
    ///                                                                        
    LANGULUS_API(LOGGER) extern Interface Instance;
 
-   template<class... T>
-   decltype(auto) Line(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) Append(T&&...) noexcept;
+   decltype(auto) Line(auto&&...) noexcept;
+   decltype(auto) Append(auto&&...) noexcept;
 
-   template<class... T>
-   decltype(auto) Section(T&&...) noexcept;
+   decltype(auto) Section(auto&&...) noexcept;
 
-   template<class... T>
-   decltype(auto) Fatal(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) Error(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) Warning(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) Verbose(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) Info(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) Message(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) Special(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) Flow(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) Input(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) Network(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) OS(T&&...) noexcept;
-   template<class... T>
-   decltype(auto) Prompt(T&&...) noexcept;
+   decltype(auto) Fatal(auto&&...) noexcept;
+   decltype(auto) Error(auto&&...) noexcept;
+   decltype(auto) Warning(auto&&...) noexcept;
+   decltype(auto) Verbose(auto&&...) noexcept;
+   decltype(auto) Info(auto&&...) noexcept;
+   decltype(auto) Message(auto&&...) noexcept;
+   decltype(auto) Special(auto&&...) noexcept;
+   decltype(auto) Flow(auto&&...) noexcept;
+   decltype(auto) Input(auto&&...) noexcept;
+   decltype(auto) Network(auto&&...) noexcept;
+   decltype(auto) OS(auto&&...) noexcept;
+   decltype(auto) Prompt(auto&&...) noexcept;
 
 } // namespace Langulus::Logger
 
