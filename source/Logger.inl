@@ -85,21 +85,6 @@ namespace Langulus::Logger
       return *this;
    }
 
-   /// Write an exception                                                     
-   ///   @param e - exception to write                                        
-   ///   @return a reference to the logger for chaining                       
-   LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (const Exception& e) noexcept {
-      #if LANGULUS(DEBUG)
-         Write(fmt::format("{}({} at {})",
-            e.GetName(), e.GetMessage(), e.GetLocation())
-         );
-      #else
-         Write(fmt::format("{}", e.GetName()));
-      #endif
-      return *this;
-   }
-
    /// Push a command                                                         
    ///   @param c - the command to push                                       
    ///   @return a reference to the logger for chaining                       
@@ -170,8 +155,7 @@ namespace Langulus::Logger
    /// Dereference anything sparse, and route it through the logger again     
    ///   @param anything - pointer to stringify                               
    ///   @return a reference to the logger for chaining                       
-   template<CT::Sparse T>
-   LANGULUS(INLINED)
+   template<CT::Sparse T> LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const T& sparse) noexcept {
       if constexpr (CT::BuiltinCharacter<T>) {
          Write(sparse);
@@ -192,8 +176,7 @@ namespace Langulus::Logger
    /// Stringify anything that has a valid fmt formatter                      
    ///   @param anything - type to stringify                                  
    ///   @return a reference to the logger for chaining                       
-   template<::Langulus::Logger::Formattable T>
-   LANGULUS(INLINED)
+   template<::Langulus::Logger::Formattable T> LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const T& anything) noexcept {
       Write(fmt::format("{}", anything));
       return *this;
@@ -219,8 +202,7 @@ namespace Langulus::Logger
    /// A general new-line write function with color                           
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Line(T&&...arguments) noexcept {
       if constexpr (sizeof...(arguments) > 0) {
          Instance.NewLine();
@@ -232,8 +214,7 @@ namespace Langulus::Logger
    /// A general same-line write function with color                          
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Append(T&&...arguments) noexcept {
       if constexpr (sizeof...(arguments) > 0)
          (Instance << ... << ::std::forward<T>(arguments));
@@ -245,8 +226,7 @@ namespace Langulus::Logger
    /// scope's end                                                            
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a scoped tab                                                 
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Section(T&&...arguments) noexcept {
       if constexpr (sizeof...(arguments) > 0) {
          Instance.NewLine();
@@ -260,8 +240,7 @@ namespace Langulus::Logger
    /// Write a new-line fatal error                                           
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Fatal([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_FATALERRORS
          if constexpr (sizeof...(arguments) > 0) {
@@ -279,8 +258,7 @@ namespace Langulus::Logger
    /// Write a new-line error                                                 
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Error([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_ERRORS
          if constexpr (sizeof...(arguments) > 0) {
@@ -298,8 +276,7 @@ namespace Langulus::Logger
    /// Write a new-line warning                                               
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Warning([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_WARNINGS
          if constexpr (sizeof...(arguments) > 0) {
@@ -317,8 +294,7 @@ namespace Langulus::Logger
    /// Write a new-line with verbose information                              
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Verbose([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_VERBOSE
          if constexpr (sizeof...(arguments) > 0) {
@@ -335,8 +311,7 @@ namespace Langulus::Logger
    /// Write a new-line with information                                      
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Info([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_INFOS
          if constexpr (sizeof...(arguments) > 0) {
@@ -353,8 +328,7 @@ namespace Langulus::Logger
    /// Write a new-line with a personal message                               
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Message([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_MESSAGES
          if constexpr (sizeof...(arguments) > 0) {
@@ -371,7 +345,7 @@ namespace Langulus::Logger
    /// Write a new-line with special text                                     
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Special([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_SPECIALS
          if constexpr (sizeof...(arguments) > 0) {
@@ -388,8 +362,7 @@ namespace Langulus::Logger
    /// Write a new-line with flow information                                 
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Flow([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_FLOWS
          if constexpr (sizeof...(arguments) > 0) {
@@ -406,8 +379,7 @@ namespace Langulus::Logger
    /// Write a new-line on user input                                         
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Input([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_INPUTS
          if constexpr (sizeof...(arguments) > 0) {
@@ -424,8 +396,7 @@ namespace Langulus::Logger
    /// Write a new-line with network message                                  
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Network([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_NETWORKS
          if constexpr (sizeof...(arguments) > 0) {
@@ -442,8 +413,7 @@ namespace Langulus::Logger
    /// Write a new-line with a message from OS                                
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) OS([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_OS
          if constexpr (sizeof...(arguments) > 0) {
@@ -460,8 +430,7 @@ namespace Langulus::Logger
    /// Write a new-line with an input prompt                                  
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
-   template<class... T>
-   LANGULUS(INLINED)
+   template<class...T> LANGULUS(INLINED)
    decltype(auto) Prompt([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_PROMPTS
          if constexpr (sizeof...(arguments) > 0) {
