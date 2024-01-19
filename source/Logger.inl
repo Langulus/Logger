@@ -155,8 +155,9 @@ namespace Langulus::Logger
    /// Dereference anything sparse, and route it through the logger again     
    ///   @param anything - pointer to stringify                               
    ///   @return a reference to the logger for chaining                       
-   template<CT::Sparse T> LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (const T& sparse) noexcept {
+   LANGULUS(INLINED)
+   A::Interface& A::Interface::operator << (const CT::Sparse auto& sparse) noexcept {
+      using T = Deref<decltype(sparse)>;
       if constexpr (CT::BuiltinCharacter<T>) {
          Write(sparse);
          return *this;
@@ -176,8 +177,8 @@ namespace Langulus::Logger
    /// Stringify anything that has a valid fmt formatter                      
    ///   @param anything - type to stringify                                  
    ///   @return a reference to the logger for chaining                       
-   template<::Langulus::Logger::Formattable T> LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (const T& anything) noexcept {
+   LANGULUS(INLINED)
+   A::Interface& A::Interface::operator << (const ::Langulus::Logger::Formattable auto& anything) noexcept {
       Write(fmt::format("{}", anything));
       return *this;
    }
