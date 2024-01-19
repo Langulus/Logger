@@ -240,23 +240,38 @@ namespace Langulus::Logger
    ///                                                                        
    LANGULUS_API(LOGGER) extern Interface Instance;
 
-   decltype(auto) Line(auto&&...) noexcept;
-   decltype(auto) Append(auto&&...) noexcept;
+   template<class...T>
+   decltype(auto) Line(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) Append(T&&...) noexcept;
 
-   decltype(auto) Section(auto&&...) noexcept;
+   template<class...T>
+   decltype(auto) Section(T&&...) noexcept;
 
-   decltype(auto) Fatal(auto&&...) noexcept;
-   decltype(auto) Error(auto&&...) noexcept;
-   decltype(auto) Warning(auto&&...) noexcept;
-   decltype(auto) Verbose(auto&&...) noexcept;
-   decltype(auto) Info(auto&&...) noexcept;
-   decltype(auto) Message(auto&&...) noexcept;
-   decltype(auto) Special(auto&&...) noexcept;
-   decltype(auto) Flow(auto&&...) noexcept;
-   decltype(auto) Input(auto&&...) noexcept;
-   decltype(auto) Network(auto&&...) noexcept;
-   decltype(auto) OS(auto&&...) noexcept;
-   decltype(auto) Prompt(auto&&...) noexcept;
+   template<class...T>
+   decltype(auto) Fatal(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) Error(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) Warning(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) Verbose(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) Info(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) Message(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) Special(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) Flow(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) Input(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) Network(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) OS(T&&...) noexcept;
+   template<class...T>
+   decltype(auto) Prompt(T&&...) noexcept;
 
 } // namespace Langulus::Logger
 
