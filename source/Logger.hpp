@@ -307,4 +307,27 @@ namespace fmt
       }
    };
 
+   ///                                                                        
+   /// Extend FMT to be capable of logging byte sizes                         
+   ///                                                                        
+   template<>
+   struct fmt::formatter<::Langulus::Size> {
+      template<typename ParseContext>
+      constexpr auto parse(ParseContext& ctx) {
+         return ctx.begin();
+      }
+
+      template<typename FormatContext>
+      auto format(const ::Langulus::Size& bs, FormatContext& ctx) {
+         double f;
+         if      (bs < 1'000LL)                 f = static_cast<float>(bs);
+         else if (bs < 1'000'000LL)             f = bs * 1. / 1000LL;
+         else if (bs < 1'000'000'000LL)         f = bs * 1. / 1000'000LL;
+         else if (bs < 1'000'000'000'000LL)     f = bs * 1. / 1000'000'000LL;
+         else if (bs < 1'000'000'000'000'000LL) f = bs * 1. / 1000'000'000'000LL;
+         else f = bs * 1. / 1000'000'000'000'000LL;
+         return format_to(ctx.out(), "{:.2f} {}", f, bs.GetSuffix());
+      }
+   };
+
 } // namespace fmt
