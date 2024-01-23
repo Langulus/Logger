@@ -311,14 +311,14 @@ namespace fmt
    /// Extend FMT to be capable of logging byte sizes                         
    ///                                                                        
    template<>
-   struct fmt::formatter<::Langulus::Size> {
+   struct formatter<Langulus::Size> {
       template<typename ParseContext>
       constexpr auto parse(ParseContext& ctx) {
          return ctx.begin();
       }
 
       template<typename FormatContext>
-      auto format(const ::Langulus::Size& bs, FormatContext& ctx) {
+      auto format(const Langulus::Size& bs, FormatContext& ctx) {
          double f;
          if      (bs < 1'000LL)                 f = static_cast<float>(bs);
          else if (bs < 1'000'000LL)             f = bs * 1. / 1000LL;
