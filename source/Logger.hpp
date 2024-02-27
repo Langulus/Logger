@@ -320,13 +320,27 @@ namespace fmt
       template<typename FormatContext>
       auto format(const Langulus::Size& bs, FormatContext& ctx) {
          double f;
-         if      (bs < 1'000LL)                 f = static_cast<float>(bs);
-         else if (bs < 1'000'000LL)             f = bs * 1. / 1000LL;
-         else if (bs < 1'000'000'000LL)         f = bs * 1. / 1000'000LL;
-         else if (bs < 1'000'000'000'000LL)     f = bs * 1. / 1000'000'000LL;
-         else if (bs < 1'000'000'000'000'000LL) f = bs * 1. / 1000'000'000'000LL;
-         else f = bs * 1. / 1000'000'000'000'000LL;
-         return format_to(ctx.out(), "{:.2f} {}", f, bs.GetSuffix());
+         if (bs < 1'024LL)
+            f = static_cast<float>(bs);
+         else if (bs < 1'048'576LL)
+            f = bs * 1. / 1'024LL;
+         else if (bs < 1'073'741'824LL)
+            f = bs * 1. / 1'048'576LL;
+         else if constexpr (sizeof(bs) > 4) {
+            if (bs < 1'099'511'627'776LL)
+               f = bs * 1. / 1'073'741'824LL;
+            else if (bs < 1'125'899'906'842'624LL)
+               f = bs * 1. / 1'099'511'627'776LL;
+            else
+               f = bs * 1. / 1'125'899'906'842'624LL;
+         }
+         else f = bs * 1. / 1'073'741'824LL;
+
+         double intpart;
+         if (std::modf(f, &intpart) < 0.001)
+            return format_to(ctx.out(), "{} {}", (::std::size_t) f, bs.GetSuffix());
+         else
+            return format_to(ctx.out(), "{:.2f} {}", f, bs.GetSuffix());
       }
    };
 
