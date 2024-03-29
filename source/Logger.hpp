@@ -27,16 +27,16 @@ namespace Langulus::Logger
 {
 
    /// Text container used by the logger                                      
-   using Text = ::std::basic_string<Letter>;
+   using Text     = ::std::basic_string<Letter>;
    using TextView = ::std::basic_string_view<Letter>;
 
-   template<class... T>
+   template<class...T>
    concept Formattable = CT::Dense<T...>
        and ((::fmt::is_formattable<Deref<T>>::value) and ...);
 
    /// Color codes, consistent with ANSI/VT100 escapes                        
    /// Also consistent with fmt::terminal_color                               
-   enum class Color : ::std::underlying_type_t<fmt::terminal_color> {
+   enum Color : ::std::underlying_type_t<fmt::terminal_color> {
       NoForeground = 0,
       NoBackground = 1,
 
@@ -77,10 +77,8 @@ namespace Langulus::Logger
       WhiteBgr
    };
 
-   using enum Color;
-
    /// Some formatting styles, consistent with fmt::emphasis                  
-   enum class Emphasis : ::std::underlying_type_t<fmt::emphasis> {
+   enum Emphasis : ::std::underlying_type_t<fmt::emphasis> {
       Bold        = 1,			// Not working on windows                 
       Faint       = 1 << 1,	// Not working on windows                 
       Italic      = 1 << 2,	// Not working on windows                 
@@ -91,13 +89,11 @@ namespace Langulus::Logger
       Strike      = 1 << 7,	// Not working on windows                 
    };
 
-   using enum Emphasis;
-
    /// Text style, with background color, foreground color, and emphasis      
    using Style = fmt::text_style;
 
    /// Console commands                                                       
-   enum class Command : uint8_t {
+   enum Command : uint8_t {
       Clear,		// Clear the console                                  
       NewLine,		// Write a new line, with a timestamp and tabulation  
       Pop,			// Pop the color state                                
@@ -110,11 +106,8 @@ namespace Langulus::Logger
       ExactTime,	// Write an exhaustive timestamp                      
    };
 
-   using enum Command;
-
    /// Tabulation marker (can be pushed to log)                               
-   class Tabs {
-   public:
+   struct Tabs {
       int mTabs = 0;
 
       constexpr Tabs() noexcept = default;
@@ -139,8 +132,7 @@ namespace Langulus::Logger
       ///                                                                     
       /// The abstract logger interface - override this to define attachments 
       ///                                                                     
-      class Interface {
-      public:
+      struct Interface {
          Interface& operator = (const Interface&) = delete;
          Interface& operator = (Interface&&) = delete;
 
