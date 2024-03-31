@@ -13,14 +13,14 @@ if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
     include(LangulusUtilities.cmake)
 
     # Add Langulus::Core library                                            
-    fetch_langulus_module(Core GIT_TAG f1e134132b9dc3fbc8604d428a4d702c1405c256)
+    fetch_langulus_module(Core GIT_TAG 7709663d1ccd6f1f2f9361d1279a4fa5fc1e5deb)
 endif()
 
 # Configure {fmt} library                                                   
 fetch_external_module(
     fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG        05dda9490ddd5cb89db5f5b8ec85a399d5945deb # master branch
+    GIT_TAG        f5ec5ada2bcb2c64306f3d8c25dd919dbbe4692e # master branch
 )
 
 # Build and install Logger library                                          
