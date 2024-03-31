@@ -306,7 +306,7 @@ namespace fmt
       }
 
       template<class CONTEXT> LANGULUS(INLINED)
-      auto format(T const& e, CONTEXT& ctx) {
+      auto format(T const& e, CONTEXT& ctx) const {
          #if LANGULUS(DEBUG)
             return fmt::format_to(ctx.out(), "{}({} at {})",
                e.GetName(), e.GetMessage(), e.GetLocation());
@@ -327,7 +327,7 @@ namespace fmt
       }
 
       template<typename FormatContext>
-      auto format(const Langulus::Size& bs, FormatContext& ctx) {
+      auto format(const Langulus::Size& bs, FormatContext& ctx) const {
          double f;
          if (bs < 1'024LL)
             f = static_cast<float>(bs);
