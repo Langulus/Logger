@@ -36,7 +36,7 @@ namespace Langulus::Logger
 
    /// Color codes, consistent with ANSI/VT100 escapes                        
    /// Also consistent with fmt::terminal_color                               
-   enum Color : ::std::underlying_type_t<fmt::terminal_color> {
+   enum class Color : ::std::underlying_type_t<fmt::terminal_color> {
       NoForeground = 0,
       NoBackground = 1,
 
@@ -77,8 +77,12 @@ namespace Langulus::Logger
       WhiteBgr
    };
 
+   /// GCC equates templates with enum types as their underlying type, so we  
+   /// are forced to define these anums as enum class, and then do using enum 
+   using enum Color;
+
    /// Some formatting styles, consistent with fmt::emphasis                  
-   enum Emphasis : ::std::underlying_type_t<fmt::emphasis> {
+   enum class Emphasis : ::std::underlying_type_t<fmt::emphasis> {
       Bold        = 1,			// Not working on windows                 
       Faint       = 1 << 1,	// Not working on windows                 
       Italic      = 1 << 2,	// Not working on windows                 
@@ -89,11 +93,20 @@ namespace Langulus::Logger
       Strike      = 1 << 7,	// Not working on windows                 
    };
 
+   constexpr bool operator & (const Emphasis& lhs, const Emphasis& rhs) noexcept {
+      using T = ::std::underlying_type_t<fmt::emphasis>;
+      return (static_cast<T>(lhs) & static_cast<T>(rhs)) == static_cast<T>(rhs);
+   }
+
+   /// GCC equates templates with enum types as their underlying type, so we  
+   /// are forced to define these anums as enum class, and then do using enum 
+   using enum Emphasis;
+
    /// Text style, with background color, foreground color, and emphasis      
    using Style = fmt::text_style;
 
    /// Console commands                                                       
-   enum Command : uint8_t {
+   enum class Command : uint8_t {
       Clear,		// Clear the console                                  
       NewLine,		// Write a new line, with a timestamp and tabulation  
       Pop,			// Pop the color state                                
@@ -105,6 +118,10 @@ namespace Langulus::Logger
       Time,			// Write a short timestamp                            
       ExactTime,	// Write an exhaustive timestamp                      
    };
+
+   /// GCC equates templates with enum types as their underlying type, so we  
+   /// are forced to define these anums as enum class, and then do using enum 
+   using enum Command;
 
    /// Tabulation marker (can be pushed to log)                               
    struct Tabs {
