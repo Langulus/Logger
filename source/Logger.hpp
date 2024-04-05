@@ -83,6 +83,7 @@ namespace Langulus::Logger
 
    /// Some formatting styles, consistent with fmt::emphasis                  
    enum class Emphasis : ::std::underlying_type_t<fmt::emphasis> {
+      Default     = 0,			
       Bold        = 1,			// Not working on windows                 
       Faint       = 1 << 1,	// Not working on windows                 
       Italic      = 1 << 2,	// Not working on windows                 
