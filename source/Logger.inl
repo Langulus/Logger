@@ -158,7 +158,7 @@ namespace Langulus::Logger
    LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const CT::Sparse auto& sparse) noexcept {
       using T = Deref<decltype(sparse)>;
-      if constexpr (CT::BuiltinCharacter<T>) {
+      if constexpr (CT::String<T>) {
          Write(sparse);
          return *this;
       }
