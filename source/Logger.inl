@@ -18,7 +18,7 @@ namespace Langulus::Logger
    ScopedTabs::~ScopedTabs() noexcept {
       while (mTabs > 0) {
          --mTabs;
-         Instance << Command::Untab;
+         Instance.RunCommand(Command::Untab);
       }
    }
 
@@ -90,7 +90,7 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const Command& c) noexcept {
-      Write(c);
+      Instance.RunCommand(c);
       return *this;
    }
 
@@ -99,7 +99,7 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const Color& c) noexcept {
-      Write(c);
+      Instance.SetColor(c);
       return *this;
    }
 
@@ -108,7 +108,7 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const Emphasis& e) noexcept {
-      Write(e);
+      Instance.SetEmphasis(e);
       return *this;
    }
 
@@ -117,7 +117,7 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const Style& c) noexcept {
-      Write(c);
+      Instance.SetStyle(c);
       return *this;
    }
 
@@ -128,7 +128,7 @@ namespace Langulus::Logger
    A::Interface& A::Interface::operator << (const Tabs& t) noexcept {
       auto tabs = ::std::max(1, t.mTabs);
       while (tabs) {
-         Write(Command::Tab);
+         Instance.RunCommand(Command::Tab);
          --tabs;
       }
 
@@ -140,7 +140,7 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const TextView& t) noexcept {
-      Write(t);
+      Instance.Write(t);
       return *this;
    }
 
@@ -148,7 +148,7 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const ::std::nullptr_t&) noexcept {
-      Write("null");
+      Instance.Write("null");
       return *this;
    }
 
@@ -159,7 +159,7 @@ namespace Langulus::Logger
    A::Interface& A::Interface::operator << (const CT::Sparse auto& sparse) noexcept {
       using T = Deref<decltype(sparse)>;
       if constexpr (CT::String<T>) {
-         Write(sparse);
+         Instance.Write(sparse);
          return *this;
       }
       else {
@@ -179,7 +179,7 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const ::Langulus::Logger::Formattable auto& anything) noexcept {
-      Write(fmt::format("{}", anything));
+      Instance.Write(fmt::format("{}", anything));
       return *this;
    }
 
@@ -192,7 +192,7 @@ namespace Langulus::Logger
    ScopedTabs A::Interface::operator << (Tabs&& t) noexcept {
       auto tabs = ::std::max(1, t.mTabs);
       while (tabs) {
-         Write(Command::Tab);
+         Instance.RunCommand(Command::Tab);
          --tabs;
       }
 
