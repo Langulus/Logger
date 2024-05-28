@@ -26,6 +26,7 @@ fetch_external_module(
 # Build and install Logger library                                          
 add_library(LangulusLogger ${LANGULUS_LIBRARY_TYPE}
     source/Logger.cpp
+    source/HTML.cpp
 )
 
 target_compile_definitions(LangulusLogger

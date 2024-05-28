@@ -21,6 +21,7 @@
 #include <string>
 #include <fmt/format.h>
 #include <fmt/color.h>
+#include <fstream>
 
 
 namespace Langulus::Logger
@@ -165,12 +166,8 @@ namespace Langulus::Logger
          static Text GetSimpleTime() noexcept;
 
          virtual void Write(const TextView&) const noexcept = 0;
-         virtual void Write(const Command&) noexcept = 0;
-         virtual void Write(const Color&) noexcept = 0;
-         virtual void Write(const Emphasis&) noexcept = 0;
-         virtual void Write(const Style&) noexcept = 0;
+         virtual void Write(const Style&) const noexcept = 0;
          virtual void NewLine() const noexcept = 0;
-         virtual void Tabulate() const noexcept = 0;
 
          /// Implicit bool operator in order to use log in 'if' statements    
          /// Example: if (condition && Logger::Info("stuff"))                 
@@ -203,12 +200,6 @@ namespace Langulus::Logger
    ///                                                                        
    class Interface final : public A::Interface {
    private:
-      // Tabulator color and formatting                                 
-      static constexpr Style DefaultStyle = {};
-      static constexpr Style TabStyle = fmt::fg(fmt::terminal_color::bright_black);
-      static constexpr Style TimeStampStyle = TabStyle;
-      static constexpr TextView TabString = "|  ";
-
       // Color stack                                                    
       ::std::stack<Style> mStyleStack;
       // Number of tabulations                                          
@@ -220,6 +211,13 @@ namespace Langulus::Logger
       ::std::list<A::Interface*> mDuplicators;
 
    public:
+      // Tabulator color and formatting                                 
+      static constexpr Style DefaultStyle = {};
+      static constexpr Style TabStyle = fmt::fg(fmt::terminal_color::bright_black);
+      static constexpr Style TimeStampStyle = TabStyle;
+      static constexpr TextView TabString = "|  ";
+      size_t GetTabs() const noexcept { return mTabulator; }
+
       LANGULUS_API(LOGGER)  Interface();
       LANGULUS_API(LOGGER)  Interface(const Interface&);
       LANGULUS_API(LOGGER) ~Interface();
@@ -228,12 +226,16 @@ namespace Langulus::Logger
       /// Interface override                                                  
       ///                                                                     
       LANGULUS_API(LOGGER) void Write(const TextView&) const noexcept;
-      LANGULUS_API(LOGGER) void Write(const Command&) noexcept;
-      LANGULUS_API(LOGGER) void Write(const Color&) noexcept;
-      LANGULUS_API(LOGGER) void Write(const Emphasis&) noexcept;
-      LANGULUS_API(LOGGER) void Write(const Style&) noexcept;
+      LANGULUS_API(LOGGER) void Write(const Style&) const noexcept;
       LANGULUS_API(LOGGER) void NewLine() const noexcept;
-      LANGULUS_API(LOGGER) void Tabulate() const noexcept;
+
+      ///                                                                     
+      /// State changers                                                      
+      ///                                                                     
+      LANGULUS_API(LOGGER) void RunCommand(const Command&) noexcept;
+      LANGULUS_API(LOGGER) void SetStyle(const Style&) noexcept;
+      LANGULUS_API(LOGGER) void SetColor(const Color&) noexcept;
+      LANGULUS_API(LOGGER) void SetEmphasis(const Emphasis&) noexcept;
 
       ///                                                                     
       /// Attachments                                                         
@@ -244,6 +246,7 @@ namespace Langulus::Logger
       LANGULUS_API(LOGGER) void AttachRedirector(A::Interface*) noexcept;
       LANGULUS_API(LOGGER) void DettachRedirector(A::Interface*) noexcept;
    };
+
 
    ///                                                                        
    /// The global logger instance                                             
@@ -282,6 +285,48 @@ namespace Langulus::Logger
    decltype(auto) OS(T&&...) noexcept;
    template<class...T>
    decltype(auto) Prompt(T&&...) noexcept;
+
+
+   ///                                                                        
+   /// Helpful redirectors and duplicators                                    
+   ///                                                                        
+
+   ///                                                                        
+   /// Consumes all logging messages, so that they don't interfere with       
+   /// rendering inside the console.                                          
+   /// Use it like this:                                                      
+   ///    Logger::Instance.AttachRedirector(&Logger::MessageSinkInstance);    
+   ///    <suppresses all logging in console>                                 
+   ///    Logger::Instance.DettachRedirector(&Logger::MessageSinkInstance);   
+   ///    <you can log once again>                                            
+   ///                                                                        
+   struct MessageSink final : Logger::A::Interface {
+      void Write(const TextView&) const noexcept {}
+      void Write(const Style&) const noexcept {}
+      void NewLine() const noexcept {}
+   } MessageSinkInstance;
+
+   ///                                                                        
+   /// Generates HTML code from logging messages and append them to an        
+   /// output file. Can be used both as duplicator or redirector.             
+   /// Use it like this:                                                      
+   ///    Logger::ToHTML logRedirect("outputfile.htm");                       
+   ///    Logger::Instance.AttachRedirector(&logRedirect);                    
+   ///    <redirect all logging to an HTML file>                              
+   ///    Logger::Instance.DettachRedirector(&logRedirect);                   
+   ///    <you can log once again in the console>                             
+   ///                                                                        
+   struct ToHTML final : Logger::A::Interface {
+   private:
+      mutable std::ofstream mFile;
+
+   public:
+      ToHTML(const std::string&);
+
+      void Write(const TextView&) const noexcept;
+      void Write(const Style&) const noexcept;
+      void NewLine() const noexcept;
+   };
 
 } // namespace Langulus::Logger
 
