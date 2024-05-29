@@ -3,8 +3,7 @@
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
-/// Distributed under GNU General Public License v3+                          
-/// See LICENSE file, or https://www.gnu.org/licenses                         
+/// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #include "Logger.hpp"
 #include <type_traits>
@@ -12,18 +11,43 @@
 #include <chrono>
 #include <fmt/chrono.h>
 
+
 using Clock = ::std::chrono::system_clock;
+
+namespace Langulus::Logger
+{
+
+   Interface Instance {};
+   MessageSink MessageSinkInstance {};
+
+   void AttachDuplicator(A::Interface* d) noexcept {
+      Instance.AttachDuplicator(d);
+   }
+
+   void DettachDuplicator(A::Interface* d) noexcept {
+      Instance.DettachDuplicator(d);
+   }
+
+   void AttachRedirector(A::Interface* r) noexcept {
+      Instance.AttachRedirector(r);
+   }
+
+   void DettachRedirector(A::Interface* r) noexcept {
+      Instance.DettachRedirector(r);
+   }
+
+} // namespace Langulus::Logger
 
 using namespace Langulus;
 using namespace Langulus::Logger;
 
    
-/// When using fmt::print(style, mask, ...), the style will be reset after 
-/// message has been written, and I don't want that to happen              
-///   @param style - the style to set                                      
+/// When using fmt::print(style, mask, ...), the style will be reset after    
+/// message has been written, and I don't want that to happen                 
+///   @param style - the style to set                                         
 LANGULUS(INLINED)
 void FmtPrintStyle(const Style& style) {
-   // Always reset before a style change                             
+   // Always reset before a style change                                
    fmt::print("{}", "\x1b[0m");
       
    if (style.has_emphasis()) {
@@ -42,23 +66,28 @@ void FmtPrintStyle(const Style& style) {
    }
 }
 
-/// The global logger instance                                             
-Interface Instance {};
+/// Scoped tabulator destruction                                              
+ScopedTabs::~ScopedTabs() noexcept {
+   while (mTabs > 0) {
+      --mTabs;
+      Instance.RunCommand(Command::Untab);
+   }
+}
 
-/// Logger construction                                                    
+/// Logger construction                                                       
 Interface::Interface() {
    mStyleStack.push(DefaultStyle);
 }
 
-/// Logger copy-construction                                               
+/// Logger copy-construction                                                  
 Interface::Interface(const Interface& other)
    : mStyleStack {other.mStyleStack} {}
 
-/// Logger destruction                                                     
+/// Logger destruction                                                        
 Interface::~Interface() {}
 
-/// Generate an exhaustive timestamp in the current system time zone       
-///   @return the timestamp text as {:%F %T %Z}                            
+/// Generate an exhaustive timestamp in the current system time zone          
+///   @return the timestamp text as {:%F %T %Z}                               
 Text Logger::A::Interface::GetAdvancedTime() noexcept {
    try {
       const auto now = Clock::to_time_t(Clock::now());
@@ -67,8 +96,8 @@ Text Logger::A::Interface::GetAdvancedTime() noexcept {
    catch (...) { return "<advanced time error>"; }
 }
 
-/// Generate a short timestamp in the current system time zone             
-///   @return the timestamp text as {:%T}                                  
+/// Generate a short timestamp in the current system time zone                
+///   @return the timestamp text as {:%T}                                     
 Text Logger::A::Interface::GetSimpleTime() noexcept {
    try {
       const auto now = Clock::to_time_t(Clock::now());
@@ -77,58 +106,58 @@ Text Logger::A::Interface::GetSimpleTime() noexcept {
    catch (...) { return "<simple time error>"; }
 }
 
-/// Write a string view to stdout                                          
-///   @param stdString - the text view to write                            
+/// Write a string view to stdout                                             
+///   @param stdString - the text view to write                               
 void Interface::Write(const TextView& stdString) const noexcept {
-   // Dispatch to redirectors                                        
+   // Dispatch to redirectors                                           
    if (not mRedirectors.empty()) {
       for (auto attachment : mRedirectors)
          attachment->Write(stdString);
 
-      // The presence of a redirector blocks console printing        
+      // The presence of a redirector blocks console printing           
       return;
    }
 
    try { fmt::print("{}", stdString); }
    catch (...) { Logger::Append("<logger error>"); }
 
-   // Dispatch to duplicators                                        
+   // Dispatch to duplicators                                           
    for (auto attachment : mDuplicators)
       attachment->Write(stdString);
 }
 
-/// Change the style                                                       
-///   @param s - the style                                                 
+/// Change the style                                                          
+///   @param s - the style                                                    
 void Interface::Write(const Style& s) const noexcept {
-   // Dispatch to redirectors                                        
+   // Dispatch to redirectors                                           
    if (not mRedirectors.empty()) {
       for (auto attachment : mRedirectors)
          attachment->Write(s);
 
-      // The presence of a redirector blocks console printing        
+      // The presence of a redirector blocks console printing           
       return;
    }
 
    FmtPrintStyle(s);
 
-   // Dispatch to duplicators                                        
+   // Dispatch to duplicators                                           
    for (auto attachment : mDuplicators)
       attachment->Write(s);
 }
-   
-/// Remove formatting, add a new line, add a timestamp and tabulate        
-///   @attention top of the style stack is not applied                     
+
+/// Remove formatting, add a new line, add a timestamp and tabulate           
+///   @attention top of the style stack is not applied                        
 void Interface::NewLine() const noexcept {
-   // Dispatch to redirectors                                        
+   // Dispatch to redirectors                                           
    if (not mRedirectors.empty()) {
       for (auto attachment : mRedirectors)
          attachment->NewLine();
 
-      // The presence of a redirector blocks console printing        
+      // The presence of a redirector blocks console printing           
       return;
    }
 
-   // Clear formatting, add new line, simple time stamp, and tabs    
+   // Clear formatting, add new line, simple time stamp, and tabs       
    fmt::print("\n");
    FmtPrintStyle(TimeStampStyle);
    fmt::print("{}| ", GetSimpleTime());
@@ -142,17 +171,36 @@ void Interface::NewLine() const noexcept {
       }
    }
 
-   // Dispatch to duplicators                                        
+   // Dispatch to duplicators                                           
    for (auto attachment : mDuplicators)
       attachment->NewLine();
 }
 
-/// Execute a logger command                                               
-///   @param c - the command to execute                                    
+/// Clear the entire log (clear the console window or file)                   
+void Interface::Clear() const noexcept {
+   // Dispatch to redirectors                                           
+   if (not mRedirectors.empty()) {
+      for (auto attachment : mRedirectors)
+         attachment->Clear();
+
+      // The presence of a redirector blocks console printing           
+      return;
+   }
+
+   // Clear the window                                                  
+   fmt::print("{}", "\x1b[2J");
+
+   // Dispatch to duplicators                                           
+   for (auto attachment : mDuplicators)
+      attachment->Clear();
+}
+
+/// Execute a logger command                                                  
+///   @param c - the command to execute                                       
 void Interface::RunCommand(const Command& c) noexcept {
    switch (c) {
    case Command::Clear:
-      fmt::print("{}", "\x1b[2J");
+      Clear();
       break;
    case Command::NewLine:
       NewLine();
@@ -183,6 +231,9 @@ void Interface::RunCommand(const Command& c) noexcept {
    case Command::Push:
       mStyleStack.push(mStyleStack.top());
       break;
+   case Command::Stylize:
+      Write(mStyleStack.top());
+      break;
    case Command::Tab:
       ++mTabulator;
       break;
@@ -193,32 +244,33 @@ void Interface::RunCommand(const Command& c) noexcept {
    }
 }
    
-/// Change the foreground/background color                                 
-///   @param c - the color                                                 
-void Interface::SetColor(const Color& c) noexcept {
+/// Change the foreground/background color                                    
+///   @param c - the color                                                    
+///   @return the last style, with coloring applied                           
+const Style& Interface::SetColor(const Color& c) noexcept {
    auto& style = mStyleStack.top();
    const auto oldStyle = style;
    if (c == Color::NoForeground) {
-      // Reset the foreground color                                  
+      // Reset the foreground color                                     
       style = {};
       if (oldStyle.has_background())
          style |= fmt::bg(oldStyle.get_background());
    }
    else if (c == Color::NoBackground) {
-      // Reset the background color                                  
+      // Reset the background color                                     
       style = {};
       if (oldStyle.has_foreground())
          style |= fmt::fg(oldStyle.get_foreground());
    }
    else if ((c >= Color::Black    and c < Color::BlackBgr) 
          or  (c >= Color::DarkGray and c < Color::DarkGrayBgr)) {
-      // Create a new foreground color style                         
+      // Create a new foreground color style                            
       style = fmt::fg(static_cast<fmt::terminal_color>(c));
       if (oldStyle.has_background())
          style |= fmt::bg(oldStyle.get_background());
    }
    else {
-      // Create a new background color style                         
+      // Create a new background color style                            
       style = fmt::fg(static_cast<fmt::terminal_color>(c));
       if (oldStyle.has_background())
          style |= fmt::bg(oldStyle.get_background());
@@ -226,47 +278,136 @@ void Interface::SetColor(const Color& c) noexcept {
 
    if (oldStyle.has_emphasis())
       style |= oldStyle.get_emphasis();
+   return style;
 }
 
-/// Change the emphasis                                                    
-///   @param c - the color                                                 
-void Interface::SetEmphasis(const Emphasis& e) noexcept {
+/// Change the emphasis                                                       
+///   @param c - the color                                                    
+const Style& Interface::SetEmphasis(const Emphasis& e) noexcept {
    auto& style = mStyleStack.top();
    style |= static_cast<fmt::emphasis>(e);
+   return style;
 }
 
-/// Change the style                                                       
-///   @param s - the style                                                 
-void Interface::SetStyle(const Style& s) noexcept {
+/// Change the style                                                          
+///   @param s - the style                                                    
+const Style& Interface::SetStyle(const Style& s) noexcept {
    mStyleStack.top() = s;
+   return mStyleStack.top();
 }
 
-/// Attach another logger, if no redirectors are attached, any logging     
-/// will be duplicated to the provided interface                           
-///   @attention the logger doesn't have ownership of the attachment       
-///   @param duplicator - the logger to attach                             
+/// Attach another logger, if no redirectors are attached, any logging        
+/// will be duplicated to the provided interface                              
+///   @attention the logger doesn't have ownership of the attachment          
+///   @param duplicator - the logger to attach                                
 void Interface::AttachDuplicator(A::Interface* duplicator) noexcept {
    mDuplicators.push_back(duplicator);
 }
 
-/// Dettach a duplicator                                                   
-///   @attention the logger doesn't have ownership of the attachment       
-///   @param duplicator - the duplicator to dettach                        
+/// Dettach a duplicator                                                      
+///   @attention the logger doesn't have ownership of the attachment          
+///   @param duplicator - the duplicator to dettach                           
 void Interface::DettachDuplicator(A::Interface* duplicator) noexcept {
    mDuplicators.remove(duplicator);
 }
 
-/// Attach another logger, that will receive any logging, but also consume 
-/// it, so that it doesn't reach the console or any attached duplicators   
-///   @attention the logger doesn't have ownership of the attachment       
-///   @param redirector - the logger to attach                             
+/// Attach another logger, that will receive any logging, but also consume    
+/// it, so that it doesn't reach the console or any attached duplicators      
+///   @attention the logger doesn't have ownership of the attachment          
+///   @param redirector - the logger to attach                                
 void Interface::AttachRedirector(A::Interface* redirector) noexcept {
    mRedirectors.push_back(redirector);
 }
 
-/// Dettach a redirector                                                   
-///   @attention the logger doesn't have ownership of the attachment       
-///   @param redirector - the duplicator to dettach                        
+/// Dettach a redirector                                                      
+///   @attention the logger doesn't have ownership of the attachment          
+///   @param redirector - the duplicator to dettach                           
 void Interface::DettachRedirector(A::Interface* redirector) noexcept {
    mRedirectors.remove(redirector);
+}
+
+/// Does nothing, but allows for grouping logging statements in ()            
+/// Example: Logger::Error() << "yeah" << (Logger::Info() << "no")            
+///   @return a reference to the logger for chaining                          
+Logger::A::Interface& Logger::A::Interface::operator << (Logger::A::Interface&) noexcept {
+   return *this;
+}
+
+/// Push a command                                                            
+///   @param c - the command to push                                          
+///   @return a reference to the logger for chaining                          
+Logger::A::Interface& Logger::A::Interface::operator << (const Command& c) noexcept {
+   Instance.RunCommand(c);
+   return *this;
+}
+
+/// Push a foreground color                                                   
+///   @param c - the command to push                                          
+///   @return a reference to the logger for chaining                          
+Logger::A::Interface& Logger::A::Interface::operator << (const Color& c) noexcept {
+   Instance.SetColor(c);
+   Instance.RunCommand(Command::Stylize);
+   return *this;
+}
+
+/// Push an emphasis                                                          
+///   @param e - the emphasis to push                                         
+///   @return a reference to the logger for chaining                          
+Logger::A::Interface& Logger::A::Interface::operator << (const Emphasis& e) noexcept {
+   Instance.SetEmphasis(e);
+   Instance.RunCommand(Command::Stylize);
+   return *this;
+}
+
+/// Push a foreground and background color                                    
+///   @param c - the state to push                                            
+///   @return a reference to the logger for chaining                          
+Logger::A::Interface& Logger::A::Interface::operator << (const Style& c) noexcept {
+   Instance.SetStyle(c);
+   Instance.RunCommand(Command::Stylize);
+   return *this;
+}
+
+/// Push a number of tabs                                                     
+///   @param t - the tabs to push                                             
+///   @return a reference to the logger for chaining                          
+Logger::A::Interface& Logger::A::Interface::operator << (const Tabs& t) noexcept {
+   auto tabs = ::std::max(1, t.mTabs);
+   while (tabs) {
+      Instance.RunCommand(Command::Tab);
+      --tabs;
+   }
+
+   return *this;
+}
+
+/// Write string views                                                        
+///   @param t - text to write                                                
+///   @return a reference to the logger for chaining                          
+Logger::A::Interface& Logger::A::Interface::operator << (const TextView& t) noexcept {
+   Instance.Write(t);
+   return *this;
+}
+
+/// Write a nullptr as "null"                                                 
+///   @return a reference to the logger for chaining                          
+Logger::A::Interface& Logger::A::Interface::operator << (const ::std::nullptr_t&) noexcept {
+   Instance.Write("null");
+   return *this;
+}
+
+/// Push a number of tabs                                                     
+/// Keeps track of the number of tabs that have been pushed, and then         
+/// automatically untabs when the Tabs object is destroyed                    
+///   @param t - [in/out] the tabs to push                                    
+///   @return a reference to the logger for chaining                          
+ScopedTabs Logger::A::Interface::operator << (Tabs&& t) noexcept {
+   auto tabs = ::std::max(1, t.mTabs);
+   while (tabs) {
+      Instance.RunCommand(Command::Tab);
+      --tabs;
+   }
+
+   ++t.mTabs;
+   return ScopedTabs {t.mTabs};
 }
