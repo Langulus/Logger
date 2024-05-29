@@ -3,8 +3,7 @@
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
-/// Distributed under GNU General Public License v3+                          
-/// See LICENSE file, or https://www.gnu.org/licenses                         
+/// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
 #include <Core/Exceptions.hpp>
@@ -14,6 +13,9 @@
 #else
    #define LANGULUS_API_LOGGER() LANGULUS_IMPORT()
 #endif
+
+/// Make the rest of the code aware, that Langulus::Logger has been included  
+#define LANGULUS_LIBRARY_LOGGER() 1
 
 #include <stack>
 #include <list>
@@ -111,10 +113,11 @@ namespace Langulus::Logger
    enum class Command : uint8_t {
       Clear,		// Clear the console                                  
       NewLine,		// Write a new line, with a timestamp and tabulation  
-      Pop,			// Pop the color state                                
-      Push,			// Push the color state                               
+      Pop,			// Pop the style                                      
+      Push,			// Push the style                                     
       Invert,		// Inverts background and foreground colors           
-      Reset,		// Reset the color and formatting state               
+      Reset,		// Reset the style                                    
+      Stylize,    // Apply the last style                               
       Tab,			// Tab once on a new line after this command          
       Untab,		// Untab once, again on a new line after this command 
       Time,			// Write a short timestamp                            
@@ -138,11 +141,11 @@ namespace Langulus::Logger
    };
 
    /// Scoped tabulation marker that restores tabbing when destroyed          
-   struct ScopedTabs : public Tabs {
+   struct ScopedTabs : Tabs {
       using Tabs::Tabs;
       constexpr ScopedTabs(ScopedTabs&& other) noexcept
          : Tabs {::std::forward<Tabs>(other)} {}
-      ~ScopedTabs() noexcept;
+      LANGULUS_API(LOGGER) ~ScopedTabs() noexcept;
    };
 
    namespace A
@@ -168,6 +171,7 @@ namespace Langulus::Logger
          virtual void Write(const TextView&) const noexcept = 0;
          virtual void Write(const Style&) const noexcept = 0;
          virtual void NewLine() const noexcept = 0;
+         virtual void Clear() const noexcept = 0;
 
          /// Implicit bool operator in order to use log in 'if' statements    
          /// Example: if (condition && Logger::Info("stuff"))                 
@@ -176,17 +180,18 @@ namespace Langulus::Logger
             return true;
          }
 
-         Interface& operator << (A::Interface&) noexcept;
-         Interface& operator << (const TextView&) noexcept;
-         Interface& operator << (const Command&) noexcept;
-         Interface& operator << (const Color&) noexcept;
-         Interface& operator << (const Emphasis&) noexcept;
-         Interface& operator << (const Style&) noexcept;
-         Interface& operator << (const Tabs&) noexcept;
-         Interface& operator << (const ::std::nullptr_t&) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (A::Interface&) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (const TextView&) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (const Command&) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (const Color&) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (const Emphasis&) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (const Style&) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (const Tabs&) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (const ::std::nullptr_t&) noexcept;
+         LANGULUS_API(LOGGER) ScopedTabs operator << (Tabs&&) noexcept;
+
          Interface& operator << (const CT::Sparse auto&) noexcept;
          Interface& operator << (const ::Langulus::Logger::Formattable auto&) noexcept;
-         ScopedTabs operator << (Tabs&&) noexcept;
       };
 
    } // namespace Langulus::Logger::A
@@ -228,14 +233,15 @@ namespace Langulus::Logger
       LANGULUS_API(LOGGER) void Write(const TextView&) const noexcept;
       LANGULUS_API(LOGGER) void Write(const Style&) const noexcept;
       LANGULUS_API(LOGGER) void NewLine() const noexcept;
+      LANGULUS_API(LOGGER) void Clear() const noexcept;
 
       ///                                                                     
       /// State changers                                                      
       ///                                                                     
       LANGULUS_API(LOGGER) void RunCommand(const Command&) noexcept;
-      LANGULUS_API(LOGGER) void SetStyle(const Style&) noexcept;
-      LANGULUS_API(LOGGER) void SetColor(const Color&) noexcept;
-      LANGULUS_API(LOGGER) void SetEmphasis(const Emphasis&) noexcept;
+      LANGULUS_API(LOGGER) const Style& SetStyle(const Style&) noexcept;
+      LANGULUS_API(LOGGER) const Style& SetColor(const Color&) noexcept;
+      LANGULUS_API(LOGGER) const Style& SetEmphasis(const Emphasis&) noexcept;
 
       ///                                                                     
       /// Attachments                                                         
@@ -286,6 +292,12 @@ namespace Langulus::Logger
    template<class...T>
    decltype(auto) Prompt(T&&...) noexcept;
 
+   LANGULUS_API(LOGGER) void AttachDuplicator(A::Interface*) noexcept;
+   LANGULUS_API(LOGGER) void DettachDuplicator(A::Interface*) noexcept;
+
+   LANGULUS_API(LOGGER) void AttachRedirector(A::Interface*) noexcept;
+   LANGULUS_API(LOGGER) void DettachRedirector(A::Interface*) noexcept;
+
 
    ///                                                                        
    /// Helpful redirectors and duplicators                                    
@@ -295,37 +307,45 @@ namespace Langulus::Logger
    /// Consumes all logging messages, so that they don't interfere with       
    /// rendering inside the console.                                          
    /// Use it like this:                                                      
-   ///    Logger::Instance.AttachRedirector(&Logger::MessageSinkInstance);    
+   ///    Logger::AttachRedirector(&Logger::MessageSinkInstance);             
    ///    <suppresses all logging in console>                                 
-   ///    Logger::Instance.DettachRedirector(&Logger::MessageSinkInstance);   
+   ///    Logger::DettachRedirector(&Logger::MessageSinkInstance);            
    ///    <you can log once again>                                            
    ///                                                                        
    struct MessageSink final : Logger::A::Interface {
       void Write(const TextView&) const noexcept {}
       void Write(const Style&) const noexcept {}
       void NewLine() const noexcept {}
-   } MessageSinkInstance;
+      void Clear() const noexcept {}
+   };
+
+   LANGULUS_API(LOGGER) extern MessageSink MessageSinkInstance;
 
    ///                                                                        
    /// Generates HTML code from logging messages and append them to an        
    /// output file. Can be used both as duplicator or redirector.             
    /// Use it like this:                                                      
    ///    Logger::ToHTML logRedirect("outputfile.htm");                       
-   ///    Logger::Instance.AttachRedirector(&logRedirect);                    
+   ///    Logger::AttachRedirector(&logRedirect);                             
    ///    <redirect all logging to an HTML file>                              
-   ///    Logger::Instance.DettachRedirector(&logRedirect);                   
+   ///    Logger::DettachRedirector(&logRedirect);                            
    ///    <you can log once again in the console>                             
    ///                                                                        
    struct ToHTML final : Logger::A::Interface {
    private:
+      std::string mFilename;
       mutable std::ofstream mFile;
 
-   public:
-      ToHTML(const std::string&);
+      void WriteHeader() const;
 
-      void Write(const TextView&) const noexcept;
-      void Write(const Style&) const noexcept;
-      void NewLine() const noexcept;
+   public:
+      LANGULUS_API(LOGGER)  ToHTML(const std::string&);
+      LANGULUS_API(LOGGER) ~ToHTML();
+
+      LANGULUS_API(LOGGER) void Write(const TextView&) const noexcept;
+      LANGULUS_API(LOGGER) void Write(const Style&) const noexcept;
+      LANGULUS_API(LOGGER) void NewLine() const noexcept;
+      LANGULUS_API(LOGGER) void Clear() const noexcept;
    };
 
 } // namespace Langulus::Logger
@@ -335,16 +355,13 @@ namespace Langulus::Logger
 
 #include "Logger.inl"
 
-/// Make the rest of the code aware, that Langulus::Logger has been included  
-#define LANGULUS_LIBRARY_LOGGER() 1
-
 namespace fmt
 {
    
    ///                                                                        
    /// Extend FMT to be capable of logging any exception                      
    ///                                                                        
-   template<Langulus::CT::Exception T>
+   template<::Langulus::CT::Exception T>
    struct formatter<T> {
       template<class CONTEXT>
       constexpr auto parse(CONTEXT& ctx) {
@@ -354,10 +371,10 @@ namespace fmt
       template<class CONTEXT> LANGULUS(INLINED)
       auto format(T const& e, CONTEXT& ctx) const {
          #if LANGULUS(DEBUG)
-            return fmt::format_to(ctx.out(), "{}({} at {})",
+            return ::fmt::format_to(ctx.out(), "{}({} at {})",
                e.GetName(), e.GetMessage(), e.GetLocation());
          #else
-            return fmt::format_to(ctx.out(), "{}", e.GetName());
+            return ::fmt::format_to(ctx.out(), "{}", e.GetName());
          #endif
       }
    };
@@ -366,14 +383,14 @@ namespace fmt
    /// Extend FMT to be capable of logging byte sizes                         
    ///                                                                        
    template<>
-   struct formatter<Langulus::Size> {
-      template<typename ParseContext>
-      constexpr auto parse(ParseContext& ctx) {
+   struct formatter<::Langulus::Size> {
+      template<class CONTEXT>
+      constexpr auto parse(CONTEXT& ctx) {
          return ctx.begin();
       }
 
-      template<typename FormatContext>
-      auto format(const Langulus::Size& bs, FormatContext& ctx) const {
+      template<class CONTEXT>
+      auto format(::Langulus::Size const& bs, CONTEXT& ctx) const {
          double f;
          if (bs < 1'024LL)
             f = static_cast<float>(bs);
@@ -392,10 +409,10 @@ namespace fmt
          else f = bs * 1. / 1'073'741'824LL;
 
          double intpart;
-         if (std::modf(f, &intpart) < 0.001)
-            return format_to(ctx.out(), "{} {}", (::std::size_t) f, bs.GetSuffix());
+         if (::std::modf(f, &intpart) < 0.001)
+            return ::fmt::format_to(ctx.out(), "{} {}", static_cast<::std::size_t>(f), bs.GetSuffix());
          else
-            return format_to(ctx.out(), "{:.2f} {}", f, bs.GetSuffix());
+            return ::fmt::format_to(ctx.out(), "{:.2f} {}", f, bs.GetSuffix());
       }
    };
 

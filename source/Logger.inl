@@ -3,8 +3,7 @@
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
-/// Distributed under GNU General Public License v3+                          
-/// See LICENSE file, or https://www.gnu.org/licenses                         
+/// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
 #include "Logger.hpp"
@@ -12,15 +11,6 @@
 
 namespace Langulus::Logger
 {
-
-   /// Scoped tabulator destruction                                           
-   LANGULUS(INLINED)
-   ScopedTabs::~ScopedTabs() noexcept {
-      while (mTabs > 0) {
-         --mTabs;
-         Instance.RunCommand(Command::Untab);
-      }
-   }
 
    /// Analyzes text returned by LANGULUS(FUNCTION) in order to isolate the   
    /// name part for logging                                                  
@@ -77,91 +67,14 @@ namespace Langulus::Logger
       return nodecorations;
    }
 
-   /// Does nothing, but allows for grouping logging statements in ()         
-   /// Example: Logger::Error() << "yeah" << (Logger::Info() << "no")         
-   ///   @return a reference to the logger for chaining                       
-   LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (A::Interface&) noexcept {
-      return *this;
-   }
-
-   /// Push a command                                                         
-   ///   @param c - the command to push                                       
-   ///   @return a reference to the logger for chaining                       
-   LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (const Command& c) noexcept {
-      Instance.RunCommand(c);
-      return *this;
-   }
-
-   /// Push a foreground color                                                
-   ///   @param c - the command to push                                       
-   ///   @return a reference to the logger for chaining                       
-   LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (const Color& c) noexcept {
-      Instance.SetColor(c);
-      return *this;
-   }
-
-   /// Push an emphasis                                                       
-   ///   @param e - the emphasis to push                                      
-   ///   @return a reference to the logger for chaining                       
-   LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (const Emphasis& e) noexcept {
-      Instance.SetEmphasis(e);
-      return *this;
-   }
-
-   /// Push a foreground and background color                                 
-   ///   @param c - the state to push                                         
-   ///   @return a reference to the logger for chaining                       
-   LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (const Style& c) noexcept {
-      Instance.SetStyle(c);
-      return *this;
-   }
-
-   /// Push a number of tabs                                                  
-   ///   @param t - the tabs to push                                          
-   ///   @return a reference to the logger for chaining                       
-   LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (const Tabs& t) noexcept {
-      auto tabs = ::std::max(1, t.mTabs);
-      while (tabs) {
-         Instance.RunCommand(Command::Tab);
-         --tabs;
-      }
-
-      return *this;
-   }
-
-   /// Write string views                                                     
-   ///   @param t - text to write                                             
-   ///   @return a reference to the logger for chaining                       
-   LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (const TextView& t) noexcept {
-      Instance.Write(t);
-      return *this;
-   }
-
-   /// Write a nullptr as "null"                                              
-   ///   @return a reference to the logger for chaining                       
-   LANGULUS(INLINED)
-   A::Interface& A::Interface::operator << (const ::std::nullptr_t&) noexcept {
-      Instance.Write("null");
-      return *this;
-   }
-
    /// Dereference anything sparse, and route it through the logger again     
    ///   @param anything - pointer to stringify                               
    ///   @return a reference to the logger for chaining                       
    LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const CT::Sparse auto& sparse) noexcept {
       using T = Deref<decltype(sparse)>;
-      if constexpr (CT::String<T>) {
-         Instance.Write(sparse);
-         return *this;
-      }
+      if constexpr (CT::String<T>)
+         return operator << (TextView {sparse});
       else {
          using DT = Deptr<T>;
          static_assert(CT::Sparse<DT> or ::Langulus::Logger::Formattable<DT>,
@@ -179,25 +92,8 @@ namespace Langulus::Logger
    ///   @return a reference to the logger for chaining                       
    LANGULUS(INLINED)
    A::Interface& A::Interface::operator << (const ::Langulus::Logger::Formattable auto& anything) noexcept {
-      Instance.Write(fmt::format("{}", anything));
-      return *this;
-   }
-
-   /// Push a number of tabs                                                  
-   /// Keeps track of the number of tabs that have been pushed, and then      
-   /// automatically untabs when the Tabs object is destroyed                 
-   ///   @param t - [in/out] the tabs to push                                 
-   ///   @return a reference to the logger for chaining                       
-   LANGULUS(INLINED)
-   ScopedTabs A::Interface::operator << (Tabs&& t) noexcept {
-      auto tabs = ::std::max(1, t.mTabs);
-      while (tabs) {
-         Instance.RunCommand(Command::Tab);
-         --tabs;
-      }
-
-      ++t.mTabs;
-      return ScopedTabs {t.mTabs};
+      const auto formatted = fmt::format("{}", anything);
+      return operator << (TextView {formatted});
    }
 
    /// A general new-line write function with color                           
