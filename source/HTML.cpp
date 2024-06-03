@@ -28,6 +28,7 @@ ToHTML::~ToHTML() {
 ///   @param text - the text to append to the file                            
 void ToHTML::Write(const TextView& text) const noexcept {
    mFile << text;
+   mFile.flush();
 }
 
 /// Apply some style                                                          
