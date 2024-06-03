@@ -339,7 +339,7 @@ namespace Langulus::Logger
       void WriteHeader() const;
 
    public:
-      LANGULUS_API(LOGGER)  ToHTML(const std::string&);
+      LANGULUS_API(LOGGER)  ToHTML(const TextView&);
       LANGULUS_API(LOGGER) ~ToHTML();
 
       LANGULUS_API(LOGGER) void Write(const TextView&) const noexcept;
