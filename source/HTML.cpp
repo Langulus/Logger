@@ -13,7 +13,7 @@ using namespace Langulus::Logger;
 
 /// Create an HTML file duplicator/redirector                                 
 ///   @param filename - the relative filename of the log file                 
-ToHTML::ToHTML(const std::string& filename) : mFilename {filename} {
+ToHTML::ToHTML(const TextView& filename) : mFilename {filename} {
    mFile.open(mFilename, std::ios::out | std::ios::trunc);
    if (not mFile)
       throw std::runtime_error {"Can't open log file"};
