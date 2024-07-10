@@ -51,18 +51,18 @@ void FmtPrintStyle(const Style& style) {
    fmt::print("{}", "\x1b[0m");
       
    if (style.has_emphasis()) {
-      const auto emphasis = fmt::detail::make_emphasis<Letter>(style.get_emphasis());
-      fmt::print("{}", emphasis.begin());
+      const auto e = fmt::detail::make_emphasis<Letter>(style.get_emphasis());
+      fmt::print("{}", e.begin());
    }
 
    if (style.has_foreground()) {
-      const auto foreground = fmt::detail::make_foreground_color<Letter>(style.get_foreground());
-      fmt::print("{}", foreground.begin());
+      const auto f = fmt::detail::make_foreground_color<Letter>(style.get_foreground());
+      fmt::print("{}", f.begin());
    }
 
    if (style.has_background()) {
-      const auto background = fmt::detail::make_background_color<Letter>(style.get_background());
-      fmt::print("{}", background.begin());
+      const auto b = fmt::detail::make_background_color<Letter>(style.get_background());
+      fmt::print("{}", b.begin());
    }
 }
 
@@ -145,8 +145,7 @@ void Interface::Write(const Style& s) const noexcept {
       attachment->Write(s);
 }
 
-/// Remove formatting, add a new line, add a timestamp and tabulate           
-///   @attention top of the style stack is not applied                        
+/// Add a new line, tabulating properly, but continuing the previous style    
 void Interface::NewLine() const noexcept {
    // Dispatch to redirectors                                           
    if (not mRedirectors.empty()) {
@@ -171,9 +170,13 @@ void Interface::NewLine() const noexcept {
       }
    }
 
+   FmtPrintStyle(mStyleStack.top());
+
    // Dispatch to duplicators                                           
-   for (auto attachment : mDuplicators)
+   for (auto attachment : mDuplicators) {
       attachment->NewLine();
+      attachment->Write(mStyleStack.top());
+   }
 }
 
 /// Clear the entire log (clear the console window or file)                   
@@ -224,8 +227,6 @@ void Interface::RunCommand(const Command& c) noexcept {
    case Command::Pop:
       if (mStyleStack.size() > 1)
          mStyleStack.pop();
-      else
-         mStyleStack.top() = DefaultStyle;
       Write(mStyleStack.top());
       break;
    case Command::Push:
@@ -263,7 +264,7 @@ const Style& Interface::SetColor(const Color& c) noexcept {
          style |= fmt::fg(oldStyle.get_foreground());
    }
    else if ((c >= Color::Black    and c < Color::BlackBgr) 
-         or  (c >= Color::DarkGray and c < Color::DarkGrayBgr)) {
+   or       (c >= Color::DarkGray and c < Color::DarkGrayBgr)) {
       // Create a new foreground color style                            
       style = fmt::fg(static_cast<fmt::terminal_color>(c));
       if (oldStyle.has_background())
@@ -271,9 +272,9 @@ const Style& Interface::SetColor(const Color& c) noexcept {
    }
    else {
       // Create a new background color style                            
-      style = fmt::fg(static_cast<fmt::terminal_color>(c));
-      if (oldStyle.has_background())
-         style |= fmt::bg(oldStyle.get_background());
+      style = fmt::bg(static_cast<fmt::terminal_color>(static_cast<uint8_t>(c) - 10));
+      if (oldStyle.has_foreground())
+         style |= fmt::fg(oldStyle.get_foreground());
    }
 
    if (oldStyle.has_emphasis())

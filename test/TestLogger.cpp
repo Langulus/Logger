@@ -30,7 +30,7 @@ SCENARIO("Logging to console", "[logger]") {
             Logger::Line("This should be a line inside a section #1");
             Logger::Line("This should be a line inside a section #2");
             {
-               auto scope2 = Logger::Section("This should be a subsection section title");
+               auto scope2 = Logger::Section("This should be a subsection title");
                Logger::Line("This should be a line inside a subsection #1");
                Logger::Line("This should be a line inside a subsection #2");
                Logger::Line("This should be a line inside a subsection #3");
@@ -62,54 +62,78 @@ SCENARIO("Logging to console", "[logger]") {
 
       WHEN("Calling Logger::Fatal()") {
          Logger::Fatal("This should be a fatal error and should be prefixed with FATAL ERROR");
+         Logger::Line("This should be a continued fatal error on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Calling Logger::Error()") {
          Logger::Error("This should be a non-fatal error, and should be prefixed with ERROR");
+         Logger::Line("This should be a continued non-fatal error on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Calling Logger::Warning()") {
          Logger::Warning("This should be a warning, and should be prefixed with WARNING");
+         Logger::Line("This should be a continued warning on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Calling Logger::Verbose()") {
          Logger::Verbose("This is a verbose info message");
+         Logger::Line("This should be a continued verbose on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Calling Logger::Info()") {
          Logger::Info("This is an info message");
+         Logger::Line("This should be a continued info on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Calling Logger::Message()") {
          Logger::Message("This is a message directed towards the user");
+         Logger::Line("This should be a continued message on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Calling Logger::Special()") {
          Logger::Special("This is a special message for a special user, like you");
+         Logger::Line("This should be a continued special message on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Calling Logger::Flow()") {
          Logger::Flow("This is a flow control message");
+         Logger::Line("This should be a continued flow on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Calling Logger::Input()") {
          Logger::Input("This is an input event message");
+         Logger::Line("This should be a continued input on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Calling Logger::Network()") {
          Logger::Network("This is a network message");
+         Logger::Line("This should be a continued network on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Calling Logger::OS()") {
          Logger::OS("This is an OS event message");
+         Logger::Line("This should be a continued OS event on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Calling Logger::Prompt()") {
          Logger::Prompt("This is an input prompt, that blocks execution and waits for console input (TODO)");
+         Logger::Line("This should be a continued Prompt on a new line, without any prefix");
+         Logger::Append(", and this should be appended");
       }
 
       WHEN("Logging numbers, characters and booleans") {
-         Logger::Special() << "The answer is " << 42 << '!' << " It's " << bool{true} << ", I tell ya!";
+         Logger::Special() << "The answer is " << 42 << '!' << " It's " << true << ", I tell ya!";
       }
 
       WHEN("Pushing and popping styles") {
