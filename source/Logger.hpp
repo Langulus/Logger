@@ -270,27 +270,62 @@ namespace Langulus::Logger
    template<class...T>
    decltype(auto) Fatal(T&&...) noexcept;
    template<class...T>
+   NOD() ScopedTabs FatalTab(T&&...) noexcept;
+
+   template<class...T>
    decltype(auto) Error(T&&...) noexcept;
+   template<class...T>
+   NOD() ScopedTabs ErrorTab(T&&...) noexcept;
+
    template<class...T>
    decltype(auto) Warning(T&&...) noexcept;
    template<class...T>
+   NOD() ScopedTabs WarningTab(T&&...) noexcept;
+
+   template<class...T>
    decltype(auto) Verbose(T&&...) noexcept;
+   template<class...T>
+   NOD() ScopedTabs VerboseTab(T&&...) noexcept;
+
    template<class...T>
    decltype(auto) Info(T&&...) noexcept;
    template<class...T>
+   NOD() ScopedTabs InfoTab(T&&...) noexcept;
+
+   template<class...T>
    decltype(auto) Message(T&&...) noexcept;
+   template<class...T>
+   NOD() ScopedTabs MessageTab(T&&...) noexcept;
+
    template<class...T>
    decltype(auto) Special(T&&...) noexcept;
    template<class...T>
+   NOD() ScopedTabs SpecialTab(T&&...) noexcept;
+
+   template<class...T>
    decltype(auto) Flow(T&&...) noexcept;
+   template<class...T>
+   NOD() ScopedTabs FlowTab(T&&...) noexcept;
+
    template<class...T>
    decltype(auto) Input(T&&...) noexcept;
    template<class...T>
+   NOD() ScopedTabs InputTab(T&&...) noexcept;
+
+   template<class...T>
    decltype(auto) Network(T&&...) noexcept;
+   template<class...T>
+   NOD() ScopedTabs NetworkTab(T&&...) noexcept;
+
    template<class...T>
    decltype(auto) OS(T&&...) noexcept;
    template<class...T>
+   NOD() ScopedTabs OSTab(T&&...) noexcept;
+
+   template<class...T>
    decltype(auto) Prompt(T&&...) noexcept;
+   template<class...T>
+   NOD() ScopedTabs PromptTab(T&&...) noexcept;
 
    LANGULUS_API(LOGGER) void AttachDuplicator(A::Interface*) noexcept;
    LANGULUS_API(LOGGER) void DettachDuplicator(A::Interface*) noexcept;

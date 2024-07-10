@@ -157,6 +157,15 @@ namespace Langulus::Logger
       #endif
    }
 
+   /// Write a new-line fatal error and tab all next lines                    
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs FatalTab([[maybe_unused]] T&&...arguments) noexcept {
+      Fatal(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
+   }
+
    /// Write a new-line error                                                 
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
@@ -174,6 +183,15 @@ namespace Langulus::Logger
       #else
          return (Instance);
       #endif
+   }
+
+   /// Write a new-line error and tab all next lines                          
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs ErrorTab([[maybe_unused]] T&&...arguments) noexcept {
+      Error(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
    }
 
    /// Write a new-line warning                                               
@@ -195,6 +213,15 @@ namespace Langulus::Logger
       #endif
    }
 
+   /// Write a new-line warning and tab all next lines                        
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs WarningTab([[maybe_unused]] T&&...arguments) noexcept {
+      Warning(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
+   }
+
    /// Write a new-line with verbose information                              
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
@@ -211,6 +238,15 @@ namespace Langulus::Logger
       #else
          return (Instance);
       #endif
+   }
+
+   /// Write a new-line vernose and tab all next lines                        
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs VerboseTab([[maybe_unused]] T&&...arguments) noexcept {
+      Verbose(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
    }
 
    /// Write a new-line with information                                      
@@ -231,6 +267,15 @@ namespace Langulus::Logger
       #endif
    }
 
+   /// Write a new-line info and tab all next lines                           
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs InfoTab([[maybe_unused]] T&&...arguments) noexcept {
+      Info(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
+   }
+
    /// Write a new-line with a personal message                               
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
@@ -247,6 +292,15 @@ namespace Langulus::Logger
       #else
          return (Instance);
       #endif
+   }
+
+   /// Write a new-line message and tab all next lines                        
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs MessageTab([[maybe_unused]] T&&...arguments) noexcept {
+      Message(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
    }
 
    /// Write a new-line with special text                                     
@@ -267,6 +321,15 @@ namespace Langulus::Logger
       #endif
    }
 
+   /// Write a new-line special and tab all next lines                        
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs SpecialTab([[maybe_unused]] T&&...arguments) noexcept {
+      Special(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
+   }
+
    /// Write a new-line with flow information                                 
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
@@ -283,6 +346,15 @@ namespace Langulus::Logger
       #else
          return (Instance);
       #endif
+   }
+
+   /// Write a new-line flow and tab all next lines                           
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs FlowTab([[maybe_unused]] T&&...arguments) noexcept {
+      Flow(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
    }
 
    /// Write a new-line on user input                                         
@@ -303,6 +375,15 @@ namespace Langulus::Logger
       #endif
    }
 
+   /// Write a new-line input and tab all next lines                          
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs InputTab([[maybe_unused]] T&&...arguments) noexcept {
+      Input(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
+   }
+
    /// Write a new-line with network message                                  
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
@@ -319,6 +400,15 @@ namespace Langulus::Logger
       #else
          return (Instance);
       #endif
+   }
+
+   /// Write a new-line network and tab all next lines                        
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs NetworkTab([[maybe_unused]] T&&...arguments) noexcept {
+      Network(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
    }
 
    /// Write a new-line with a message from OS                                
@@ -339,6 +429,15 @@ namespace Langulus::Logger
       #endif
    }
 
+   /// Write a new-line OS and tab all next lines                             
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs OSTab([[maybe_unused]] T&&...arguments) noexcept {
+      OS(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
+   }
+
    /// Write a new-line with an input prompt                                  
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
@@ -355,6 +454,15 @@ namespace Langulus::Logger
       #else
          return (Instance);
       #endif
+   }
+   
+   /// Write a new-line prompt and tab all next lines                         
+   ///   @tparam ...T - a sequence of elements to log (deducible)             
+   ///   @return a scoped tab, that will untab when destroyed                 
+   template<class...T> LANGULUS(INLINED)
+   ScopedTabs PromptTab([[maybe_unused]] T&&...arguments) noexcept {
+      Prompt(::std::forward<T>(arguments)...);
+      return (Instance << Tabs {});
    }
 
 } // namespace Langulus::Logger
