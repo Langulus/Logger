@@ -35,7 +35,7 @@ void ToHTML::Write(const TextView& text) const noexcept {
 ///   @param style - the style to set                                         
 void ToHTML::Write(const Style& style) const noexcept {
    // Always reset before a style change                                
-   Write(" </strong></em></u></blink></del></span>");
+   Write(" \n</code></strong></em></u></blink></del></span><code>");
 
    if (style.has_emphasis()) {
       const auto em = static_cast<uint8_t>(style.get_emphasis());
@@ -57,121 +57,129 @@ void ToHTML::Write(const Style& style) const noexcept {
          Write("<del>");
    }
 
+   if (not style.has_foreground() and not style.has_background())
+      return;
+
+   std::string style_string = "<span style = \"";
    if (style.has_foreground()) {
       const auto fg = static_cast<fmt::terminal_color>(
          style.get_foreground().value.term_color);
 
       switch (fg) {
       case fmt::terminal_color::black:
-         Write("<span style = \"color: black;\">");
+         style_string += "color: black; ";
          break;
       case fmt::terminal_color::red:
-         Write("<span style = \"color: DarkRed;\">");
+         style_string += "color: DarkRed; ";
          break;
       case fmt::terminal_color::green:
-         Write("<span style = \"color: ForestGreen;\">");
+         style_string += "color: ForestGreen; ";
          break;
       case fmt::terminal_color::yellow:
-         Write("<span style = \"color: DarkOrange;\">");
+         style_string += "color: DarkOrange; ";
          break;
       case fmt::terminal_color::blue:
-         Write("<span style = \"color: blue;\">");
+         style_string += "color: blue; ";
          break;
       case fmt::terminal_color::magenta:
-         Write("<span style = \"color: DarkMagenta;\">");
+         style_string += "color: DarkMagenta; ";
          break;
       case fmt::terminal_color::cyan:
-         Write("<span style = \"color: DarkCyan;\">");
+         style_string += "color: DarkCyan; ";
          break;
       case fmt::terminal_color::white:
-         Write("<span style = \"color: LightGray;\">");
+         style_string += "color: LightGray; ";
          break;
       case fmt::terminal_color::bright_black:
-         Write("<span style = \"color: gray;\">");
+         style_string += "color: gray; ";
          break;
       case fmt::terminal_color::bright_red:
-         Write("<span style = \"color: Red;\">");
+         style_string += "color: Red; ";
          break;
       case fmt::terminal_color::bright_green:
-         Write("<span style = \"color: GreenYellow;\">");
+         style_string += "color: GreenYellow; ";
          break;
       case fmt::terminal_color::bright_yellow:
-         Write("<span style = \"color: Gold;\">");
+         style_string += "color: Gold; ";
          break;
       case fmt::terminal_color::bright_blue:
-         Write("<span style = \"color: LightSkyBlue;\">");
+         style_string += "color: royalblue; ";
          break;
       case fmt::terminal_color::bright_magenta:
-         Write("<span style = \"color: magenta;\">");
+         style_string += "color: magenta; ";
          break;
       case fmt::terminal_color::bright_cyan:
-         Write("<span style = \"color: cyan;\">");
+         style_string += "color: cyan; ";
          break;
       case fmt::terminal_color::bright_white:
-         Write("<span style = \"color: white;\">");
+         style_string += "color: white; ";
          break;
       }
    }
    
    if (style.has_background()) {
-      const auto fg = static_cast<fmt::terminal_color>(
+      const auto bg = static_cast<fmt::terminal_color>(
          style.get_background().value.term_color);
 
-      switch (fg) {
+      switch (bg) {
       case fmt::terminal_color::black:
-         Write("<span style = \"background-color: black;\">");
+         style_string += "background-color: black; ";
          break;
       case fmt::terminal_color::red:
-         Write("<span style = \"background-color: DarkRed;\">");
+         style_string += "background-color: DarkRed; ";
          break;
       case fmt::terminal_color::green:
-         Write("<span style = \"background-color: ForestGreen;\">");
+         style_string += "background-color: ForestGreen; ";
          break;
       case fmt::terminal_color::yellow:
-         Write("<span style = \"background-color: DarkOrange;\">");
+         style_string += "background-color: DarkOrange; ";
          break;
       case fmt::terminal_color::blue:
-         Write("<span style = \"background-color: blue;\">");
+         style_string += "background-color: blue; ";
          break;
       case fmt::terminal_color::magenta:
-         Write("<span style = \"background-color: DarkMagenta;\">");
+         style_string += "background-color: DarkMagenta; ";
          break;
       case fmt::terminal_color::cyan:
-         Write("<span style = \"background-color: DarkCyan;\">");
+         style_string += "background-color: DarkCyan; ";
          break;
       case fmt::terminal_color::white:
-         Write("<span style = \"background-color: LightGray;\">");
+         style_string += "background-color: LightGray; ";
          break;
       case fmt::terminal_color::bright_black:
-         Write("<span style = \"background-color: gray;\">");
+         style_string += "background-color: gray; ";
          break;
       case fmt::terminal_color::bright_red:
-         Write("<span style = \"background-color: Red;\">");
+         style_string += "background-color: Red; ";
          break;
       case fmt::terminal_color::bright_green:
-         Write("<span style = \"background-color: GreenYellow;\">");
+         style_string += "background-color: GreenYellow; ";
          break;
       case fmt::terminal_color::bright_yellow:
-         Write("<span style = \"background-color: Gold;\">");
+         style_string += "background-color: Gold; ";
          break;
       case fmt::terminal_color::bright_blue:
-         Write("<span style = \"background-color: LightSkyBlue;\">");
+         style_string += "background-color: royalblue; ";
          break;
       case fmt::terminal_color::bright_magenta:
-         Write("<span style = \"background-color: magenta;\">");
+         style_string += "background-color: magenta; ";
          break;
       case fmt::terminal_color::bright_cyan:
-         Write("<span style = \"background-color: cyan;\">");
+         style_string += "background-color: cyan; ";
          break;
       case fmt::terminal_color::bright_white:
-         Write("<span style = \"background-color: white;\">");
+         style_string += "background-color: white; ";
          break;
       }
    }
+
+   style_string += "\">\n";
+   Write(style_string);
 }
 
 /// Remove formatting, add a new line, add a timestamp and tabulate           
 ///   @attention top of the style stack is not applied                        
+///   @param timestamp - whether to insert a timestamp                        
 void ToHTML::NewLine() const noexcept {
    Write("<br>");
    Write(Instance.TimeStampStyle);
@@ -197,8 +205,9 @@ void ToHTML::Clear() const noexcept {
 
 /// Write file header - general HTML styling options, etc.                    
 void ToHTML::WriteHeader() const {
-   Write("<body style = \"color: gray; background-color: black; font-family: monospace; font-size: 14px;\">");
-   Write("<h1>Log started - ");
+   Write("<!DOCTYPE html><html>\n");
+   Write("<body style = \"color: LightGray; background-color: black; font-family: monospace; font-size: 14px;\">\n");
+   Write("<h2>Log started - ");
    Write(GetAdvancedTime());
-   Write("</h1>");
+   Write("</h2><code>\n");
 }
