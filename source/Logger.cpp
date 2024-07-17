@@ -128,7 +128,7 @@ void Interface::Write(const TextView& stdString) const noexcept {
 
 /// Change the style                                                          
 ///   @param s - the style                                                    
-void Interface::Write(const Style& s) const noexcept {
+void Interface::Write(Style s) const noexcept {
    // Dispatch to redirectors                                           
    if (not mRedirectors.empty()) {
       for (auto attachment : mRedirectors)
@@ -200,7 +200,7 @@ void Interface::Clear() const noexcept {
 
 /// Execute a logger command                                                  
 ///   @param c - the command to execute                                       
-void Interface::RunCommand(const Command& c) noexcept {
+void Interface::RunCommand(Command c) noexcept {
    switch (c) {
    case Command::Clear:
       Clear();
@@ -232,6 +232,11 @@ void Interface::RunCommand(const Command& c) noexcept {
    case Command::Push:
       mStyleStack.push(mStyleStack.top());
       break;
+   case Command::PopAndPush:
+      if (mStyleStack.size() > 1)
+         mStyleStack.pop();
+      mStyleStack.push(mStyleStack.top());
+      break;
    case Command::Stylize:
       Write(mStyleStack.top());
       break;
@@ -246,9 +251,31 @@ void Interface::RunCommand(const Command& c) noexcept {
 }
    
 /// Change the foreground/background color                                    
-///   @param c - the color                                                    
+///   @param c_with_flags - the color with optional mixing flags              
 ///   @return the last style, with coloring applied                           
-const Style& Interface::SetColor(const Color& c) noexcept {
+const Style& Interface::SetColor(Color c_with_flags) noexcept {
+   if (static_cast<unsigned>(c_with_flags)
+   &   static_cast<unsigned>(Color::PreviousColor)) {
+      // We have to pop                                                 
+      if (mStyleStack.size() > 1)
+         mStyleStack.pop();
+   }
+
+   if (static_cast<unsigned>(c_with_flags)
+   &   static_cast<unsigned>(Color::NextColor)) {
+      // We have to push                                                
+      mStyleStack.push(mStyleStack.top());
+   }
+
+   // Strip the mixing bits from the color                              
+   const Color c = static_cast<Color>(
+      static_cast<unsigned>(c_with_flags) & (~(
+          static_cast<unsigned>(Color::PreviousColor)
+        | static_cast<unsigned>(Color::NextColor)
+      ))
+   );
+
+   // Mix...                                                            
    auto& style = mStyleStack.top();
    const auto oldStyle = style;
    if (c == Color::NoForeground) {
@@ -284,7 +311,7 @@ const Style& Interface::SetColor(const Color& c) noexcept {
 
 /// Change the emphasis                                                       
 ///   @param c - the color                                                    
-const Style& Interface::SetEmphasis(const Emphasis& e) noexcept {
+const Style& Interface::SetEmphasis(Emphasis e) noexcept {
    auto& style = mStyleStack.top();
    style |= static_cast<fmt::emphasis>(e);
    return style;
@@ -292,7 +319,7 @@ const Style& Interface::SetEmphasis(const Emphasis& e) noexcept {
 
 /// Change the style                                                          
 ///   @param s - the style                                                    
-const Style& Interface::SetStyle(const Style& s) noexcept {
+const Style& Interface::SetStyle(Style s) noexcept {
    mStyleStack.top() = s;
    return mStyleStack.top();
 }
@@ -337,7 +364,7 @@ Logger::A::Interface& Logger::A::Interface::operator << (Logger::A::Interface&) 
 /// Push a command                                                            
 ///   @param c - the command to push                                          
 ///   @return a reference to the logger for chaining                          
-Logger::A::Interface& Logger::A::Interface::operator << (const Command& c) noexcept {
+Logger::A::Interface& Logger::A::Interface::operator << (Command c) noexcept {
    Instance.RunCommand(c);
    return *this;
 }
@@ -345,7 +372,7 @@ Logger::A::Interface& Logger::A::Interface::operator << (const Command& c) noexc
 /// Push a foreground color                                                   
 ///   @param c - the command to push                                          
 ///   @return a reference to the logger for chaining                          
-Logger::A::Interface& Logger::A::Interface::operator << (const Color& c) noexcept {
+Logger::A::Interface& Logger::A::Interface::operator << (Color c) noexcept {
    Instance.SetColor(c);
    Instance.RunCommand(Command::Stylize);
    return *this;
@@ -354,7 +381,7 @@ Logger::A::Interface& Logger::A::Interface::operator << (const Color& c) noexcep
 /// Push an emphasis                                                          
 ///   @param e - the emphasis to push                                         
 ///   @return a reference to the logger for chaining                          
-Logger::A::Interface& Logger::A::Interface::operator << (const Emphasis& e) noexcept {
+Logger::A::Interface& Logger::A::Interface::operator << (Emphasis e) noexcept {
    Instance.SetEmphasis(e);
    Instance.RunCommand(Command::Stylize);
    return *this;
@@ -363,22 +390,9 @@ Logger::A::Interface& Logger::A::Interface::operator << (const Emphasis& e) noex
 /// Push a foreground and background color                                    
 ///   @param c - the state to push                                            
 ///   @return a reference to the logger for chaining                          
-Logger::A::Interface& Logger::A::Interface::operator << (const Style& c) noexcept {
+Logger::A::Interface& Logger::A::Interface::operator << (Style c) noexcept {
    Instance.SetStyle(c);
    Instance.RunCommand(Command::Stylize);
-   return *this;
-}
-
-/// Push a number of tabs                                                     
-///   @param t - the tabs to push                                             
-///   @return a reference to the logger for chaining                          
-Logger::A::Interface& Logger::A::Interface::operator << (const Tabs& t) noexcept {
-   auto tabs = ::std::max(1, t.mTabs);
-   while (tabs) {
-      Instance.RunCommand(Command::Tab);
-      --tabs;
-   }
-
    return *this;
 }
 
@@ -392,8 +406,21 @@ Logger::A::Interface& Logger::A::Interface::operator << (const TextView& t) noex
 
 /// Write a nullptr as "null"                                                 
 ///   @return a reference to the logger for chaining                          
-Logger::A::Interface& Logger::A::Interface::operator << (const ::std::nullptr_t&) noexcept {
+Logger::A::Interface& Logger::A::Interface::operator << (::std::nullptr_t) noexcept {
    Instance.Write("null");
+   return *this;
+}
+
+/// Push a number of tabs                                                     
+///   @param t - the tabs to push                                             
+///   @return a reference to the logger for chaining                          
+Logger::A::Interface& Logger::A::Interface::operator << (const Tabs& t) noexcept {
+   auto tabs = ::std::max(1, t.mTabs);
+   while (tabs) {
+      Instance.RunCommand(Command::Tab);
+      --tabs;
+   }
+
    return *this;
 }
 

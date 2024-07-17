@@ -12,8 +12,12 @@
 
 int main(int argc, char* argv[]) {
    // Duplicate any logging messages to an external HTML file           
-   Logger::ToHTML logFile {"logfile.htm"};
-   Logger::AttachDuplicator(&logFile);
+   Logger::ToHTML logFile1 {"logfile.htm"};
+   Logger::AttachDuplicator(&logFile1);
+
+   // Duplicate any logging messages to an external txt file            
+   Logger::ToTXT logFile2 {"logfile.txt"};
+   Logger::AttachDuplicator(&logFile2);
 
    Catch::Session session;
    return session.run(argc, argv);

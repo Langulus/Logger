@@ -39,7 +39,7 @@ namespace Langulus::Logger
 
    /// Color codes, consistent with ANSI/VT100 escapes                        
    /// Also consistent with fmt::terminal_color                               
-   enum class Color : ::std::underlying_type_t<fmt::terminal_color> {
+   enum class Color : unsigned {
       NoForeground = 0,
       NoBackground = 1,
 
@@ -77,7 +77,138 @@ namespace Langulus::Logger
       BlueBgr,
       PurpleBgr,
       CyanBgr,
-      WhiteBgr
+      WhiteBgr,
+
+      // Bits that dictate how to mix the colors                        
+      // Color is always mixed with the currently set one, unless the   
+      // 'PreviousColor' bit is on, in which case the style is popped   
+      // before applying color                                          
+      PreviousColor     = 128,
+
+      // Color is always mixed with the currently set one, unless the   
+      // 'NextColor' bit is on, in which case the style is pushed       
+      // before applying color                                          
+      NextColor     = 128,
+
+      // Colors that mix with the previous color                        
+      PopNoForeground   = NoForeground | PreviousColor,
+      PopNoBackground   = NoBackground | PreviousColor,
+
+      PopBlack          = Black | PreviousColor,
+      PopDarkRed        = DarkRed | PreviousColor,
+      PopDarkGreen      = DarkGreen | PreviousColor,
+      PopDarkYellow     = DarkYellow | PreviousColor,
+      PopDarkBlue       = DarkBlue | PreviousColor,
+      PopDarkPurple     = DarkPurple | PreviousColor,
+      PopDarkCyan       = DarkCyan | PreviousColor,
+      PopGray           = Gray | PreviousColor,
+
+      PopBlackBgr       = BlackBgr | PreviousColor,
+      PopDarkRedBgr     = DarkRedBgr | PreviousColor,
+      PopDarkGreenBgr   = DarkGreenBgr | PreviousColor,
+      PopDarkYellowBgr  = DarkYellowBgr | PreviousColor,
+      PopDarkBlueBgr    = DarkBlueBgr | PreviousColor,
+      PopDarkPurpleBgr  = DarkPurpleBgr | PreviousColor,
+      PopDarkCyanBgr    = DarkCyanBgr | PreviousColor,
+      PopGrayBgr        = GrayBgr | PreviousColor,
+
+      PopDarkGray       = DarkGray | PreviousColor,
+      PopRed            = Red | PreviousColor,
+      PopGreen          = Green | PreviousColor,
+      PopYellow         = Yellow | PreviousColor,
+      PopBlue           = Blue | PreviousColor,
+      PopPurple         = Purple | PreviousColor,
+      PopCyan           = Cyan | PreviousColor,
+      PopWhite          = White | PreviousColor,
+
+      PopDarkGrayBgr    = DarkGrayBgr | PreviousColor,
+      PopRedBgr         = RedBgr | PreviousColor,
+      PopGreenBgr       = GreenBgr | PreviousColor,
+      PopYellowBgr      = YellowBgr | PreviousColor,
+      PopBlueBgr        = BlueBgr | PreviousColor,
+      PopPurpleBgr      = PurpleBgr | PreviousColor,
+      PopCyanBgr        = CyanBgr | PreviousColor,
+      PopWhiteBgr       = WhiteBgr | PreviousColor,
+
+      // Colors that mix with the next color                            
+      PushNoForeground  = NoForeground | NextColor,
+      PushNoBackground  = NoBackground | NextColor,
+
+      PushBlack         = Black | NextColor,
+      PushDarkRed       = DarkRed | NextColor,
+      PushDarkGreen     = DarkGreen | NextColor,
+      PushDarkYellow    = DarkYellow | NextColor,
+      PushDarkBlue      = DarkBlue | NextColor,
+      PushDarkPurple    = DarkPurple | NextColor,
+      PushDarkCyan      = DarkCyan | NextColor,
+      PushGray          = Gray | NextColor,
+
+      PushBlackBgr      = BlackBgr | NextColor,
+      PushDarkRedBgr    = DarkRedBgr | NextColor,
+      PushDarkGreenBgr  = DarkGreenBgr | NextColor,
+      PushDarkYellowBgr = DarkYellowBgr | NextColor,
+      PushDarkBlueBgr   = DarkBlueBgr | NextColor,
+      PushDarkPurpleBgr = DarkPurpleBgr | NextColor,
+      PushDarkCyanBgr   = DarkCyanBgr | NextColor,
+      PushGrayBgr       = GrayBgr | NextColor,
+
+      PushDarkGray      = DarkGray | NextColor,
+      PushRed           = Red | NextColor,
+      PushGreen         = Green | NextColor,
+      PushYellow        = Yellow | NextColor,
+      PushBlue          = Blue | NextColor,
+      PushPurple        = Purple | NextColor,
+      PushCyan          = Cyan | NextColor,
+      PushWhite         = White | NextColor,
+
+      PushDarkGrayBgr   = DarkGrayBgr | NextColor,
+      PushRedBgr        = RedBgr | NextColor,
+      PushGreenBgr      = GreenBgr | NextColor,
+      PushYellowBgr     = YellowBgr | NextColor,
+      PushBlueBgr       = BlueBgr | NextColor,
+      PushPurpleBgr     = PurpleBgr | NextColor,
+      PushCyanBgr       = CyanBgr | NextColor,
+      PushWhiteBgr      = WhiteBgr | NextColor,
+
+      // Colors that reset to previous color, push and mix              
+      PopAndPushNoForeground  = NoForeground | NextColor | PreviousColor,
+      PopAndPushNoBackground  = NoBackground | NextColor | PreviousColor,
+
+      PopAndPushBlack         = Black | NextColor | PreviousColor,
+      PopAndPushDarkRed       = DarkRed | NextColor | PreviousColor,
+      PopAndPushDarkGreen     = DarkGreen | NextColor | PreviousColor,
+      PopAndPushDarkYellow    = DarkYellow | NextColor | PreviousColor,
+      PopAndPushDarkBlue      = DarkBlue | NextColor | PreviousColor,
+      PopAndPushDarkPurple    = DarkPurple | NextColor | PreviousColor,
+      PopAndPushDarkCyan      = DarkCyan | NextColor | PreviousColor,
+      PopAndPushGray          = Gray | NextColor | PreviousColor,
+
+      PopAndPushBlackBgr      = BlackBgr | NextColor | PreviousColor,
+      PopAndPushDarkRedBgr    = DarkRedBgr | NextColor | PreviousColor,
+      PopAndPushDarkGreenBgr  = DarkGreenBgr | NextColor | PreviousColor,
+      PopAndPushDarkYellowBgr = DarkYellowBgr | NextColor | PreviousColor,
+      PopAndPushDarkBlueBgr   = DarkBlueBgr | NextColor | PreviousColor,
+      PopAndPushDarkPurpleBgr = DarkPurpleBgr | NextColor | PreviousColor,
+      PopAndPushDarkCyanBgr   = DarkCyanBgr | NextColor | PreviousColor,
+      PopAndPushGrayBgr       = GrayBgr | NextColor | PreviousColor,
+
+      PopAndPushDarkGray      = DarkGray | NextColor | PreviousColor,
+      PopAndPushRed           = Red | NextColor | PreviousColor,
+      PopAndPushGreen         = Green | NextColor | PreviousColor,
+      PopAndPushYellow        = Yellow | NextColor | PreviousColor,
+      PopAndPushBlue          = Blue | NextColor | PreviousColor,
+      PopAndPushPurple        = Purple | NextColor | PreviousColor,
+      PopAndPushCyan          = Cyan | NextColor | PreviousColor,
+      PopAndPushWhite         = White | NextColor | PreviousColor,
+
+      PopAndPushDarkGrayBgr   = DarkGrayBgr | NextColor | PreviousColor,
+      PopAndPushRedBgr        = RedBgr | NextColor | PreviousColor,
+      PopAndPushGreenBgr      = GreenBgr | NextColor | PreviousColor,
+      PopAndPushYellowBgr     = YellowBgr | NextColor | PreviousColor,
+      PopAndPushBlueBgr       = BlueBgr | NextColor | PreviousColor,
+      PopAndPushPurpleBgr     = PurpleBgr | NextColor | PreviousColor,
+      PopAndPushCyanBgr       = CyanBgr | NextColor | PreviousColor,
+      PopAndPushWhiteBgr      = WhiteBgr | NextColor | PreviousColor
    };
 
    /// GCC equates templates with enum types as their underlying type, so we  
@@ -113,8 +244,9 @@ namespace Langulus::Logger
    enum class Command : uint8_t {
       Clear,		// Clear the console                                  
       NewLine,		// Write a new line, with a timestamp and tabulation  
-      Pop,			// Pop the style                                      
-      Push,			// Push the style                                     
+      Pop,			// Pop the style, and apply previous style            
+      Push,			// Push the current style                             
+      PopAndPush, // Pop the style and push another, don't stylize yet  
       Invert,		// Inverts background and foreground colors           
       Reset,		// Reset the style                                    
       Stylize,    // Apply the last style                               
@@ -169,7 +301,7 @@ namespace Langulus::Logger
          static Text GetSimpleTime() noexcept;
 
          virtual void Write(const TextView&) const noexcept = 0;
-         virtual void Write(const Style&) const noexcept = 0;
+         virtual void Write(Style) const noexcept = 0;
          virtual void NewLine() const noexcept = 0;
          virtual void Clear() const noexcept = 0;
 
@@ -182,12 +314,13 @@ namespace Langulus::Logger
 
          LANGULUS_API(LOGGER) Interface& operator << (A::Interface&) noexcept;
          LANGULUS_API(LOGGER) Interface& operator << (const TextView&) noexcept;
-         LANGULUS_API(LOGGER) Interface& operator << (const Command&) noexcept;
-         LANGULUS_API(LOGGER) Interface& operator << (const Color&) noexcept;
-         LANGULUS_API(LOGGER) Interface& operator << (const Emphasis&) noexcept;
-         LANGULUS_API(LOGGER) Interface& operator << (const Style&) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (Command) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (Color) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (Emphasis) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (Style) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (::std::nullptr_t) noexcept;
+
          LANGULUS_API(LOGGER) Interface& operator << (const Tabs&) noexcept;
-         LANGULUS_API(LOGGER) Interface& operator << (const ::std::nullptr_t&) noexcept;
          LANGULUS_API(LOGGER) ScopedTabs operator << (Tabs&&) noexcept;
 
          Interface& operator << (const CT::Sparse auto&) noexcept;
@@ -231,17 +364,17 @@ namespace Langulus::Logger
       /// Interface override                                                  
       ///                                                                     
       LANGULUS_API(LOGGER) void Write(const TextView&) const noexcept;
-      LANGULUS_API(LOGGER) void Write(const Style&) const noexcept;
+      LANGULUS_API(LOGGER) void Write(Style) const noexcept;
       LANGULUS_API(LOGGER) void NewLine() const noexcept;
       LANGULUS_API(LOGGER) void Clear() const noexcept;
 
       ///                                                                     
       /// State changers                                                      
       ///                                                                     
-      LANGULUS_API(LOGGER) void RunCommand(const Command&) noexcept;
-      LANGULUS_API(LOGGER) const Style& SetStyle(const Style&) noexcept;
-      LANGULUS_API(LOGGER) const Style& SetColor(const Color&) noexcept;
-      LANGULUS_API(LOGGER) const Style& SetEmphasis(const Emphasis&) noexcept;
+      LANGULUS_API(LOGGER) void RunCommand(Command) noexcept;
+      LANGULUS_API(LOGGER) const Style& SetStyle(Style) noexcept;
+      LANGULUS_API(LOGGER) const Style& SetColor(Color) noexcept;
+      LANGULUS_API(LOGGER) const Style& SetEmphasis(Emphasis) noexcept;
 
       ///                                                                     
       /// Attachments                                                         
@@ -349,7 +482,7 @@ namespace Langulus::Logger
    ///                                                                        
    struct MessageSink final : Logger::A::Interface {
       void Write(const TextView&) const noexcept {}
-      void Write(const Style&) const noexcept {}
+      void Write(Style) const noexcept {}
       void NewLine() const noexcept {}
       void Clear() const noexcept {}
    };
@@ -357,9 +490,9 @@ namespace Langulus::Logger
    LANGULUS_API(LOGGER) extern MessageSink MessageSinkInstance;
 
    ///                                                                        
-   /// Generates HTML code from logging messages and append them to an        
-   /// output file. Can be used both as duplicator or redirector.             
-   /// Use it like this:                                                      
+   /// Generates HTML code from logging messages. Can be used both as         
+   /// duplicator or redirector. Colors and styles are consistent with        
+   /// console output. Use it like this:                                      
    ///    Logger::ToHTML logRedirect("outputfile.htm");                       
    ///    Logger::AttachRedirector(&logRedirect);                             
    ///    <redirect all logging to an HTML file>                              
@@ -372,13 +505,41 @@ namespace Langulus::Logger
       mutable std::ofstream mFile;
 
       void WriteHeader() const;
+      void WriteFooter() const;
 
    public:
       LANGULUS_API(LOGGER)  ToHTML(const TextView&);
       LANGULUS_API(LOGGER) ~ToHTML();
 
       LANGULUS_API(LOGGER) void Write(const TextView&) const noexcept;
-      LANGULUS_API(LOGGER) void Write(const Style&) const noexcept;
+      LANGULUS_API(LOGGER) void Write(Style) const noexcept;
+      LANGULUS_API(LOGGER) void NewLine() const noexcept;
+      LANGULUS_API(LOGGER) void Clear() const noexcept;
+   };
+
+   ///                                                                        
+   /// Generates plain text file from logging messages. Can be used both as   
+   /// duplicator or redirector. Strips and and all styling. Use it like this:
+   ///    Logger::ToTXT logRedirect("outputfile.htm");                        
+   ///    Logger::AttachRedirector(&logRedirect);                             
+   ///    <redirect all logging to a plain text file>                         
+   ///    Logger::DettachRedirector(&logRedirect);                            
+   ///    <you can log once again in the console>                             
+   ///                                                                        
+   struct ToTXT final : Logger::A::Interface {
+   private:
+      std::string mFilename;
+      mutable std::ofstream mFile;
+
+      void WriteHeader() const;
+      void WriteFooter() const;
+
+   public:
+      LANGULUS_API(LOGGER)  ToTXT(const TextView&);
+      LANGULUS_API(LOGGER) ~ToTXT();
+
+      LANGULUS_API(LOGGER) void Write(const TextView&) const noexcept;
+      LANGULUS_API(LOGGER) void Write(Style) const noexcept;
       LANGULUS_API(LOGGER) void NewLine() const noexcept;
       LANGULUS_API(LOGGER) void Clear() const noexcept;
    };

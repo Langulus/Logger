@@ -21,6 +21,7 @@ ToHTML::ToHTML(const TextView& filename) : mFilename {filename} {
 }
 
 ToHTML::~ToHTML() {
+   WriteFooter();
    mFile.close();
 }
 
@@ -33,7 +34,7 @@ void ToHTML::Write(const TextView& text) const noexcept {
 
 /// Apply some style                                                          
 ///   @param style - the style to set                                         
-void ToHTML::Write(const Style& style) const noexcept {
+void ToHTML::Write(Style style) const noexcept {
    // Always reset before a style change                                
    Write(" \n</code></strong></em></u></blink></del></span><code>");
 
@@ -179,7 +180,6 @@ void ToHTML::Write(const Style& style) const noexcept {
 
 /// Remove formatting, add a new line, add a timestamp and tabulate           
 ///   @attention top of the style stack is not applied                        
-///   @param timestamp - whether to insert a timestamp                        
 void ToHTML::NewLine() const noexcept {
    Write("<br>");
    Write(Instance.TimeStampStyle);
@@ -210,4 +210,11 @@ void ToHTML::WriteHeader() const {
    Write("<h2>Log started - ");
    Write(GetAdvancedTime());
    Write("</h2><code>\n");
+}
+
+/// Write file footer - just the official shutdown timestamp                  
+void ToHTML::WriteFooter() const {
+   Write("<h2>Log ended - ");
+   Write(GetAdvancedTime());
+   Write("</h2></code></body></html>");
 }
