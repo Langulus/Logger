@@ -1,4 +1,4 @@
-///                                                                           
+﻿///                                                                           
 /// Langulus::Logger                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
@@ -128,10 +128,8 @@ namespace Langulus::Logger
    decltype(auto) Section(T&&...arguments) noexcept {
       if constexpr (sizeof...(arguments) > 0) {
          Instance.NewLine();
-         Instance << Command::Push
-                  << Color::White
-                  << Emphasis::Bold
-                  << Emphasis::Underline;
+         Instance << Interface::TabStyle << "┌─ "
+                  << Color::PushWhite << Emphasis::Bold << Emphasis::Underline;
          (Instance << ... << ::std::forward<T>(arguments));
          return (Instance << Command::Pop << Tabs {});
       }
@@ -145,7 +143,7 @@ namespace Langulus::Logger
    decltype(auto) Fatal([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_FATALERRORS
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::DarkRed;
+         Instance << Command::PopAndPush << Color::DarkRed;
 
          if constexpr (sizeof...(arguments) > 0) {
             Instance << "FATAL ERROR: ";
@@ -173,7 +171,7 @@ namespace Langulus::Logger
    decltype(auto) Error([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_ERRORS
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::Red;
+         Instance << Command::PopAndPush << Color::Red;
 
          if constexpr (sizeof...(arguments) > 0) {
             Instance << "ERROR: ";
@@ -201,7 +199,7 @@ namespace Langulus::Logger
    decltype(auto) Warning([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_WARNINGS
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::DarkYellow;
+         Instance << Command::PopAndPush << Color::DarkYellow;
 
          if constexpr (sizeof...(arguments) > 0) {
             Instance << "WARNING: ";
@@ -229,12 +227,13 @@ namespace Langulus::Logger
    decltype(auto) Verbose([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_VERBOSE
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::DarkGray;
+         Instance << Command::PopAndPush << Color::DarkGray;
 
-         if constexpr (sizeof...(arguments) > 0)
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance << "VERBOSE: ";
             return (Instance << ... << ::std::forward<T>(arguments));
-         else
-            return (Instance);
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -256,12 +255,13 @@ namespace Langulus::Logger
    decltype(auto) Info([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_INFOS
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::Gray;
+         Instance << Command::PopAndPush << Color::Gray;
 
-         if constexpr (sizeof...(arguments) > 0)
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance << "INFO: ";
             return (Instance << ... << ::std::forward<T>(arguments));
-         else
-            return (Instance);
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -283,12 +283,13 @@ namespace Langulus::Logger
    decltype(auto) Message([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_MESSAGES
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::White;
+         Instance << Command::PopAndPush << Color::White;
 
-         if constexpr (sizeof...(arguments) > 0)
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance << "MESSAGE: ";
             return (Instance << ... << ::std::forward<T>(arguments));
-         else
-            return (Instance);
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -310,12 +311,13 @@ namespace Langulus::Logger
    decltype(auto) Special([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_SPECIALS
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::Purple;
+         Instance << Command::PopAndPush << Color::Purple;
 
-         if constexpr (sizeof...(arguments) > 0)
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance << "SPECIAL: ";
             return (Instance << ... << ::std::forward<T>(arguments));
-         else
-            return (Instance);
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -337,12 +339,13 @@ namespace Langulus::Logger
    decltype(auto) Flow([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_FLOWS
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::DarkCyan;
+         Instance << Command::PopAndPush << Color::DarkCyan;
 
-         if constexpr (sizeof...(arguments) > 0)
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance << "FLOW: ";
             return (Instance << ... << ::std::forward<T>(arguments));
-         else
-            return (Instance);
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -364,12 +367,13 @@ namespace Langulus::Logger
    decltype(auto) Input([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_INPUTS
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::Blue;
+         Instance << Command::PopAndPush << Color::Blue;
 
-         if constexpr (sizeof...(arguments) > 0)
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance << "INPUT: ";
             return (Instance << ... << ::std::forward<T>(arguments));
-         else
-            return (Instance);
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -391,12 +395,13 @@ namespace Langulus::Logger
    decltype(auto) Network([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_NETWORKS
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::Yellow;
+         Instance << Command::PopAndPush << Color::Yellow;
 
-         if constexpr (sizeof...(arguments) > 0)
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance << "NETWORK: ";
             return (Instance << ... << ::std::forward<T>(arguments));
-         else
-            return (Instance);
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -418,12 +423,13 @@ namespace Langulus::Logger
    decltype(auto) OS([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_OS
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::DarkBlue;
+         Instance << Command::PopAndPush << Color::DarkBlue;
 
-         if constexpr (sizeof...(arguments) > 0)
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance << "OS: ";
             return (Instance << ... << ::std::forward<T>(arguments));
-         else
-            return (Instance);
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif
@@ -445,12 +451,13 @@ namespace Langulus::Logger
    decltype(auto) Prompt([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_PROMPTS
          Instance.NewLine();
-         Instance << Command::Pop << Command::Push << Color::Green;
+         Instance << Command::PopAndPush << Color::Green;
 
-         if constexpr (sizeof...(arguments) > 0)
+         if constexpr (sizeof...(arguments) > 0) {
+            Instance << "PROMPT: ";
             return (Instance << ... << ::std::forward<T>(arguments));
-         else
-            return (Instance);
+         }
+         else return (Instance);
       #else
          return (Instance);
       #endif

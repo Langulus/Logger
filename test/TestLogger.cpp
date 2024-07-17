@@ -139,7 +139,7 @@ SCENARIO("Logging to console", "[logger]") {
       WHEN("Pushing and popping styles") {
          Logger::Warning("This is a warning, ",
             Logger::Push, Logger::Underline, "but now we underline it, ",
-               Logger::Push, Logger::RedBgr, "then we even change color, ",
+               Logger::PushRedBgr, "then we even change color, ",
                Logger::Pop, "but then we return to underlined warning, ",
             Logger::Pop, "and finally, back to warning, ",
          Logger::Pop, "but if we actually pop once more, we return to default Logger style\n\n");
