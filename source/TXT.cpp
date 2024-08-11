@@ -34,7 +34,7 @@ void ToTXT::Write(const TextView& text) const noexcept {
 
 /// Plain text logging ignores all styles                                     
 ///   @param style - the style to set                                         
-void ToTXT::Write(Style style) const noexcept {
+void ToTXT::Write(Style) const noexcept {
    LANGULUS(NOOP);
 }
 
