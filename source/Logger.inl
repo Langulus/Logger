@@ -87,6 +87,12 @@ namespace Langulus::Logger
       }
    }
 
+   /// Log any character array                                                
+   template<class T, size_t N> LANGULUS(INLINED)
+   A::Interface& A::Interface::operator << (const ::std::array<T, N>& a) noexcept {
+      return operator << (TextView {a.data(), N});
+   }
+
    /// Stringify anything that has a valid fmt formatter                      
    ///   @param anything - type to stringify                                  
    ///   @return a reference to the logger for chaining                       

@@ -324,6 +324,8 @@ namespace Langulus::Logger
          LANGULUS_API(LOGGER) ScopedTabs operator << (Tabs&&) noexcept;
 
          Interface& operator << (const CT::Sparse auto&) noexcept;
+         template<class T, size_t N>
+         Interface& operator << (const ::std::array<T, N>&) noexcept;
          Interface& operator << (const ::Langulus::Logger::Formattable auto&) noexcept;
       };
 
@@ -543,6 +545,19 @@ namespace Langulus::Logger
       LANGULUS_API(LOGGER) void NewLine() const noexcept;
       LANGULUS_API(LOGGER) void Clear() const noexcept;
    };
+
+   /// Generate hexadecimal string from a given value                         
+   ///   @param format - the template string                                  
+   ///   @param args... - the arguments                                       
+   ///   @return the instantiated template                                    
+   auto Hex(const auto& from) {
+      ::std::array<char, sizeof(from) * 2> result {};
+      auto from_bytes = reinterpret_cast<const std::byte*>(&from);
+      auto to_bytes = result.data();
+      for (Offset i = 0; i < sizeof(from); ++i)
+         fmt::format_to_n(to_bytes + i * 2, 2, "{:X}", from_bytes[i]);
+      return result;
+   }
 
 } // namespace Langulus::Logger
 
