@@ -61,88 +61,123 @@ SCENARIO("Logging to console", "[logger]") {
       }
 
       WHEN("Calling Logger::Fatal()") {
-         Logger::Fatal("This should be a fatal error and should be prefixed with FATAL ERROR");
-         Logger::Line("This should be a continued fatal error on a new line, without any prefix");
+         Logger::Fatal("This should be a fatal error and should be prefixed with |F|");
+         Logger::Line("This should be a continued fatal error on a new line, with |F| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside a fatal error");
+         Logger::Line("This should be a line inside a section, inside a fatal error");
       }
 
       WHEN("Calling Logger::Error()") {
-         Logger::Error("This should be a non-fatal error, and should be prefixed with ERROR");
-         Logger::Line("This should be a continued non-fatal error on a new line, without any prefix");
+         Logger::Error("This should be a non-fatal error, and should be prefixed with |E|");
+         Logger::Line("This should be a continued non-fatal error on a new line, with |E| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside an error");
+         Logger::Line("This should be a line inside a section, inside an error");
       }
 
       WHEN("Calling Logger::Warning()") {
-         Logger::Warning("This should be a warning, and should be prefixed with WARNING");
-         Logger::Line("This should be a continued warning on a new line, without any prefix");
+         Logger::Warning("This should be a warning, and should be prefixed with |W|");
+         Logger::Line("This should be a continued warning on a new line, with |W| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside a warning");
+         Logger::Line("This should be a line inside a section, inside a warning");
       }
 
       WHEN("Calling Logger::Verbose()") {
-         Logger::Verbose("This is a verbose info message");
-         Logger::Line("This should be a continued verbose on a new line, without any prefix");
+         Logger::Verbose("This is a verbose info message, and should be prefixed with |V|");
+         Logger::Line("This should be a continued verbose on a new line, with |V| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside a verbose message");
+         Logger::Line("This should be a line inside a section, inside a verbose message");
       }
 
       WHEN("Calling Logger::Info()") {
-         Logger::Info("This is an info message");
-         Logger::Line("This should be a continued info on a new line, without any prefix");
+         Logger::Info("This is an info message, and should be prefixed with |I|");
+         Logger::Line("This should be a continued info on a new line, with |I| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside an info message");
+         Logger::Line("This should be a line inside a section, inside an info message");
       }
 
       WHEN("Calling Logger::Message()") {
-         Logger::Message("This is a message directed towards the user");
-         Logger::Line("This should be a continued message on a new line, without any prefix");
+         Logger::Message("This is a message directed towards the user, and should be prefixed with |M|");
+         Logger::Line("This should be a continued message on a new line, with |M| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside a message");
+         Logger::Line("This should be a line inside a section, inside a message");
       }
 
       WHEN("Calling Logger::Special()") {
-         Logger::Special("This is a special message for a special user, like you");
-         Logger::Line("This should be a continued special message on a new line, without any prefix");
+         Logger::Special("This is a special message for a special user, like you, and should be prefixed with |S|");
+         Logger::Line("This should be a continued special message on a new line, with |S| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside a special message");
+         Logger::Line("This should be a line inside a section, inside a special message");
       }
 
       WHEN("Calling Logger::Flow()") {
-         Logger::Flow("This is a flow control message");
-         Logger::Line("This should be a continued flow on a new line, without any prefix");
+         Logger::Flow("This is a flow control message, and should be prefixed with |L|");
+         Logger::Line("This should be a continued flow on a new line, with |L| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside a flow message");
+         Logger::Line("This should be a line inside a section, inside a flow message");
       }
 
       WHEN("Calling Logger::Input()") {
-         Logger::Input("This is an input event message");
-         Logger::Line("This should be a continued input on a new line, without any prefix");
+         Logger::Input("This is an input event message, and should be prefixed with |N|");
+         Logger::Line("This should be a continued input on a new line, with |N| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside an input message");
+         Logger::Line("This should be a line inside a section, inside an input message");
       }
 
       WHEN("Calling Logger::Network()") {
-         Logger::Network("This is a network message");
-         Logger::Line("This should be a continued network on a new line, without any prefix");
+         Logger::Network("This is a network message, and should be prefixed with |T|");
+         Logger::Line("This should be a continued network on a new line, with |T| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside a network message");
+         Logger::Line("This should be a line inside a section, inside a network message");
       }
 
       WHEN("Calling Logger::OS()") {
-         Logger::OS("This is an OS event message");
-         Logger::Line("This should be a continued OS event on a new line, without any prefix");
+         Logger::OS("This is an OS event message, and should be prefixed with |O|");
+         Logger::Line("This should be a continued OS event on a new line, with |O| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside an OS message");
+         Logger::Line("This should be a line inside a section, inside an OS message");
       }
 
       WHEN("Calling Logger::Prompt()") {
-         Logger::Prompt("This is an input prompt, that blocks execution and waits for console input (TODO)");
-         Logger::Line("This should be a continued Prompt on a new line, without any prefix");
+         Logger::Prompt("This is an input prompt, that blocks execution and waits for console input (TODO), and should be prefixed with |P|");
+         Logger::Line("This should be a continued Prompt on a new line, with |P| prefix");
          Logger::Append(", and this should be appended");
+         auto scope = Logger::Section("This should be a section inside a prompt");
+         Logger::Line("This should be a line inside a section, inside a prompt");
       }
 
       WHEN("Logging numbers, characters and booleans") {
-         Logger::Special() << "The answer is " << 42 << '!' << " It's " << true << ", I tell ya!";
+         Logger::Special() << "#1 The answer is " << 42 << '!' << " It's " << true << ", I tell ya!";
+         Logger::Special("#2 The answer is ", 42, '!', " It's ", true, ", I tell ya!");
+      }
+
+      WHEN("You shouldn't see these") {
+         Logger::Line() << "#1 You shouldn't see the following: " << Logger::Intent::Ignore << 42 << '!' << " It's " << true << ", I tell ya!" << Logger::Reset;
+         Logger::Line("#2 You shouldn't see the following (color should be reset to default intent): ", Logger::Intent::Ignore, 42, '!', " It's ", true, ", I tell ya!");
+         auto scope1 = Logger::Section("This section should be invisible, too");
+         Logger::Line("#3 You shouldn't see this line AT ALL: ", 42, '!', " It's ", true, ", I tell ya!");
+         auto scope2 = Logger::Section("As well as this one");
       }
 
       WHEN("Pushing and popping styles") {
-         Logger::Warning("This is a warning, ",
+         Logger::Warning(Logger::Color::Cyan, "This is actually a warning, ",
             Logger::Push, Logger::Underline, "but now we underline it, ",
                Logger::PushRedBgr, "then we even change color, ",
                Logger::Pop, "but then we return to underlined warning, ",
             Logger::Pop, "and finally, back to warning, ",
-         Logger::Pop, "but if we actually pop once more, we return to default Logger style\n\n");
+         Logger::Pop, "but if we actually pop once more, we return to the original intent",
+         Logger::Pop, ", and any subsequent pop shouldn't change anything");
+         Logger::Line("^ just checking the above statement\n\n");
       }
    }
 }

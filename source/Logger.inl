@@ -102,7 +102,7 @@ namespace Langulus::Logger
       return operator << (TextView {formatted});
    }
 
-   /// A general new-line write function that continues the last style        
+   /// A general new-line write function that continues the last intent/style 
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class...T> LANGULUS(INLINED)
@@ -115,7 +115,7 @@ namespace Langulus::Logger
          return (Instance);
    }
 
-   /// A general same-line write function that continues the last style       
+   /// A general same-line write function that continues the last style/intent
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a reference to the logger for chaining                       
    template<class...T> LANGULUS(INLINED)
@@ -127,15 +127,18 @@ namespace Langulus::Logger
 
    /// Write a section on a new line, tab all consecutive lines, bold it,     
    /// and return the scoped tabs, that will be	untabbed automatically at the 
-   /// scope's end                                                            
+   /// scope's end. Section color is context dependent on the current style   
    ///   @tparam ...T - a sequence of elements to log (deducible)             
    ///   @return a scoped tab                                                 
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Section(T&&...arguments) noexcept {
       if constexpr (sizeof...(arguments) > 0) {
+         const auto currentStyle = Instance.GetCurrentStyle();
          Instance.NewLine();
-         Instance << Interface::TabStyle << "┌─ "
-                  << Color::PushWhite << Emphasis::Bold << Emphasis::Underline;
+         Instance << Command::Push
+                  << Instance.TabStyle << "┌─ "
+                  << currentStyle
+                  << Emphasis::Underline;
          (Instance << ... << ::std::forward<T>(arguments));
          return (Instance << Command::Pop << Tabs {});
       }
@@ -148,15 +151,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Fatal([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_FATALERRORS
+         Instance << Intent::FatalError;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::DarkRed;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "FATAL ERROR: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -166,8 +169,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs FatalTab([[maybe_unused]] T&&...arguments) noexcept {
-      Fatal(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_FATALERRORS
+         Fatal(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
    /// Write a new-line error                                                 
@@ -176,15 +184,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Error([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_ERRORS
+         Instance << Intent::Error;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::Red;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "ERROR: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -194,8 +202,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs ErrorTab([[maybe_unused]] T&&...arguments) noexcept {
-      Error(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_ERRORS
+         Error(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
    /// Write a new-line warning                                               
@@ -204,15 +217,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Warning([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_WARNINGS
+         Instance << Intent::Warning;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::DarkYellow;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "WARNING: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -222,8 +235,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs WarningTab([[maybe_unused]] T&&...arguments) noexcept {
-      Warning(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_WARNINGS
+         Warning(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
    /// Write a new-line with verbose information                              
@@ -232,15 +250,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Verbose([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_VERBOSE
+         Instance << Intent::Verbose;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::DarkGray;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "VERBOSE: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -250,8 +268,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs VerboseTab([[maybe_unused]] T&&...arguments) noexcept {
-      Verbose(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_VERBOSE
+         Verbose(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
    /// Write a new-line with information                                      
@@ -260,15 +283,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Info([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_INFOS
+         Instance << Intent::Info;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::Gray;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "INFO: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -278,8 +301,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs InfoTab([[maybe_unused]] T&&...arguments) noexcept {
-      Info(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_INFOS
+         Info(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
    /// Write a new-line with a personal message                               
@@ -288,15 +316,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Message([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_MESSAGES
+         Instance << Intent::Message;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::White;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "MESSAGE: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -306,8 +334,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs MessageTab([[maybe_unused]] T&&...arguments) noexcept {
-      Message(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_MESSAGES
+         Message(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
    /// Write a new-line with special text                                     
@@ -316,15 +349,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Special([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_SPECIALS
+         Instance << Intent::Special;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::Purple;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "SPECIAL: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -334,8 +367,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs SpecialTab([[maybe_unused]] T&&...arguments) noexcept {
-      Special(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_SPECIALS
+         Special(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
    /// Write a new-line with flow information                                 
@@ -344,15 +382,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Flow([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_FLOWS
+         Instance << Intent::Flow;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::DarkCyan;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "FLOW: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -362,8 +400,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs FlowTab([[maybe_unused]] T&&...arguments) noexcept {
-      Flow(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_FLOWS
+         Flow(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
    /// Write a new-line on user input                                         
@@ -372,15 +415,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Input([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_INPUTS
+         Instance << Intent::Input;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::Blue;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "INPUT: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -390,8 +433,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs InputTab([[maybe_unused]] T&&...arguments) noexcept {
-      Input(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_INPUTS
+         Input(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
    /// Write a new-line with network message                                  
@@ -400,15 +448,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Network([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_NETWORKS
+         Instance << Intent::Network;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::Yellow;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "NETWORK: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -418,8 +466,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs NetworkTab([[maybe_unused]] T&&...arguments) noexcept {
-      Network(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_NETWORKS
+         Network(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
    /// Write a new-line with a message from OS                                
@@ -428,15 +481,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) OS([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_OS
+         Instance << Intent::OS;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::DarkBlue;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "OS: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -446,8 +499,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs OSTab([[maybe_unused]] T&&...arguments) noexcept {
-      OS(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_OS
+         OS(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
    /// Write a new-line with an input prompt                                  
@@ -456,15 +514,15 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Prompt([[maybe_unused]] T&&...arguments) noexcept {
       #ifdef LANGULUS_LOGGER_ENABLE_PROMPTS
+         Instance << Intent::Prompt;
          Instance.NewLine();
-         Instance << Command::PopAndPush << Color::Green;
 
-         if constexpr (sizeof...(arguments) > 0) {
-            Instance << "PROMPT: ";
+         if constexpr (sizeof...(arguments) > 0)
             return (Instance << ... << ::std::forward<T>(arguments));
-         }
-         else return (Instance);
+         else
+            return (Instance);
       #else
+         Instance << Intent::Ignore;
          return (Instance);
       #endif
    }
@@ -474,8 +532,13 @@ namespace Langulus::Logger
    ///   @return a scoped tab, that will untab when destroyed                 
    template<class...T> LANGULUS(INLINED)
    ScopedTabs PromptTab([[maybe_unused]] T&&...arguments) noexcept {
-      Prompt(::std::forward<T>(arguments)...);
-      return (Instance << Tabs {});
+      #ifdef LANGULUS_LOGGER_ENABLE_PROMPTS
+         Prompt(::std::forward<T>(arguments)...);
+         return (Instance << Tabs {});
+      #else
+         Instance << Intent::Ignore;
+         return ScopedTabs {0};
+      #endif
    }
 
 } // namespace Langulus::Logger
