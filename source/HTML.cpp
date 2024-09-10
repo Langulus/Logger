@@ -184,6 +184,11 @@ void ToHTML::NewLine() const noexcept {
    Write("<br>");
    Write(Instance.TimeStampStyle);
    Write(GetSimpleTime());
+   Write("|");
+   if (Instance.CurrentIntent != Intent::Ignore)
+      Write(Instance.IntentStyle[int(Instance.CurrentIntent)].prefix);
+   else
+      Write(" ");
    Write("| ");
 
    auto tabs = Instance.GetTabs();
@@ -214,7 +219,7 @@ void ToHTML::WriteHeader() const {
 
 /// Write file footer - just the official shutdown timestamp                  
 void ToHTML::WriteFooter() const {
-   Write("<h2>Log ended - ");
+   Write("</strong></em></u></blink></del></span><h2>Log ended - ");
    Write(GetAdvancedTime());
    Write("</h2></code></body></html>");
 }

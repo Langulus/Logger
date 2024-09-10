@@ -75,9 +75,7 @@ ScopedTabs::~ScopedTabs() noexcept {
 }
 
 /// Logger construction                                                       
-Interface::Interface() {
-   mStyleStack.push(DefaultStyle);
-}
+Interface::Interface() {}
 
 /// Logger copy-construction                                                  
 Interface::Interface(const Interface& other)
@@ -109,6 +107,9 @@ Text Logger::A::Interface::GetSimpleTime() noexcept {
 /// Write a string view to stdout                                             
 ///   @param stdString - the text view to write                               
 void Interface::Write(const TextView& stdString) const noexcept {
+   if (CurrentIntent == Intent::Ignore)
+      return;
+
    // Dispatch to redirectors                                           
    if (not mRedirectors.empty()) {
       for (auto attachment : mRedirectors)
@@ -129,6 +130,9 @@ void Interface::Write(const TextView& stdString) const noexcept {
 /// Change the style                                                          
 ///   @param s - the style                                                    
 void Interface::Write(Style s) const noexcept {
+   if (CurrentIntent == Intent::Ignore)
+      return;
+
    // Dispatch to redirectors                                           
    if (not mRedirectors.empty()) {
       for (auto attachment : mRedirectors)
@@ -147,6 +151,9 @@ void Interface::Write(Style s) const noexcept {
 
 /// Add a new line, tabulating properly, but continuing the previous style    
 void Interface::NewLine() const noexcept {
+   if (CurrentIntent == Intent::Ignore)
+      return;
+
    // Dispatch to redirectors                                           
    if (not mRedirectors.empty()) {
       for (auto attachment : mRedirectors)
@@ -159,7 +166,11 @@ void Interface::NewLine() const noexcept {
    // Clear formatting, add new line, simple time stamp, and tabs       
    fmt::print("\n");
    FmtPrintStyle(TimeStampStyle);
-   fmt::print("{}| ", GetSimpleTime());
+
+   if (CurrentIntent == Intent::Ignore)
+      fmt::print("{}| | ",  GetSimpleTime());
+   else
+      fmt::print("{}|{}| ", GetSimpleTime(), IntentStyle[int(CurrentIntent)].prefix);
 
    if (mTabulator) {
       auto tabs = mTabulator;
@@ -168,6 +179,11 @@ void Interface::NewLine() const noexcept {
          fmt::print("{}", TabString);
          --tabs;
       }
+   }
+
+   if (mStyleStack.empty()) {
+      const_cast<decltype(mStyleStack)&>(mStyleStack)
+         .push(GetCurrentStyle());
    }
 
    FmtPrintStyle(mStyleStack.top());
@@ -215,7 +231,11 @@ void Interface::RunCommand(Command c) noexcept {
    case Command::Reset:
       while (not mStyleStack.empty())
          mStyleStack.pop();
-      mStyleStack.push(DefaultStyle);
+
+      if (CurrentIntent == Intent::Ignore)
+         CurrentIntent = DefaultIntent;
+
+      mStyleStack.push(GetCurrentStyle());
       Write(mStyleStack.top());
       break;
    case Command::Time:
@@ -225,19 +245,27 @@ void Interface::RunCommand(Command c) noexcept {
       Write(GetAdvancedTime());
       break;
    case Command::Pop:
-      if (mStyleStack.size() > 1)
+      if (not mStyleStack.empty())
          mStyleStack.pop();
+
+      if (mStyleStack.empty())
+         mStyleStack.push(GetCurrentStyle());
+
       Write(mStyleStack.top());
       break;
    case Command::Push:
       mStyleStack.push(mStyleStack.top());
       break;
    case Command::PopAndPush:
-      if (mStyleStack.size() > 1)
+      if (not mStyleStack.empty())
          mStyleStack.pop();
+
       mStyleStack.push(mStyleStack.top());
       break;
    case Command::Stylize:
+      if (mStyleStack.empty())
+         mStyleStack.push(GetCurrentStyle());
+
       Write(mStyleStack.top());
       break;
    case Command::Tab:
@@ -250,10 +278,13 @@ void Interface::RunCommand(Command c) noexcept {
    }
 }
    
-/// Change the foreground/background color                                    
+/// Change the foreground/background color by modifying the current style     
 ///   @param c_with_flags - the color with optional mixing flags              
 ///   @return the last style, with coloring applied                           
-const Style& Interface::SetColor(Color c_with_flags) noexcept {
+auto Interface::SetColor(Color c_with_flags) noexcept -> const Style& {
+   if (mStyleStack.empty())
+      mStyleStack.push(GetCurrentStyle());
+
    if (static_cast<unsigned>(c_with_flags)
    &   static_cast<unsigned>(Color::PreviousColor)) {
       // We have to pop                                                 
@@ -309,19 +340,38 @@ const Style& Interface::SetColor(Color c_with_flags) noexcept {
    return style;
 }
 
-/// Change the emphasis                                                       
-///   @param c - the color                                                    
-const Style& Interface::SetEmphasis(Emphasis e) noexcept {
+/// Change the emphasis by modifying the current style                        
+///   @param e - the emphasis                                                 
+auto Interface::SetEmphasis(Emphasis e) noexcept -> const Style& {
+   if (mStyleStack.empty())
+      mStyleStack.push(GetCurrentStyle());
+
    auto& style = mStyleStack.top();
    style |= static_cast<fmt::emphasis>(e);
    return style;
 }
 
-/// Change the style                                                          
+/// Change the style by overwriting the current one                           
 ///   @param s - the style                                                    
-const Style& Interface::SetStyle(Style s) noexcept {
-   mStyleStack.top() = s;
+auto Interface::SetStyle(Style s) noexcept -> const Style& {
+   if (mStyleStack.empty())
+      mStyleStack.emplace(s);
+   else
+      mStyleStack.top() = s;
    return mStyleStack.top();
+}
+
+/// Get the current style                                                     
+///   @returns either the top of the style stack, or the style of the current 
+///      intent (or a default style if current intent is Ignore)              
+auto Interface::GetCurrentStyle() const noexcept -> Style {
+   if (mStyleStack.empty()) {
+      if (CurrentIntent != Intent::Ignore)
+         return IntentStyle[int(CurrentIntent)].style;
+      else
+         return {};
+   }
+   else return mStyleStack.top();
 }
 
 /// Attach another logger, if no redirectors are attached, any logging        
@@ -408,6 +458,19 @@ Logger::A::Interface& Logger::A::Interface::operator << (const TextView& t) noex
 ///   @return a reference to the logger for chaining                          
 Logger::A::Interface& Logger::A::Interface::operator << (::std::nullptr_t) noexcept {
    Instance.Write("null");
+   return *this;
+}
+
+/// Sets the current intent, and sylizes accordingly, unles Intent::Ignore    
+///   @return a reference to the logger for chaining                          
+Logger::A::Interface& Logger::A::Interface::operator << (Intent i) noexcept {
+   if (i != Intent::Counter)
+      Instance.CurrentIntent = i;
+
+   if (i < Intent::Counter) {
+      Instance.SetStyle(Instance.IntentStyle[int(i)].style);
+      Instance.RunCommand(Command::Stylize);
+   }
    return *this;
 }
 

@@ -259,6 +259,33 @@ namespace Langulus::Logger
    /// GCC equates templates with enum types as their underlying type, so we  
    /// are forced to define these anums as enum class, and then do using enum 
    using enum Command;
+   
+   /// Types of predefined messages, each with its unique style and search    
+   /// patterns.                                                              
+   enum class Intent {
+      FatalError = 0,
+      Error,
+      Warning,
+      Verbose,
+      Info,
+      Message,
+      Special,
+      Flow,
+      Input,
+      Network,
+      OS,
+      Prompt,
+
+      Counter,
+      Ignore
+   };
+
+   /// Can be used to specify each intent's style and search patterns         
+   struct IntentProperties {
+      TextView prefix;
+      Style style;
+      bool  silenced = false;
+   };
 
    /// Tabulation marker (can be pushed to log)                               
    struct Tabs {
@@ -319,6 +346,7 @@ namespace Langulus::Logger
          LANGULUS_API(LOGGER) Interface& operator << (Emphasis) noexcept;
          LANGULUS_API(LOGGER) Interface& operator << (Style) noexcept;
          LANGULUS_API(LOGGER) Interface& operator << (::std::nullptr_t) noexcept;
+         LANGULUS_API(LOGGER) Interface& operator << (Intent) noexcept;
 
          LANGULUS_API(LOGGER) Interface& operator << (const Tabs&) noexcept;
          LANGULUS_API(LOGGER) ScopedTabs operator << (Tabs&&) noexcept;
@@ -351,11 +379,31 @@ namespace Langulus::Logger
       ::std::list<A::Interface*> mDuplicators;
 
    public:
-      // Tabulator color and formatting                                 
-      static constexpr Style DefaultStyle = {};
-      static constexpr Style TabStyle = fmt::fg(fmt::terminal_color::bright_black);
-      static constexpr Style TimeStampStyle = TabStyle;
-      static constexpr TextView TabString = "|  ";
+      // Current intent                                                 
+      Intent CurrentIntent = Intent::Info;
+
+      // Intent style customization point                               
+      IntentProperties IntentStyle[int(Intent::Counter)] = {
+         {"F", fmt::fg(fmt::terminal_color::red)},             // FatalError  
+         {"E", fmt::fg(fmt::terminal_color::bright_red)},      // Error       
+         {"W", fmt::fg(fmt::terminal_color::yellow)},          // Warning     
+         {"V", fmt::fg(fmt::terminal_color::bright_black)},    // Verbose     
+         {"I", fmt::fg(fmt::terminal_color::white)},           // Info        
+         {"M", fmt::fg(fmt::terminal_color::bright_white)},    // Message     
+         {"S", fmt::fg(fmt::terminal_color::bright_magenta)},  // Special     
+         {"L", fmt::fg(fmt::terminal_color::cyan)},            // Flow        
+         {"N", fmt::fg(fmt::terminal_color::bright_blue)},     // Input       
+         {"T", fmt::fg(fmt::terminal_color::bright_yellow)},   // Network     
+         {"O", fmt::fg(fmt::terminal_color::blue)},            // OS          
+         {"P", fmt::fg(fmt::terminal_color::bright_green)}     // Prompt      
+      };
+
+      // Tabulator color and formatting customization                   
+      Intent DefaultIntent = Intent::Info;
+      Style TabStyle = fmt::fg(fmt::terminal_color::bright_black);
+      Style TimeStampStyle = TabStyle;
+      TextView TabString = "|  ";
+
       size_t GetTabs() const noexcept { return mTabulator; }
 
       LANGULUS_API(LOGGER)  Interface();
@@ -374,9 +422,10 @@ namespace Langulus::Logger
       /// State changers                                                      
       ///                                                                     
       LANGULUS_API(LOGGER) void RunCommand(Command) noexcept;
-      LANGULUS_API(LOGGER) const Style& SetStyle(Style) noexcept;
-      LANGULUS_API(LOGGER) const Style& SetColor(Color) noexcept;
-      LANGULUS_API(LOGGER) const Style& SetEmphasis(Emphasis) noexcept;
+      LANGULUS_API(LOGGER) auto GetCurrentStyle() const noexcept -> Style;
+      LANGULUS_API(LOGGER) auto SetStyle(Style) noexcept -> const Style&;
+      LANGULUS_API(LOGGER) auto SetColor(Color) noexcept -> const Style&;
+      LANGULUS_API(LOGGER) auto SetEmphasis(Emphasis) noexcept -> const Style&;
 
       ///                                                                     
       /// Attachments                                                         
