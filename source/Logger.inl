@@ -138,9 +138,9 @@ namespace Langulus::Logger
          Instance << Command::Push
                   << Instance.TabStyle << "┌─ "
                   << currentStyle
-                  << Emphasis::Underline;
+                  << Command::Pop;
          (Instance << ... << ::std::forward<T>(arguments));
-         return (Instance << Command::Pop << Tabs {});
+         return (Instance << Tabs {});
       }
       else return (Instance);
    }
