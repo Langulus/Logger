@@ -36,7 +36,7 @@ void ToHTML::Write(const TextView& text) const noexcept {
 ///   @param style - the style to set                                         
 void ToHTML::Write(Style style) const noexcept {
    // Always reset before a style change                                
-   Write(" \n</code></strong></em></u></blink></del></span><code>");
+   Write("\n</code></strong></em></u></blink></del></span><code>");
 
    if (style.has_emphasis()) {
       const auto em = static_cast<uint8_t>(style.get_emphasis());
@@ -199,6 +199,8 @@ void ToHTML::NewLine() const noexcept {
          --tabs;
       }
    }
+
+   Write(Instance.GetCurrentStyle());
 }
 
 /// Clear the log file                                                        
