@@ -355,6 +355,7 @@ namespace Langulus::Logger
          template<class T, size_t N>
          Interface& operator << (const ::std::array<T, N>&) noexcept;
          Interface& operator << (const ::Langulus::Logger::Formattable auto&) noexcept;
+         Interface& operator << (const char8_t&) noexcept;
       };
 
    } // namespace Langulus::Logger::A

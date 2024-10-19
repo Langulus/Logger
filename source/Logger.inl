@@ -101,6 +101,15 @@ namespace Langulus::Logger
       const auto formatted = fmt::format("{}", anything);
       return operator << (TextView {formatted});
    }
+   
+   /// Stringify char8_t                                                      
+   ///   @param c - char                                                      
+   ///   @return a reference to the logger for chaining                       
+   LANGULUS(INLINED)
+   A::Interface& A::Interface::operator << (const char8_t& c) noexcept {
+      const auto formatted = fmt::format("{}", reinterpret_cast<const char&>(c));
+      return operator << (TextView {formatted});
+   }
 
    /// A general new-line write function that continues the last intent/style 
    ///   @tparam ...T - a sequence of elements to log (deducible)             
