@@ -20,14 +20,14 @@ endif()
 fetch_external_module(
     fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG        c4f6fa71357b223b0ab8ac29577c6228fde8853d # master branch
+    GIT_TAG        22701d5f63fd9ba3ffa35fe94585b5bfcb69238b # master branch
 )
 
 # Build and install Logger library                                          
-add_library(LangulusLogger ${LANGULUS_LIBRARY_TYPE}
-    source/Logger.cpp
-    source/HTML.cpp
-    source/TXT.cpp
+add_langulus_library(LangulusLogger
+	source/Logger.cpp
+	source/HTML.cpp
+	source/TXT.cpp
 )
 
 target_compile_definitions(LangulusLogger
