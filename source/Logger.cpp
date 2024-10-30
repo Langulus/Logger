@@ -17,7 +17,7 @@ using Clock = ::std::chrono::system_clock;
 namespace Langulus::Logger
 {
 
-   Interface Instance {};
+   Interface   Instance {};
    MessageSink MessageSinkInstance {};
 
    void AttachDuplicator(A::Interface* d) noexcept {

@@ -4,14 +4,7 @@ file(GLOB_RECURSE
 	*.cpp
 )
 
-add_executable(LangulusLoggerTest ${LANGULUS_LOGGER_TEST_SOURCES})
-
-target_link_libraries(LangulusLoggerTest
-	PRIVATE		LangulusLogger 
-				Catch2
-)
-
-add_test(
-	NAME		LangulusLoggerTest
-	COMMAND		LangulusLoggerTest
+add_langulus_test(LangulusLoggerTest
+	SOURCES		${LANGULUS_LOGGER_TEST_SOURCES}
+	LIBRARIES	LangulusLogger
 )
