@@ -122,6 +122,9 @@ void Interface::Write(const TextView& stdString) const noexcept {
    try { fmt::print("{}", stdString); }
    catch (...) { Logger::Append("<logger error>"); }
 
+   // Always flush                                                      
+   fflush(stdout);
+
    // Dispatch to duplicators                                           
    for (auto attachment : mDuplicators)
       attachment->Write(stdString);
