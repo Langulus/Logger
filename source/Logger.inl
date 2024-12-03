@@ -130,8 +130,9 @@ namespace Langulus::Logger
    template<class...T> LANGULUS(INLINED)
    decltype(auto) Append(T&&...arguments) noexcept {
       if constexpr (sizeof...(arguments) > 0)
-         (Instance << ... << ::std::forward<T>(arguments));
-      return (Instance);
+         return (Instance << ... << ::std::forward<T>(arguments));
+      else
+         return (Instance);
    }
 
    /// Write a section on a new line, tab all consecutive lines, bold it,     
