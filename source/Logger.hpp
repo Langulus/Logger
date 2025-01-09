@@ -275,9 +275,9 @@ namespace Langulus::Logger
       Network,
       OS,
       Prompt,
+      Ignore,
 
-      Counter,
-      Ignore
+      Counter
    };
 
    /// Can be used to specify each intent's style and search patterns         
@@ -317,15 +317,13 @@ namespace Langulus::Logger
          Interface& operator = (const Interface&) = delete;
          Interface& operator = (Interface&&) = delete;
 
-         NOD() static constexpr TextView GetFunctionName(
+         static constexpr TextView GetFunctionName(
             const TextView&,
             const TextView& omit = "Langulus::"
          ) noexcept;
          
-         NOD() LANGULUS_API(LOGGER)
-         static Text GetAdvancedTime() noexcept;
-         NOD() LANGULUS_API(LOGGER)
-         static Text GetSimpleTime() noexcept;
+         LANGULUS_API(LOGGER) static Text GetAdvancedTime() noexcept;
+         LANGULUS_API(LOGGER) static Text GetSimpleTime() noexcept;
 
          virtual void Write(const TextView&) const noexcept = 0;
          virtual void Write(Style) const noexcept = 0;
@@ -385,18 +383,19 @@ namespace Langulus::Logger
 
       // Intent style customization point                               
       IntentProperties IntentStyle[int(Intent::Counter)] = {
-         {"F", fmt::fg(fmt::terminal_color::red)},             // FatalError  
-         {"E", fmt::fg(fmt::terminal_color::bright_red)},      // Error       
-         {"W", fmt::fg(fmt::terminal_color::yellow)},          // Warning     
-         {"V", fmt::fg(fmt::terminal_color::bright_black)},    // Verbose     
-         {"I", fmt::fg(fmt::terminal_color::white)},           // Info        
-         {"M", fmt::fg(fmt::terminal_color::bright_white)},    // Message     
-         {"S", fmt::fg(fmt::terminal_color::bright_magenta)},  // Special     
-         {"L", fmt::fg(fmt::terminal_color::cyan)},            // Flow        
-         {"N", fmt::fg(fmt::terminal_color::bright_blue)},     // Input       
-         {"T", fmt::fg(fmt::terminal_color::bright_yellow)},   // Network     
-         {"O", fmt::fg(fmt::terminal_color::blue)},            // OS          
-         {"P", fmt::fg(fmt::terminal_color::bright_green)}     // Prompt      
+         {"|F| ", fmt::fg(fmt::terminal_color::red)},             // FatalError  
+         {"|E| ", fmt::fg(fmt::terminal_color::bright_red)},      // Error       
+         {"|W| ", fmt::fg(fmt::terminal_color::yellow)},          // Warning     
+         {"|V| ", fmt::fg(fmt::terminal_color::bright_black)},    // Verbose     
+         {"|I| ", fmt::fg(fmt::terminal_color::white)},           // Info        
+         {"|M| ", fmt::fg(fmt::terminal_color::bright_white)},    // Message     
+         {"|S| ", fmt::fg(fmt::terminal_color::bright_magenta)},  // Special     
+         {"|L| ", fmt::fg(fmt::terminal_color::cyan)},            // Flow        
+         {"|N| ", fmt::fg(fmt::terminal_color::bright_blue)},     // Input       
+         {"|T| ", fmt::fg(fmt::terminal_color::bright_yellow)},   // Network     
+         {"|O| ", fmt::fg(fmt::terminal_color::blue)},            // OS          
+         {"|P| ", fmt::fg(fmt::terminal_color::bright_green)},    // Prompt      
+         {"| | ", fmt::fg(fmt::terminal_color::bright_green)}     // Ignore      
       };
 
       // Tabulator color and formatting customization                   
@@ -454,63 +453,63 @@ namespace Langulus::Logger
 
    template<class...T>
    decltype(auto) Fatal(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs FatalTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs FatalTab(T&&...) noexcept;
 
    template<class...T>
    decltype(auto) Error(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs ErrorTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs ErrorTab(T&&...) noexcept;
 
    template<class...T>
    decltype(auto) Warning(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs WarningTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs WarningTab(T&&...) noexcept;
 
    template<class...T>
    decltype(auto) Verbose(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs VerboseTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs VerboseTab(T&&...) noexcept;
 
    template<class...T>
    decltype(auto) Info(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs InfoTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs InfoTab(T&&...) noexcept;
 
    template<class...T>
    decltype(auto) Message(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs MessageTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs MessageTab(T&&...) noexcept;
 
    template<class...T>
    decltype(auto) Special(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs SpecialTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs SpecialTab(T&&...) noexcept;
 
    template<class...T>
    decltype(auto) Flow(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs FlowTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs FlowTab(T&&...) noexcept;
 
    template<class...T>
    decltype(auto) Input(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs InputTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs InputTab(T&&...) noexcept;
 
    template<class...T>
    decltype(auto) Network(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs NetworkTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs NetworkTab(T&&...) noexcept;
 
    template<class...T>
    decltype(auto) OS(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs OSTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs OSTab(T&&...) noexcept;
 
    template<class...T>
    decltype(auto) Prompt(T&&...) noexcept;
-   template<class...T>
-   NOD() ScopedTabs PromptTab(T&&...) noexcept;
+   template<class...T> [[nodiscard]]
+   ScopedTabs PromptTab(T&&...) noexcept;
 
    LANGULUS_API(LOGGER) void AttachDuplicator(A::Interface*) noexcept;
    LANGULUS_API(LOGGER) void DettachDuplicator(A::Interface*) noexcept;
