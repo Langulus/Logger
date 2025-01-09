@@ -169,11 +169,7 @@ void Interface::NewLine() const noexcept {
    // Clear formatting, add new line, simple time stamp, and tabs       
    fmt::print("\n");
    FmtPrintStyle(TimeStampStyle);
-
-   if (CurrentIntent == Intent::Ignore)
-      fmt::print("{}| | ",  GetSimpleTime());
-   else
-      fmt::print("{}|{}| ", GetSimpleTime(), IntentStyle[int(CurrentIntent)].prefix);
+   fmt::print("{}{}", GetSimpleTime(), IntentStyle[int(CurrentIntent)].prefix);
 
    if (mTabulator) {
       auto tabs = mTabulator;
@@ -464,13 +460,14 @@ Logger::A::Interface& Logger::A::Interface::operator << (::std::nullptr_t) noexc
    return *this;
 }
 
-/// Sets the current intent, and sylizes accordingly, unles Intent::Ignore    
+/// Sets the current intent, and sylizes accordingly, unless Intent::Ignore   
 ///   @return a reference to the logger for chaining                          
 Logger::A::Interface& Logger::A::Interface::operator << (Intent i) noexcept {
-   if (i != Intent::Counter)
-      Instance.CurrentIntent = i;
+   if (i >= Intent::Counter)
+      return *this;
 
-   if (i < Intent::Counter) {
+   Instance.CurrentIntent = i;
+   if (i != Intent::Ignore) {
       Instance.SetStyle(Instance.IntentStyle[int(i)].style);
       Instance.RunCommand(Command::Stylize);
    }
