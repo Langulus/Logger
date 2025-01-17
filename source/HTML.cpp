@@ -35,32 +35,53 @@ void ToHTML::Write(const TextView& text) const noexcept {
 /// Apply some style                                                          
 ///   @param style - the style to set                                         
 void ToHTML::Write(Style style) const noexcept {
-   if ((not style.has_foreground() or style.get_foreground().value.term_color == Instance.DefaultStyle.get_foreground().value.term_color)
-   and (not style.has_background() or style.get_background().value.term_color == Instance.DefaultStyle.get_background().value.term_color)
-   and (not style.has_emphasis()   or style.get_emphasis()                    == Instance.DefaultStyle.get_emphasis())) {
-      mFile << "</span><span>";
-      return;
-   }
-
-   // Always reset before a style change                                
-   mFile << "</span><span class=\"";
-
+   bool header = false;
    if (style.has_foreground()) {
-      const auto hex = Hex(style.get_foreground().value.term_color);
-      mFile << " f" << hex[0] << hex[1];
+      const auto fg = style.get_foreground().value.term_color;
+      if (not Instance.DefaultStyle.has_foreground()
+      or fg != Instance.DefaultStyle.get_foreground().value.term_color) {
+         if (not header) {
+            mFile << "</span><span class=\"";
+            header = true;
+         }
+
+         const auto hex = Hex(fg);
+         mFile << " f" << hex[0] << hex[1];
+      }
    }
 
    if (style.has_background()) {
-      const auto hex = Hex(style.get_background().value.term_color);
-      mFile << " b" << hex[0] << hex[1];
+      const auto bg = style.get_background().value.term_color;
+      if (not Instance.DefaultStyle.has_background()
+      or bg != Instance.DefaultStyle.get_background().value.term_color) {
+         if (not header) {
+            mFile << "</span><span class=\"";
+            header = true;
+         }
+
+         const auto hex = Hex(bg);
+         mFile << " b" << hex[0] << hex[1];
+      }
    }
 
    if (style.has_emphasis()) {
-      const auto hex = Hex(style.get_emphasis());
-      mFile << " e" << hex[0] << hex[1];
+      const auto em = style.get_emphasis();
+      if (not Instance.DefaultStyle.has_emphasis()
+      or em != Instance.DefaultStyle.get_emphasis()) {
+         if (not header) {
+            mFile << "</span><span class=\"";
+            header = true;
+         }
+
+         const auto hex = Hex(em);
+         mFile << " e" << hex[0] << hex[1];
+      }
    }
 
-   mFile << "\">";
+   if (header)
+      mFile << "\">";
+   else
+      mFile << "</span><span>";
 }
 
 /// Remove formatting, add a new line, add a timestamp and tabulate           
