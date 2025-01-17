@@ -205,12 +205,10 @@ void Interface::Clear() const noexcept {
    // Clear the window                                                  
    fmt::print("{}", "\x1b[2J");
 
-   // Resume the last style                                             
    if (mStyleStack.empty()) {
       const_cast<decltype(mStyleStack)&>(mStyleStack)
          .push(GetCurrentStyle());
    }
-
    FmtPrintStyle(mStyleStack.top());
 
    // Dispatch to duplicators                                           

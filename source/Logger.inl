@@ -146,11 +146,10 @@ namespace Langulus::Logger
          const auto currentStyle = Instance.GetCurrentStyle();
          Instance.NewLine();
          Instance << Command::Push
-                  << Instance.TabStyle << "┌─ "
-                  << currentStyle
-                  << Command::Pop;
+                  << Instance.DefaultStyle << "┌─ "
+                  << currentStyle << Emphasis::Underline;
          (Instance << ... << ::std::forward<T>(arguments));
-         return (Instance << Tabs {});
+         return (Instance << Command::Pop << Tabs {});
       }
       else return (Instance);
    }
