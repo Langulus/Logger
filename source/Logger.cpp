@@ -168,12 +168,11 @@ void Interface::NewLine() const noexcept {
 
    // Clear formatting, add new line, simple time stamp, and tabs       
    fmt::print("\n");
-   FmtPrintStyle(TimeStampStyle);
+   FmtPrintStyle(DefaultStyle);
    fmt::print("{}{}", GetSimpleTime(), IntentStyle[int(CurrentIntent)].prefix);
 
    if (mTabulator) {
       auto tabs = mTabulator;
-      FmtPrintStyle(TabStyle);
       while (tabs) {
          fmt::print("{}", TabString);
          --tabs;
@@ -188,10 +187,8 @@ void Interface::NewLine() const noexcept {
    FmtPrintStyle(mStyleStack.top());
 
    // Dispatch to duplicators                                           
-   for (auto attachment : mDuplicators) {
+   for (auto attachment : mDuplicators)
       attachment->NewLine();
-      attachment->Write(mStyleStack.top());
-   }
 }
 
 /// Clear the entire log (clear the console window or file)                   
@@ -207,6 +204,14 @@ void Interface::Clear() const noexcept {
 
    // Clear the window                                                  
    fmt::print("{}", "\x1b[2J");
+
+   // Resume the last style                                             
+   if (mStyleStack.empty()) {
+      const_cast<decltype(mStyleStack)&>(mStyleStack)
+         .push(GetCurrentStyle());
+   }
+
+   FmtPrintStyle(mStyleStack.top());
 
    // Dispatch to duplicators                                           
    for (auto attachment : mDuplicators)

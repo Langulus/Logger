@@ -21,6 +21,7 @@
 #include <list>
 #include <string_view>
 #include <string>
+#include <array>
 #include <fmt/format.h>
 #include <fmt/color.h>
 #include <fstream>
@@ -400,8 +401,7 @@ namespace Langulus::Logger
 
       // Tabulator color and formatting customization                   
       Intent DefaultIntent = Intent::Info;
-      Style TabStyle = fmt::fg(fmt::terminal_color::bright_black);
-      Style TimeStampStyle = TabStyle;
+      Style  DefaultStyle = fmt::fg(fmt::terminal_color::bright_black);
       TextView TabString = "|  ";
 
       size_t GetTabs() const noexcept { return mTabulator; }
@@ -673,6 +673,22 @@ namespace fmt
             return ::fmt::format_to(ctx.out(), "{} {}", static_cast<::std::size_t>(f), bs.GetSuffix());
          else
             return ::fmt::format_to(ctx.out(), "{:.2f} {}", f, bs.GetSuffix());
+      }
+   };
+
+   ///                                                                        
+   /// Extend FMT to be capable of logging Hash                               
+   ///                                                                        
+   template<>
+   struct formatter<::Langulus::Hash> {
+      template<class CONTEXT>
+      constexpr auto parse(CONTEXT& ctx) {
+         return ctx.begin();
+      }
+
+      template<class CONTEXT> LANGULUS(INLINED)
+      auto format(::Langulus::Hash const& e, CONTEXT& ctx) const {
+         return fmt::format_to(ctx.out(), "{:02X}", e.mHash);
       }
    };
 
