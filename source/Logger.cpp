@@ -231,14 +231,9 @@ void Interface::RunCommand(Command c) noexcept {
       Write(mStyleStack.top());
       break;
    case Command::Reset:
-      while (not mStyleStack.empty())
-         mStyleStack.pop();
-
       if (CurrentIntent == Intent::Ignore)
          CurrentIntent = DefaultIntent;
-
-      mStyleStack.push(GetCurrentStyle());
-      Write(mStyleStack.top());
+      Write(DefaultStyle);
       break;
    case Command::Time:
       Write(GetSimpleTime());
