@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
-#include <Logger/Logger.hpp>
+#include <Langulus/Logger/Logger.hpp>
 #include <cstdint>
 #include <cstddef>
 #include <vector>
