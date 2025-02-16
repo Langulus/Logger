@@ -5,8 +5,8 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-#include "Main.hpp"
-#include <catch2/catch.hpp>
+#include <Langulus/Logger.hpp>
+#include <Langulus/Testing.hpp>
 
 
 SCENARIO("Logging to console", "[logger]") {

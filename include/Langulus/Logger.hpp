@@ -5,20 +5,5 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-#include "Main.hpp"
-#define CATCH_CONFIG_RUNNER
-#include <catch2/catch.hpp>
-
-
-int main(int argc, char* argv[]) {
-   // Duplicate any logging messages to an external HTML file           
-   Logger::ToHTML logFile1 {"log-test.htm"};
-   Logger::AttachDuplicator(&logFile1);
-
-   // Duplicate any logging messages to an external txt file            
-   Logger::ToTXT logFile2 {"log-test.txt"};
-   Logger::AttachDuplicator(&logFile2);
-
-   Catch::Session session;
-   return session.run(argc, argv);
-}
+#pragma once
+#include "../../source/Logger.hpp"
