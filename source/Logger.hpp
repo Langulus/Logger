@@ -6,7 +6,8 @@
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
 #pragma once
-#include <Langulus/Core/Exceptions.hpp>
+#include <Langulus/Core/Common.hpp>
+#include <Langulus/Core/Byte.hpp>
 
 #if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_LOGGER)
    #define LANGULUS_API_LOGGER() LANGULUS_EXPORT()
@@ -619,23 +620,18 @@ namespace fmt
 {
    
    ///                                                                        
-   /// Extend FMT to be capable of logging any exception                      
+   /// Extend FMT to be capable of logging Byte                               
    ///                                                                        
-   template<::Langulus::CT::Exception T>
-   struct formatter<T> {
+   template<>
+   struct formatter<::Langulus::Byte> {
       template<class CONTEXT>
       constexpr auto parse(CONTEXT& ctx) {
          return ctx.begin();
       }
 
       template<class CONTEXT> LANGULUS(INLINED)
-      auto format(T const& e, CONTEXT& ctx) const {
-         #if LANGULUS(DEBUG)
-            return ::fmt::format_to(ctx.out(), "{}({} at {})",
-               e.GetName(), e.GetMessage(), e.GetLocation());
-         #else
-            return ::fmt::format_to(ctx.out(), "{}", e.GetName());
-         #endif
+      auto format(::Langulus::Byte const& e, CONTEXT& ctx) const {
+         return fmt::format_to(ctx.out(), "{:02X}", e.mValue);
       }
    };
 
