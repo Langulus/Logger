@@ -41,7 +41,7 @@ target_link_libraries(LangulusLogger
             $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:fmt>
 )
 
-if (LANGULUS_TESTING)
+if(LANGULUS_OPTION_TESTING)
    enable_testing()
    add_subdirectory(test)
 endif()
