@@ -5,7 +5,7 @@
 ///                                                                           
 /// SPDX-License-Identifier: MIT                                              
 ///                                                                           
-#include "Logger.hpp"
+#include <Langulus/Logger/TXT.hpp>
 
 using namespace Langulus;
 using namespace Langulus::Logger;
@@ -13,7 +13,7 @@ using namespace Langulus::Logger;
 
 /// Create a plain text file duplicator/redirector                            
 ///   @param filename - the relative filename of the log file                 
-ToTXT::ToTXT(const TextView& filename) : mFilename {filename} {
+ToTXT::ToTXT(::std::string_view const& filename) : mFilename {filename} {
    mFile.open(mFilename, std::ios::out | std::ios::trunc);
    if (not mFile)
       throw std::runtime_error {"Can't open log file"};
@@ -27,7 +27,7 @@ ToTXT::~ToTXT() {
 
 /// Write text                                                                
 ///   @param text - the text to append to the file                            
-void ToTXT::Write(const TextView& text) const noexcept {
+void ToTXT::Write(::std::string_view const& text) const noexcept {
    mFile << text;
    mFile.flush();
 }
@@ -42,12 +42,12 @@ void ToTXT::Write(Style) const noexcept {
 void ToTXT::NewLine() const noexcept {
    Write("\n");
    Write(GetSimpleTime());
-   Write(Instance.IntentStyle[int(Instance.CurrentIntent)].prefix);
+   Write(GlobalState.mIntentStyle[GlobalState.GetCurrentIntent()].prefix);
 
-   auto tabs = Instance.GetTabs();
+   auto tabs = GlobalState.GetTabs();
    if (tabs) {
       while (tabs) {
-         Write(Instance.TabString);
+         Write(GlobalState.mTabString);
          --tabs;
       }
    }
@@ -58,6 +58,11 @@ void ToTXT::Clear() const noexcept {
    mFile.close();
    mFile.open(mFilename, std::ios::out | std::ios::trunc);
    WriteHeader();
+}
+
+/// Returns the output filename                                               
+auto ToTXT::GetFilename() const noexcept -> ::std::string_view {
+   return mFilename;
 }
 
 /// Write file header - just a timestamp                                      
