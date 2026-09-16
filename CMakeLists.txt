@@ -12,13 +12,14 @@ if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
    include(LangulusUtilities.cmake)
    fetch_langulus_module(Core GIT_TAG wip)
+   fetch_langulus_module(CT   GIT_TAG wip)
 endif()
 
 # Configure {fmt} library                                                   
 fetch_external_module(
    fmt
    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-   GIT_TAG        94ab51cb8c63c93220f0cdd1733bdeef95e77d60 # master branch	
+   GIT_TAG        12.2.0
 )
 
 # Build and install Logger library                                          
@@ -38,6 +39,7 @@ target_include_directories(LangulusLogger
 
 target_link_libraries(LangulusLogger
    PUBLIC   LangulusCore
+            LangulusCT
             $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:fmt>
 )
 

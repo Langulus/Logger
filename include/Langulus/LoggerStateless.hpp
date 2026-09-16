@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include <Langulus/Core.hpp>
+#include <Langulus/CT/Complete.hpp>
 
 #if LANGULUS_FEATURE(LOGGING)
 #include <stdlib.h>
@@ -38,7 +39,7 @@ namespace Langulus::Logger
    /// MARK: Color                                                            
    /// Color codes, consistent with ANSI/VT100 escapes.                       
    /// Also consistent with fmt::terminal_color.                              
-   enum class Color : uint {
+   enum class Color : unsigned {
       NoForeground = 0,
       NoBackground = 1,
 
@@ -541,7 +542,7 @@ namespace Langulus::Logger
    };
 
    /// Bytes only with integer                                                
-   constexpr Size operator""_B(ulonger num) noexcept {
+   constexpr Size operator""_B(unsigned long long num) noexcept {
       return {static_cast<size_t>(num)};
    }
 
@@ -581,36 +582,36 @@ namespace Langulus::Logger
 #endif
 
    /// Integer literals so that e.g. 5_KB works                               
-   constexpr Size operator""_KiB(ulonger num) noexcept {
+   constexpr Size operator""_KiB(unsigned long long num) noexcept {
       return {static_cast<size_t>((1LL << 10) * num)};
    }
-   constexpr Size operator""_MiB(ulonger num) noexcept {
+   constexpr Size operator""_MiB(unsigned long long num) noexcept {
       return {static_cast<size_t>((1LL << 20) * num)};
    }
-   constexpr Size operator""_GiB(ulonger num) noexcept {
+   constexpr Size operator""_GiB(unsigned long long num) noexcept {
       return {static_cast<size_t>((1LL << 30) * num)};
    }
-   constexpr Size operator""_KB(ulonger num) noexcept {
+   constexpr Size operator""_KB(unsigned long long num) noexcept {
       return {static_cast<size_t>(1'024LL * num)};
    }
-   constexpr Size operator""_MB(ulonger num) noexcept {
+   constexpr Size operator""_MB(unsigned long long num) noexcept {
       return {static_cast<size_t>(1'048'576LL * num)};
    }
-   constexpr Size operator""_GB(ulonger num) noexcept {
+   constexpr Size operator""_GB(unsigned long long num) noexcept {
       return {static_cast<size_t>(1'073'741'824LL * num)};
    }
 
 #if LANGULUS_BITNESS() > 32
-   constexpr Size operator""_TiB(ulonger num) noexcept {
+   constexpr Size operator""_TiB(unsigned long long num) noexcept {
       return {static_cast<size_t>((1LL << 40) * num)};
    }
-   constexpr Size operator""_PiB(ulonger num) noexcept {
+   constexpr Size operator""_PiB(unsigned long long num) noexcept {
       return {static_cast<size_t>((1LL << 50) * num)};
    }
-   constexpr Size operator""_TB(ulonger num) noexcept {
+   constexpr Size operator""_TB(unsigned long long num) noexcept {
       return {static_cast<size_t>(1'099'511'627'776LL * num)};
    }
-   constexpr Size operator""_PB(ulonger num) noexcept {
+   constexpr Size operator""_PB(unsigned long long num) noexcept {
       return {static_cast<size_t>(1'125'899'906'842'624LL * num)};
    }
 #endif
@@ -619,41 +620,6 @@ namespace Langulus::Logger
 #if LANGULUS_FEATURE(LOGGING)
 namespace fmt
 {
-   /// MARK: {fmt}                                                            
-   ///                                                                        
-   /// Extend FMT to be capable of logging Logger::Color                      
-   ///                                                                        
-   /*template<>
-   struct formatter<::Langulus::Logger::Color> {
-      using Color = ::Langulus::Logger::Color;
-
-      template<class CONTEXT>
-      constexpr auto parse(CONTEXT& ctx) {
-         return ctx.begin();
-      }
-
-      template<class CONTEXT> LANGULUS(INLINED)
-      auto format(Color const& c, CONTEXT& ctx) const {
-         text_style style = {};
-
-         if (c == Color::NoForeground or c == Color::NoBackground)
-            return ctx.out();
-
-         if ((c >= Color::Black and c < Color::BlackBgr)
-         or (c >= Color::DarkGray and c < Color::DarkGrayBgr)) {
-            // Create a new foreground color style                      
-            style = fg(static_cast<terminal_color>(c));
-            const auto ansi = detail::make_foreground_color<char>(style.get_foreground());
-            return format_to(ctx.out(), "{}", static_cast<const char*>(ansi));
-         }
-
-         // Create a new background color style                         
-         style = bg(static_cast<terminal_color>(static_cast<uint8_t>(c) - 10));
-         const auto ansi = detail::make_background_color<char>(style.get_background());
-         return format_to(ctx.out(), "{}", static_cast<const char*>(ansi));
-      }
-   };*/
-
    ///                                                                        
    /// Extend FMT to be capable of logging Logger::Size                       
    ///                                                                        
