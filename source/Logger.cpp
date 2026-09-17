@@ -332,15 +332,15 @@ void State::Write(ColorExt c_with_flags) const noexcept {
    if (mCurrentIntent == Intent::Ignore)
       return;
 
-   if (static_cast<uint>(c_with_flags)
-     & static_cast<uint>(ColorExt::PreviousColor)) {
+   if (static_cast<unsigned>(c_with_flags)
+     & static_cast<unsigned>(ColorExt::PreviousColor)) {
       // We have to pop                                                 
       if (mStyleStack.size() > 1)
          mStyleStack.pop();
    }
 
-   if (static_cast<uint>(c_with_flags)
-     & static_cast<uint>(ColorExt::NextColor)) {
+   if (static_cast<unsigned>(c_with_flags)
+     & static_cast<unsigned>(ColorExt::NextColor)) {
       // We have to push                                                
       if (mStyleStack.size() > 0)
          mStyleStack.push(mStyleStack.top());
@@ -348,9 +348,9 @@ void State::Write(ColorExt c_with_flags) const noexcept {
 
    // Strip the mixing bits from the color                              
    const Color c = static_cast<Color>(
-      static_cast<uint>(c_with_flags) & (~(
-          static_cast<uint>(ColorExt::PreviousColor)
-        | static_cast<uint>(ColorExt::NextColor)
+      static_cast<unsigned>(c_with_flags) & (~(
+          static_cast<unsigned>(ColorExt::PreviousColor)
+        | static_cast<unsigned>(ColorExt::NextColor)
       ))
    );
 

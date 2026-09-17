@@ -17,6 +17,8 @@
    #define LANGULUS_API_LOGGER() LANGULUS_IMPORT()
 #endif
 
+/// Make the rest of the code aware, that Langulus::Logger has been included  
+#define LANGULUS_LIBRARY_LOGGER() 1
 
 namespace Langulus::Logger
 {
