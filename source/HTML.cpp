@@ -203,7 +203,7 @@ void ToHTML::WriteHeader() const {
    emphasee[fmt::emphasis::reverse]       = "mix-blend-mode: difference; ";
    emphasee[fmt::emphasis::strikethrough] = "text-decoration: line-through; ";
    emphasee[fmt::emphasis::underline]     = "text-decoration: underline; ";
-   for (uint combination = 0; combination <= 255; ++combination) {
+   for (unsigned combination = 0; combination <= 255; ++combination) {
       const auto hex = Hex(static_cast<uint8_t>(combination));
       mFile << "   .e" << hex[0] << hex[1] << "{";
       for (auto em : emphasee) {
