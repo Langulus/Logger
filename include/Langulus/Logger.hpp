@@ -22,6 +22,10 @@
 
 namespace Langulus::Logger
 {
+   /// A simple type that will get extended with abilities in Langulus::Things
+   /// so that you can write to the logger in Flow scripts.                   
+   struct Context {};
+
    /// MARK: CommandExt                                                       
    /// Additional commands                                                    
    enum class CommandExt : uint8_t {
