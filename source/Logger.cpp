@@ -109,7 +109,7 @@ void State::Write(const ::std::string_view& stdString) const noexcept {
 /// Write text (convert wide characters to UTF8)                              
 ///   @attention will always flush file/console                               
 ///   @param stdString - the text view to write                               
-void State::Write(const ::std::wstring_view& stdString) const noexcept {
+void State::Write([[maybe_unused]] const ::std::wstring_view& stdString) const noexcept {
 #if LANGULUS_FEATURE(UNICODE)
    ::std::string buffer;
    size_t conversion_result = 0;
