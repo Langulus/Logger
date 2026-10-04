@@ -15,13 +15,6 @@ if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
    fetch_langulus_module(CT   GIT_TAG wip)
 endif()
 
-# Configure {fmt} library                                                   
-fetch_external_module(
-   fmt
-   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-   GIT_TAG        12.2.0
-)
-
 # Build and install Logger library                                          
 add_langulus_library(LangulusLogger
    SOURCES  source/Logger.cpp
@@ -40,8 +33,39 @@ target_include_directories(LangulusLogger
 target_link_libraries(LangulusLogger
    PUBLIC   LangulusCore
             LangulusCT
-            $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:fmt>
 )
+
+if (LANGULUS_OPTION_UNICODE)
+   # Configure and link simdutf library                                    
+   set(SIMDUTF_TESTS      OFF)
+   set(SIMDUTF_TOOLS      OFF)
+   set(SIMDUTF_ICONV      OFF)
+   set(SIMDUTF_FUZZERS    OFF)
+   set(SIMDUTF_BENCHMARKS OFF)
+   fetch_external_module(
+      simdutf
+      GIT_REPOSITORY https://github.com/simdutf/simdutf.git
+      GIT_TAG        v9.2.1
+   )
+   target_link_libraries(LangulusLogger PUBLIC simdutf)
+endif()
+
+if (LANGULUS_OPTION_LOGGING)
+   # Configure {fmt} library                                                   
+   fetch_external_module(
+      fmt
+      GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+      GIT_TAG        12.2.0
+   )
+
+   if (EMSCRIPTEN)
+      # Ensures that {fmt} is built with /utf-8 and without FMT_OS
+      target_compile_definitions(LangulusLogger PUBLIC FMT_HEADER_ONLY)
+      target_link_libraries(LangulusLogger PUBLIC fmt-header-only)
+   else()
+      target_link_libraries(LangulusLogger PUBLIC fmt)
+   endif()
+endif()
 
 if(LANGULUS_OPTION_TESTING)
    enable_testing()
