@@ -89,7 +89,7 @@ namespace Langulus::Logger
       Italic      = 1 << 2,	// Not working on windows                 
       Underline   = 1 << 3,
       Blink       = 1 << 4,	// Not working on windows                 
-      Reverse     = 1 << 5,
+      Invert      = 1 << 5,
       Conceal     = 1 << 6,	// Not working on windows                 
       Strike      = 1 << 7,	// Not working on windows                 
    };
@@ -104,7 +104,6 @@ namespace Langulus::Logger
    enum class Command : uint8_t {
       Clear,		// Clear the console                                  
       NewLine,		// Write a new line, with a timestamp and tabulation  
-      Invert,		// Inverts background and foreground colors           
       Time,			// Write a short timestamp                            
       ExactTime 	// Write an exhaustive timestamp                      
    };

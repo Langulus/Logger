@@ -204,9 +204,6 @@ namespace Langulus::Logger
    struct Interface {
       virtual ~Interface() noexcept = default;
       
-      Interface& operator = (const Interface&) = delete;
-      Interface& operator = (Interface&&) = delete;
-
       virtual void Write(::std::string_view const&) const noexcept = 0;
       virtual void Write(Style) const noexcept = 0;
       virtual void NewLine() const noexcept = 0;
@@ -268,10 +265,11 @@ namespace Langulus::Logger
          return Write(::std::string_view(formatted));
       }
 
+      LANGULUS_API(LOGGER) void Write(Command) const noexcept;
       LANGULUS_API(LOGGER) void Write(CommandExt) const noexcept;
       LANGULUS_API(LOGGER) void Write(Color) const noexcept;
       LANGULUS_API(LOGGER) void Write(ColorExt) const noexcept;
-      LANGULUS_API(LOGGER) void Write(const Tabs&) const noexcept;
+      LANGULUS_API(LOGGER) void Write(Tabs const&) const noexcept;
       LANGULUS_API(LOGGER) void Write(Emphasis) const noexcept;
       LANGULUS_API(LOGGER) void Write(Intent) const noexcept;
       LANGULUS_API(LOGGER) auto NewScope() const noexcept -> Scope;

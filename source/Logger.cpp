@@ -218,7 +218,7 @@ auto State::GetFilename() const noexcept -> ::std::string_view {
 
 /// Execute a logger command                                                  
 ///   @param c - the command to execute                                       
-/*void State::Write(Command c) const noexcept {
+void State::Write(Command c) const noexcept {
    switch (c) {
    case Command::Clear:
       Clear();
@@ -226,21 +226,14 @@ auto State::GetFilename() const noexcept -> ::std::string_view {
    case Command::NewLine:
       NewLine();
       break;
-   case Command::Invert:
-      SetEmphasis(Emphasis::Reverse);
-      Write(mStyleStack.top());
-      break;
    case Command::Time:
       Write(GetSimpleTime());
       break;
    case Command::ExactTime:
       Write(GetAdvancedTime());
       break;
-   case Command::Stylize:
-      Write(GetCurrentStyle());
-      break;
    }
-}*/
+}
 
 /// Execute a logger command (extended)                                       
 ///   @param c - the command to execute                                       
