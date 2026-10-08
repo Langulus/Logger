@@ -426,9 +426,9 @@ void State::Write(Intent i) const noexcept {
 
 /// Indents and returns a scoped variable that unindents at end of scope      
 ///   @return the scope                                                       
-auto State::NewScope() const noexcept -> Scope {
-   ++mTabulator;
-   return Scope {1};
+auto State::NewScope(size_t n) const noexcept -> Scope {
+   mTabulator += n;
+   return Scope {n};
 }
 
 /// Get the current style                                                     

@@ -176,13 +176,13 @@ namespace Langulus::Logger
    /// MARK: Tabs                                                             
    /// Tabulation marker (can be pushed to log)                               
    struct Tabs {
-      int mTabs = 0;
+      size_t mTabs = 0;
 
       constexpr Tabs() noexcept = default;
-      constexpr Tabs(const Tabs&) noexcept = default;
+      constexpr Tabs(Tabs const&) noexcept = default;
       constexpr Tabs(Tabs&& other) noexcept
          : mTabs {other.mTabs} { other.mTabs = 0; }
-      constexpr explicit Tabs(int tabs) noexcept
+      constexpr explicit Tabs(size_t tabs) noexcept
          : mTabs {tabs} {}
    };
 
@@ -272,7 +272,10 @@ namespace Langulus::Logger
       LANGULUS_API(LOGGER) void Write(Tabs const&) const noexcept;
       LANGULUS_API(LOGGER) void Write(Emphasis) const noexcept;
       LANGULUS_API(LOGGER) void Write(Intent) const noexcept;
-      LANGULUS_API(LOGGER) auto NewScope() const noexcept -> Scope;
+
+      [[nodiscard("Not keeping the returned scope means indent will "
+                  "be reverted once the temporary variable is destroyed")]] 
+      LANGULUS_API(LOGGER) auto NewScope(size_t = 1) const noexcept -> Scope;
 
       LANGULUS_API(LOGGER) auto GetCurrentStyle() const noexcept -> Style&;
       LANGULUS_API(LOGGER) int  GetCurrentIntent() const noexcept;
@@ -323,14 +326,27 @@ namespace Langulus::Logger
       #endif
    }
 
+   /// Adds indentation                                                       
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto Indent(size_t n) noexcept {
+      #if LANGULUS_FEATURE(LOGGING)
+         return GlobalState.NewScope(n);
+      #else
+         return UnusedScope {};
+      #endif
+   }
+
    /// MARK: Section                                                          
    /// Write a section on a new line, tab all consecutive lines, underline it,
    /// and return the scoped tabs, that will be	untabbed automatically at the 
    /// scope's end. This Section continues the last intent/style.             
    /// Use <Intent>Section if you want to change the intent as well.          
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto Section(T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto Section(T&&...arguments) noexcept {
       #if LANGULUS_FEATURE(LOGGING)
          if constexpr (sizeof...(arguments) > 0) {
             if not consteval {
@@ -372,8 +388,10 @@ namespace Langulus::Logger
 
    /// Write a new-line fatal error and tab all next lines                    
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto FatalScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto FatalScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -400,8 +418,10 @@ namespace Langulus::Logger
 
    /// Write a fatal error section and tab all next lines                     
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto FatalSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto FatalSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -445,8 +465,10 @@ namespace Langulus::Logger
 
    /// Write a new-line error and tab all next lines                          
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto ErrorScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto ErrorScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -473,8 +495,10 @@ namespace Langulus::Logger
 
    /// Write an error section and tab all next lines                          
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto ErrorSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto ErrorSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -518,8 +542,10 @@ namespace Langulus::Logger
 
    /// Write a new-line warning and tab all next lines                        
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto WarningScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto WarningScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -546,8 +572,10 @@ namespace Langulus::Logger
 
    /// Write a warning section and tab all next lines                         
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto WarningSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto WarningSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -591,8 +619,10 @@ namespace Langulus::Logger
 
    /// Write a new-line verbose and tab all next lines                        
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto VerboseScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto VerboseScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -619,8 +649,10 @@ namespace Langulus::Logger
 
    /// Write a verbose section and tab all next lines                         
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto VerboseSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto VerboseSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -664,8 +696,10 @@ namespace Langulus::Logger
 
    /// Write a new-line info and tab all next lines                           
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto InfoScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto InfoScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -692,8 +726,10 @@ namespace Langulus::Logger
 
    /// Write an info section and tab all next lines                           
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto InfoSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto InfoSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -737,8 +773,10 @@ namespace Langulus::Logger
 
    /// Write a new-line message and tab all next lines                        
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto MessageScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto MessageScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -765,8 +803,10 @@ namespace Langulus::Logger
 
    /// Write a message section and tab all next lines                         
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto MessageSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto MessageSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -810,8 +850,10 @@ namespace Langulus::Logger
 
    /// Write a new-line special and tab all next lines                        
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto SpecialScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto SpecialScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -838,8 +880,10 @@ namespace Langulus::Logger
 
    /// Write a special section and tab all next lines                         
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto SpecialSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto SpecialSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -883,8 +927,10 @@ namespace Langulus::Logger
 
    /// Write a new-line flow and tab all next lines                           
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto FlowScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto FlowScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -911,8 +957,10 @@ namespace Langulus::Logger
 
    /// Write a flow section and tab all next lines                            
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto FlowSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto FlowSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -956,8 +1004,10 @@ namespace Langulus::Logger
 
    /// Write a new-line input and tab all next lines                          
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto InputScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto InputScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -984,8 +1034,10 @@ namespace Langulus::Logger
 
    /// Write an input section and tab all next lines                          
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto InputSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto InputSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -1029,8 +1081,10 @@ namespace Langulus::Logger
 
    /// Write a new-line network and tab all next lines                        
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto NetworkScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto NetworkScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -1057,8 +1111,10 @@ namespace Langulus::Logger
 
    /// Write a network section and tab all next lines                         
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto NetworkSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto NetworkSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -1102,8 +1158,10 @@ namespace Langulus::Logger
 
    /// Write a new-line OS and tab all next lines                             
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto OSScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto OSScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -1130,8 +1188,10 @@ namespace Langulus::Logger
 
    /// Write an OS section and tab all next lines                             
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto OSSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto OSSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -1175,8 +1235,10 @@ namespace Langulus::Logger
    
    /// Write a new-line prompt and tab all next lines                         
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto PromptScoped([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto PromptScoped([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
@@ -1203,8 +1265,10 @@ namespace Langulus::Logger
    
    /// Write a prompt section and tab all next lines                          
    ///   @return a scoped tab, that will untab when destroyed                 
-   template<class...T> LANGULUS(INLINED)
-   constexpr auto PromptSection([[maybe_unused]] T&&...arguments) noexcept {
+   template<class...T>
+   [[nodiscard("Not keeping the returned scope means indent will "
+               "be reverted once the temporary variable is destroyed")]] 
+   LANGULUS(INLINED) constexpr auto PromptSection([[maybe_unused]] T&&...arguments) noexcept {
       #if not LANGULUS_FEATURE(LOGGING)
          return UnusedScope {};
       #else
