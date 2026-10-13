@@ -259,12 +259,23 @@ namespace Langulus::Logger
       LANGULUS_API(LOGGER) void Clear() const noexcept;
       LANGULUS_API(LOGGER) auto GetFilename() const noexcept -> ::std::string_view;
 
-      /// Additional services                                                 
+      /// Log anything that libfmt was extended to handle.                    
+      ///   @attention this never includes pointers                           
+      ///      https://github.com/fmtlib/fmt/issues/3157                      
       void Write(const CT::Loggable auto& anything) const noexcept {
          const auto formatted = fmt::format("{}", anything);
          return Write(::std::string_view(formatted));
       }
 
+      /// Pointer adapter that allows logging pointers                        
+      void Write(const CT::Loggable auto* anything) const noexcept {
+         if (not anything)
+            return Write(::std::string_view("null"));
+         const auto formatted = fmt::format("{}", *anything);
+         return Write(::std::string_view(formatted));
+      }
+
+      /// Additional services                                                 
       LANGULUS_API(LOGGER) void Write(Command) const noexcept;
       LANGULUS_API(LOGGER) void Write(CommandExt) const noexcept;
       LANGULUS_API(LOGGER) void Write(Color) const noexcept;
