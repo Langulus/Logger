@@ -223,7 +223,7 @@ namespace Langulus::Logger
       /// Write anything stringifiable to stdout                              
       ///   @param data - the data to write                                   
       LANGULUS(INLINED)
-      void FmtWrite(const auto& data) noexcept {
+      void FmtWrite(auto const& data) noexcept {
          try { fmt::print("{}", data); }
          catch (...) { fmt::print("<stringification error>"); }
          fflush(stdout);
@@ -257,7 +257,7 @@ namespace Langulus::Logger
    /// Generate hexadecimal string from a given value                         
    ///   @param from - the argument                                           
    ///   @return the hex string in the form of std::array                     
-   auto Hex(const auto& from) {
+   auto Hex(auto const& from) {
       ::std::array<char, sizeof(from) * 2> result {};
       auto from_bytes = reinterpret_cast<const char*>(&from);
       auto to_bytes = result.data();
