@@ -262,13 +262,15 @@ namespace Langulus::Logger
       /// Log anything that libfmt was extended to handle.                    
       ///   @attention this never includes pointers                           
       ///      https://github.com/fmtlib/fmt/issues/3157                      
-      void Write(const CT::Loggable auto& anything) const noexcept {
+      template<CT::Loggable T>
+      void Write(T const& anything) const noexcept {
          const auto formatted = fmt::format("{}", anything);
          return Write(::std::string_view(formatted));
       }
 
       /// Pointer adapter that allows logging pointers                        
-      void Write(const CT::Loggable auto* anything) const noexcept {
+      template<CT::Loggable T> requires (not ::std::is_same_v<T, char>)
+      void Write(T const* anything) const noexcept {
          if (not anything)
             return Write(::std::string_view("null"));
          const auto formatted = fmt::format("{}", *anything);

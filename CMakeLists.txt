@@ -46,6 +46,7 @@ if (LANGULUS_OPTION_UNICODE)
       simdutf
       GIT_REPOSITORY https://github.com/simdutf/simdutf.git
       GIT_TAG        v9.2.1
+      GIT_SHALLOW    TRUE
    )
    target_link_libraries(LangulusLogger PUBLIC simdutf)
 endif()
@@ -56,6 +57,7 @@ if (LANGULUS_OPTION_LOGGING)
       fmt
       GIT_REPOSITORY https://github.com/fmtlib/fmt.git
       GIT_TAG        12.2.0
+      GIT_SHALLOW    TRUE
    )
 
    if (EMSCRIPTEN)
