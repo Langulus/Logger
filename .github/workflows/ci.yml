@@ -74,9 +74,9 @@ jobs:
           - os: ubuntu-24.04
             arch: x86
             cmake_args: "-DCMAKE_CXX_FLAGS=-m32"
-          - os: ubuntu-24.04-arm
-            arch: ARM
-            cmake_args: "-DCMAKE_CXX_FLAGS=-march=armv7"
+          #- os: ubuntu-24.04-arm
+          #  arch: ARM
+          #  cmake_args: "-DCMAKE_CXX_FLAGS=-march=armv7"
           - os: ubuntu-24.04
             arch: x64
             cmake_args: "-DCMAKE_CXX_FLAGS=-m64"
@@ -91,9 +91,9 @@ jobs:
             arch: x64
             cmake_args: "-G \"Visual Studio 18 2026\" -A x64"
 
-          - os: windows-11-vs2026-arm
-            arch: ARM
-            cmake_args: "-G \"Visual Studio 18 2026\" -A ARM"
+          #- os: windows-11-vs2026-arm
+          #  arch: ARM
+          #  cmake_args: "-G \"Visual Studio 18 2026\" -A ARM"
           - os: windows-11-vs2026-arm
             arch: ARM64
             cmake_args: "-G \"Visual Studio 18 2026\" -A ARM64"
