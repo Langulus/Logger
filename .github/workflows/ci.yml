@@ -59,6 +59,8 @@ jobs:
           - os: windows-11-vs2026-arm
             arch: x64
           - os: windows-11-vs2026-arm
+            arch: ARM # doesn't come preinstalled, unfortunately
+          - os: windows-11-vs2026-arm
             cxx: clang++-21
 
         include:
@@ -105,7 +107,7 @@ jobs:
       - name: Clone
         uses: actions/checkout@v6
 
-      - if: startsWith(matrix.os, 'ubuntu') && (matrix.arch == 'x86' || matrix.arch == 'ARM') && matrix.cxx != 'emcc'
+      - if: startsWith(matrix.os, 'ubuntu') && matrix.arch == 'x86' && matrix.cxx != 'emcc'
         name: Prepare for cross-compilation (Linux)
         run: |
           sudo apt update
