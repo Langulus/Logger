@@ -55,7 +55,7 @@ if (LANGULUS_OPTION_LOGGING)
    fetch_external_module(
       fmt
       GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-      GIT_TAG        12.2.1
+      GIT_TAG        12.1.0
       GIT_SHALLOW    TRUE
    )
 
