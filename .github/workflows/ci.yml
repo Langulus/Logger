@@ -9,21 +9,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, windows-2022]   # windows-latest uses vs2026, which uses clang 22, which is full of regressions in concept compilation
+        os: [ubuntu-24.04, windows-2025]
         build: [debug, release]
         cxx: [g++-14, clang++-21, clangcl, emcc] # v143 suppport has been dropped indefinitely due to too many compiler bugs and bad C++23 support. tested on v145, too - not there yet. clangcl is 100% viable alternative (and 10x faster)
-        arch: [x86, x64]
+        arch: [x86, x64, ARM, ARM64]
 
         exclude:
           - cxx: emcc
             arch: x64
+          - cxx: emcc
+            arch: ARM64
           - os: ubuntu-24.04
             cxx: v143
           - os: ubuntu-24.04
             cxx: clangcl
-          - os: windows-2022
+          - os: windows-2025
             cxx: g++-14
-          - os: windows-2022
+          - os: windows-2025
             cxx: clang++-21
 
         include:
@@ -39,12 +41,12 @@ jobs:
           - os: ubuntu-24.04
             arch: x64
             cmake_args: "-DCMAKE_CXX_FLAGS=-m64"
-          - os: windows-2022
+          - os: windows-2025
             arch: x86
-            cmake_args: "-G \"Visual Studio 17 2022\" -A Win32"
-          - os: windows-2022
+            cmake_args: "-G \"Visual Studio 18 2026\" -A Win32"
+          - os: windows-2025
             arch: x64
-            cmake_args: "-G \"Visual Studio 17 2022\" -A x64"
+            cmake_args: "-G \"Visual Studio 18 2026\" -A x64"
           - build: debug
             debug_flags: "-DLANGULUS_OPTION_SAFE_MODE=ON"
 
@@ -54,7 +56,7 @@ jobs:
       - name: Clone
         uses: actions/checkout@v6
 
-      - if: matrix.os == 'ubuntu-24.04' && matrix.arch == 'x86' && matrix.cxx != 'emcc'
+      - if: matrix.os == 'ubuntu-24.04' && (matrix.arch == 'x86' || matrix.arch == 'ARM') && matrix.cxx != 'emcc'
         name: Prepare for cross-compilation (Linux)
         run: |
           sudo apt update
@@ -101,7 +103,7 @@ jobs:
           -DLANGULUS_OPTION_TESTING=ON
           ${{matrix.debug_flags}}
 
-      - if: matrix.os == 'windows-2022' && matrix.cxx == 'emcc'
+      - if: matrix.os == 'windows-2025' && matrix.cxx == 'emcc'
         name: Prepate environment (Windows with emscripten)
         run: |
           git clone https://github.com/emscripten-core/emsdk.git
@@ -110,8 +112,8 @@ jobs:
           ./emsdk.bat install latest
           ./emsdk.bat activate latest --permanent
 
-      - if: matrix.os == 'windows-2022' && matrix.cxx != 'emcc'
-        name: Configure (Windows with VS2022)
+      - if: matrix.os == 'windows-2025' && matrix.cxx != 'emcc'
+        name: Configure (Windows with Visual Studio)
         run: >
           mkdir build && cd build && cmake ..
           ${{matrix.cmake_args}} -T "${{matrix.cxx}}"
@@ -120,7 +122,7 @@ jobs:
           -DLANGULUS_OPTION_TESTING=ON
           ${{matrix.debug_flags}}
 
-      - if: matrix.os == 'windows-2022' && matrix.cxx == 'emcc'
+      - if: matrix.os == 'windows-2025' && matrix.cxx == 'emcc'
         name: Configure (Windows with emscripten)
         run: >
           mkdir build && cd build && python D:\a\Anyness\Anyness\emsdk\upstream\emscripten\emcmake.py cmake ..
