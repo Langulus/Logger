@@ -11,8 +11,8 @@ if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
    include(LangulusUtilities.cmake)
-   fetch_langulus_module(Core GIT_TAG wip)
-   fetch_langulus_module(CT   GIT_TAG wip)
+   #fetch_langulus_module(Core GIT_TAG wip)
+   fetch_langulus_module(CT   GIT_TAG wip) # should automatically pull core
 endif()
 
 # Build and install Logger library                                          
@@ -31,8 +31,7 @@ target_include_directories(LangulusLogger
 )
 
 target_link_libraries(LangulusLogger
-   PUBLIC   LangulusCore
-            LangulusCT
+   PUBLIC   LangulusCT # should automatically link core
 )
 
 if (LANGULUS_OPTION_UNICODE)
