@@ -15,8 +15,11 @@ jobs:
         arch: [x86, x64, ARM, ARM64]
 
         exclude:
+          # Only 32bit builds for WASM are stable. This is architecture-agnostic binary, so doesn't really matter. It's made to run in any browser anyways.
           - cxx: emcc
             arch: x64
+          - cxx: emcc
+            arch: ARM
           - cxx: emcc
             arch: ARM64
 
@@ -35,6 +38,8 @@ jobs:
             cxx: clangcl
           - os: ubuntu-24.04-arm
             arch: x86
+          - os: ubuntu-24.04-arm
+            arch: ARM # multilib not available for ARM
           - os: ubuntu-24.04-arm
             arch: x64
 
