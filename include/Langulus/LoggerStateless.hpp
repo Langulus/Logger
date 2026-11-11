@@ -7,7 +7,6 @@
 ///                                                                           
 #pragma once
 #include <Langulus/Core.hpp>
-#include <Langulus/CT/Complete.hpp>
 
 #if LANGULUS_FEATURE(LOGGING)
 #include <stdlib.h>
@@ -23,17 +22,16 @@ namespace Langulus::CT
    /// Anything formattable by fmt is also loggable.                          
    /// You can extend this concept by specializing fmt::formatter yourself.   
    template<class...T>
-   concept Loggable = Validate<T...> and (::fmt::is_formattable<T>::value and ...);
+   concept Loggable = (::fmt::is_formattable<T>::value and ...);
 
    template<class...T>
-   concept NotLoggable = Validate<T...> and ((not Loggable<T>) and ...);
+   concept NotLoggable = ((not Loggable<T>) and ...);
 }
 #endif 
 
 
 ///                                                                           
 /// Logger library namespace                                                  
-///                                                                           
 namespace Langulus::Logger
 {
    /// MARK: Color                                                            
@@ -616,12 +614,12 @@ namespace Langulus::Logger
 #endif
 }
 
+/// MARK: {fmt}                                                               
 #if LANGULUS_FEATURE(LOGGING)
 namespace fmt
 {
    ///                                                                        
    /// Extend FMT to be capable of logging Logger::Size                       
-   ///                                                                        
    template<>
    struct formatter<::Langulus::Logger::Size> {
       template<class CONTEXT>
@@ -637,7 +635,6 @@ namespace fmt
 
    ///                                                                        
    /// Extend FMT to be capable of logging std::array of characters           
-   ///                                                                        
    template<size_t N>
    struct formatter<::std::array<char, N>> {
       template<class CONTEXT>
