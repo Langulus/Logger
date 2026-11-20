@@ -13,10 +13,12 @@
 
 #if LglsVerboseEnabled == 1
    #define LglsVerbose(STYLE,...)         ::Langulus::Logger::STYLE(__VA_ARGS__)
+   #define LglsVerboseAppend(...)         ::Langulus::Logger::Append(__VA_ARGS__)
    #define LglsVerboseScoped(STYLE,...)   const auto _ = ::Langulus::Logger::STYLE##Scoped(__VA_ARGS__)
    #define LglsVerboseSection(STYLE,...)  const auto _ = ::Langulus::Logger::STYLE##Section(__VA_ARGS__)
 #else
    #define LglsVerbose(...)         LANGULUS(NOOP)
+   #define LglsVerboseAppend(...)   LANGULUS(NOOP)
    #define LglsVerboseScoped(...)   LANGULUS(NOOP)
    #define LglsVerboseSection(...)  LANGULUS(NOOP)
 #endif

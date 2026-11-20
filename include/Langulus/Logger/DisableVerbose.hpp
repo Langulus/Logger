@@ -7,4 +7,6 @@
 ///                                                                           
 #undef LglsVerboseEnabled
 #undef LglsVerbose
+#undef LglsVerboseAppend
 #undef LglsVerboseScoped
+#undef LglsVerboseSection
