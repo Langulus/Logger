@@ -176,13 +176,13 @@ namespace Langulus::Logger
    /// MARK: Tabs                                                             
    /// Tabulation marker (can be pushed to log)                               
    struct Tabs {
-      size_t mTabs = 0;
+      int mTabs = 0;
 
       constexpr Tabs() noexcept = default;
       constexpr Tabs(Tabs const&) noexcept = default;
       constexpr Tabs(Tabs&& other) noexcept
          : mTabs {other.mTabs} { other.mTabs = 0; }
-      constexpr explicit Tabs(size_t tabs) noexcept
+      constexpr explicit Tabs(int tabs) noexcept
          : mTabs {tabs} {}
    };
 

@@ -387,11 +387,8 @@ void State::Write(const Tabs& tabs) const noexcept {
    if (not tabs.mTabs)
       return;
 
-   if (tabs.mTabs < 0) {
-      if (static_cast<size_t>(tabs.mTabs) > mTabulator)
-         mTabulator = 0;
-      else
-         mTabulator -= tabs.mTabs;
+   if (tabs.mTabs < 0 and static_cast<size_t>(-tabs.mTabs) > mTabulator) {
+      mTabulator = 0;
       return;
    }
 
@@ -428,7 +425,7 @@ void State::Write(Intent i) const noexcept {
 ///   @return the scope                                                       
 auto State::NewScope(size_t n) const noexcept -> Scope {
    mTabulator += n;
-   return Scope {n};
+   return Scope {static_cast<int>(n)};
 }
 
 /// Get the current style                                                     
